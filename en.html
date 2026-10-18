@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5a3fd4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>[hidden]{display:none!important} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%}</style>
+<title>Rotation Matchup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: barra squadre fissa in alto, tre schede (Panchina per il telefono, Studio per il laptop, Dati); colori MySportee viola/arancio */
+:root {
+  --bg: #f4f3f8; --surface: #ffffff; --sunk: #ebe9f2; --ink: #1d1a2e; --muted: #67627d; --line: #dedbe8;
+  --accent: #5a3fd4; --accent-ink: #ffffff; --hot: #e9661c; --good: #17905f; --bad: #cf3f3f;
+  --f-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12101b; --surface: #1b1828; --sunk: #242036; --ink: #eeebf8; --muted: #9d97b4; --line: #302b45;
+  --accent: #9b86ff; --accent-ink: #14111f; --hot: #ff8b45; --good: #3cc58c; --bad: #f06d6d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12101b; --surface: #1b1828; --sunk: #242036; --ink: #eeebf8; --muted: #9d97b4; --line: #302b45;
+  --accent: #9b86ff; --accent-ink: #14111f; --hot: #ff8b45; --good: #3cc58c; --bad: #f06d6d; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45 }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface) }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+button { font: inherit; color: inherit; cursor: pointer }
+button:focus-visible, select:focus-visible, input:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line) }
+.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 10px }
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 24px; letter-spacing: .01em; text-transform: uppercase; line-height: 1 }
+.brand b { color: var(--hot) }
+.teams { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1 1 340px }
+.teams label { display: flex; flex-direction: column; gap: 2px; flex: 1 1 140px; min-width: 0 }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600 }
+select { width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-weight: 600 }
+.vs { font-family: var(--f-display); font-weight: 700; color: var(--muted); padding-top: 14px }
+nav.tabs { display: flex; gap: 4px; background: var(--sunk); padding: 3px; border-radius: 9px }
+nav.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 7px; font-weight: 600; color: var(--muted) }
+nav.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12) }
+
+main { padding-block: 18px 40px; display: grid; gap: 18px }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0 }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 21px; text-transform: uppercase; letter-spacing: .02em; margin: 0 0 10px; text-wrap: balance }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 8px; font-weight: 600 }
+p { margin: 0 }
+.note { color: var(--muted); font-size: 13px; max-width: 70ch }
+.grid2 { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)) }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+
+/* controlli a chip */
+.field { display: grid; gap: 6px }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 0; min-width: 46px; font-weight: 600; text-align: center }
+.chip.wide { padding: 8px 14px }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
+.chip.ghost[aria-pressed="true"] { background: var(--hot); border-color: var(--hot); color: #fff }
+.bench-form { display: grid; gap: 14px }
+.row { display: flex; gap: 18px; flex-wrap: wrap }
+.row > .field { flex: 1 1 200px }
+.btn { border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 600; background: var(--accent); color: var(--accent-ink) }
+.btn.sec { background: var(--sunk); color: var(--ink) }
+.btn.small { padding: 6px 10px; font-size: 13px }
+
+/* risultato panchina */
+.verdict { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; padding: 14px 16px; border-radius: var(--r); background: var(--sunk) }
+.verdict .big { font-family: var(--f-display); font-weight: 700; font-size: 64px; line-height: .9; color: var(--hot); grid-row: span 2 }
+.verdict .k { font-family: var(--f-display); font-size: 22px; font-weight: 700; text-transform: uppercase }
+.verdict .s { color: var(--muted); font-size: 13px }
+.bars { display: grid; gap: 5px }
+.bar { display: grid; grid-template-columns: 34px 1fr 52px; gap: 8px; align-items: center; font-size: 14px }
+.bar .t { height: 20px; background: var(--sunk); border-radius: 4px; overflow: hidden; position: relative }
+.bar .t i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px }
+.bar.best .t i { background: var(--hot) }
+.bar .t .mid { position: absolute; top: -2px; bottom: -2px; left: 50%; border-left: 1px dashed var(--muted); opacity: .6 }
+.bar b { font-family: var(--f-display); font-size: 18px }
+.bar .v { text-align: right }
+.log { display: grid; gap: 4px; font-size: 13px }
+.log div { display: flex; gap: 10px; flex-wrap: wrap; padding: 6px 8px; background: var(--bg); border-radius: 6px }
+.endset { border-top: 1px dashed var(--line); padding-top: 14px; display: grid; gap: 12px }
+
+/* tabelle */
+.tbl-wrap { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 14px }
+th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600 }
+td.r, th.r { text-align: right }
+.pct { display: inline-flex; align-items: center; gap: 6px }
+.pct s { text-decoration: none; display: inline-block; height: 6px; border-radius: 3px; background: var(--accent); opacity: .75 }
+.n { color: var(--muted); font-size: 12px }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--sunk) }
+.tag.w { background: color-mix(in oklab, var(--good) 18%, var(--surface)); color: var(--good) }
+.tag.l { background: color-mix(in oklab, var(--bad) 16%, var(--surface)); color: var(--bad) }
+.hi { color: var(--good); font-weight: 600 } .lo { color: var(--bad); font-weight: 600 }
+
+/* heatmap */
+.heat { display: grid; grid-template-columns: 54px repeat(6, minmax(40px, 1fr)); gap: 3px; min-width: 330px }
+.heat .h { font-size: 11px; color: var(--muted); text-align: center; align-self: end; padding-bottom: 2px; font-weight: 600 }
+.heat .rh { font-family: var(--f-display); font-weight: 700; font-size: 17px; align-self: center }
+.heat button { border: 0; border-radius: 5px; padding: 10px 0; font-family: var(--f-mono); font-size: 14px; color: var(--ink) }
+.heat button[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: -2px }
+.legend { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); margin-top: 8px; flex-wrap: wrap }
+.legend i { width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in oklab, var(--bad) 70%, var(--surface)), var(--sunk), color-mix(in oklab, var(--good) 70%, var(--surface))) }
+.phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin-top: 10px }
+.ph { padding: 7px 9px; background: var(--bg); border-radius: 6px; font-size: 13px; display: grid; gap: 2px }
+.ph b { font-family: var(--f-display); font-size: 16px }
+
+.findings { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none }
+.findings li { padding: 10px 12px; background: var(--bg); border-radius: 8px; border-left: 3px solid var(--accent) }
+.findings li.strong { border-left-color: var(--hot) }
+.findings b { font-weight: 600 }
+
+.drop { border: 2px dashed var(--line); border-radius: var(--r); padding: 22px; text-align: center; display: grid; gap: 8px; justify-items: center }
+.drop.over { border-color: var(--accent); background: var(--sunk) }
+.matches { display: grid; gap: 6px }
+.match { display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--bg); border-radius: 8px; flex-wrap: wrap }
+.match .t { flex: 1 1 220px; min-width: 0 }
+.warn { padding: 10px 12px; border-radius: 8px; background: color-mix(in oklab, var(--hot) 14%, var(--surface)); font-size: 13px }
+.empty { color: var(--muted); padding: 10px 0 }
+/* rete */
+.nets { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); margin-top: 10px }
+.phn { background: var(--bg); border-radius: 8px; padding: 10px; display: grid; gap: 8px; min-width: 0 }
+.phh { display: flex; justify-content: space-between; gap: 8px; font-size: 14px }
+.phh b { font-family: var(--f-display); font-size: 17px; font-weight: 700 }
+.net { display: grid; gap: 4px }
+.netrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px }
+.netline { position: relative; height: 10px }
+.netline::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dotted var(--muted) }
+.netline span { position: absolute; left: 50%; transform: translate(-50%, -2px); background: var(--bg); padding: 0 6px; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted) }
+.pl { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 6px; padding: 5px 6px; border-radius: 6px; background: var(--surface); border: 1px solid var(--line); min-width: 0; font-size: 12.5px; line-height: 1.25 }
+.pl.us { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)) }
+.pl.them { border-color: color-mix(in oklab, var(--hot) 45%, var(--line)) }
+.pl.set { opacity: .7 }
+.pl .rl { grid-row: span 2; align-self: center; font-family: var(--f-display); font-weight: 700; font-size: 15px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--sunk) }
+.pl.us .rl { color: var(--accent) } .pl.them .rl { color: var(--hot) }
+.pl .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.pl .ef { font-size: 12px }
+.netfoot { display: grid; gap: 2px; font-size: 12px; color: var(--muted); margin-top: 4px }
+.netfoot b { color: var(--ink) }
+details.panel > summary { cursor: pointer; list-style-position: outside; margin-left: 18px }
+/* piano di battuta */
+.plan { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)) }
+.pc { background: var(--bg); border-radius: 8px; padding: 12px; display: grid; gap: 8px; min-width: 0; align-content: start }
+.pch { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+.pch b { font-family: var(--f-display); font-size: 18px; font-weight: 700; text-transform: uppercase }
+.srv { font-size: 14px }
+.pcb { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start }
+.tg-list { display: grid; gap: 6px; font-size: 14px; min-width: 0 }
+.risk { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 99px; text-transform: uppercase; letter-spacing: .05em }
+.risk.push { background: var(--hot); color: #fff }
+.risk.safe { background: color-mix(in oklab, var(--good) 22%, var(--surface)); color: var(--good) }
+.risk.aim { background: var(--sunk); color: var(--ink) }
+.court { display: grid; grid-template-columns: repeat(3, 34px); gap: 2px; position: relative; padding-bottom: 14px }
+.cz { height: 34px; border-radius: 4px; display: grid; place-items: center; align-content: center; font-size: 10px; line-height: 1.1 }
+.cz b { font-size: 12px } .cz i { font-style: normal; font-size: 9.5px }
+.cz.tg { outline: 2px solid var(--ink); outline-offset: -2px }
+.cnet { position: absolute; left: 0; right: 0; bottom: 0; border-top: 2px dotted var(--muted); font-size: 9px; text-align: center; color: var(--muted); text-transform: uppercase; letter-spacing: .1em }
+/* alzata */
+.setl { font-size: 13px }
+.setgrid { display: grid; gap: 18px; grid-template-columns: auto minmax(0, 400px) minmax(0, 1fr); align-items: start }
+.landpick { display: grid; gap: 8px; justify-items: start; max-width: 200px }
+.court.big { grid-template-columns: repeat(3, 56px) }
+.court.big .cz { height: 50px; border: 1px solid var(--line); background: var(--bg); color: var(--ink) }
+.court.big .cz b { font-size: 15px } .court.big .cz i { font-size: 10px; color: var(--muted) }
+.court.big .cz[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.court.big .cz[aria-pressed="true"] i { color: inherit }
+@media (max-width: 900px) { .setgrid { grid-template-columns: minmax(0, 1fr) } .landpick { max-width: none } }
+.setcourt { display: grid; gap: 4px }
+.szrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px }
+.sz { border-radius: 8px; padding: 8px; display: grid; gap: 1px; min-height: 92px; align-content: start; background: color-mix(in oklab, var(--hot) var(--a), var(--sunk)); min-width: 0 }
+.sz.top { outline: 2px solid var(--hot); outline-offset: -2px }
+.sz b { font-family: var(--f-display); font-size: 26px; line-height: 1 }
+.szl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600 }
+.szw { font-size: 12.5px; overflow-wrap: anywhere }
+.setinfo { display: grid; gap: 8px; font-size: 14px }
+.jump { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin }
+.jump .chip { white-space: nowrap; flex: none }
+[id^="st-"], details.panel { scroll-margin-top: 170px }
+.lang { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 6px 4px }
+@media (max-width: 520px) { .verdict .big { font-size: 52px } .brand { font-size: 21px } nav.tabs { width: 100% } nav.tabs button { flex: 1 } }
+@media (prefers-reduced-motion: no-preference) { .bar .t i { transition: width .25s ease } }
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Rotation <b>Matchup</b></div>
+    <div class="teams">
+      <label for="selMy"><span class="lbl">Us</span><select id="selMy"></select></label>
+      <span class="vs">VS</span>
+      <label for="selOpp"><span class="lbl">Opponent</span><select id="selOpp"></select></label>
+    </div>
+    <a class="lang" href="index.html" hreflang="it">Italiano</a>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-bench" aria-selected="true" data-tab="bench">Bench</button>
+      <button role="tab" id="tab-study" aria-selected="false" data-tab="study">Study</button>
+      <button role="tab" id="tab-data" aria-selected="false" data-tab="data">Data</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap"><main id="main"></main></div>
+
+<script>
+// ===== Rotazioni: core (parser .dvw + statistiche + simulazione + previsione) =====
+const RC = (() => {
+  const nextRot = r => (r === 1 ? 6 : r - 1); // ordine DataVolley: P1 -> P6 -> P5 ...
+
+  function normName(s) {
+    return (s || '').toUpperCase().replace(/\(.*?\)/g, ' ').replace(/[^A-Z0-9 ]/g, ' ')
+      .replace(/\b(VC|V C|WOMEN|W|FC|BC)\b/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function section(lines, name) {
+    const i = lines.findIndex(l => l.trim().toUpperCase() === '[3' + name + ']');
+    if (i < 0) return [];
+    const out = [];
+    for (let j = i + 1; j < lines.length && !/^\[3/.test(lines[j]); j++) out.push(lines[j]);
+    return out;
+  }
+
+  function parseDVW(text, fileName) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    const match = section(lines, 'MATCH');
+    const teamsL = section(lines, 'TEAMS').filter(l => l.trim());
+    if (teamsL.length < 2) throw new Error('Teams section not found');
+    const mf = (match[0] || '').split(';');
+    const tf = teamsL.map(l => l.split(';'));
+    const teams = [0, 1].map(i => ({
+      code: (tf[i][0] || '').trim(), name: (tf[i][1] || '').trim(),
+      coach: (tf[i][3] || '').trim(), key: normName(tf[i][1])
+    }));
+    // giocatrici: ruolo DataVolley 1 libero, 2 schiacciatrice, 3 opposto, 4 centrale, 5 palleggiatrice
+    const players = [section(lines, 'PLAYERS-H'), section(lines, 'PLAYERS-V')].map(arr => {
+      const out = {};
+      arr.forEach(l => {
+        const f = l.split(';'); if (f.length < 14 || f[1] === '' || isNaN(+f[1])) return;
+        const last = (f[9] || '').trim(), first = (f[10] || '').trim();
+        out[+f[1]] = { last, first, role: (f[12] || '').trim() === 'L' ? 1 : (+f[13] || 0) };
+      });
+      return out;
+    });
+    const pstats = [{}, {}];
+    const ps = (side, n) => (pstats[side][n] = pstats[side][n] || { aN: 0, aK: 0, aE: 0, aB: 0, sN: 0, sA: 0, sE: 0, bK: 0, rN: 0, rG: 0, rE: 0 });
+    const lineups = [{}, {}]; // lineups[side][rot]["z1,z2,...,z6"] = rally
+
+    const scout = section(lines, 'SCOUT');
+    const sets = {};
+    let lastWinner = null, curSet = 0, pendingServer = null, setter = [null, null], srv = null, rec = null, waitAtt = -1, att = null;
+    const getSet = n => (sets[n] = sets[n] || { n, rallies: [], start: null, firstServe: null, lineup: null, setters: [null, null] });
+
+    for (const raw of scout) {
+      if (!raw.trim()) continue;
+      const f = raw.split(';');
+      const code = f[0];
+      const setN = parseInt(f[8], 10);
+      if (/^\*\*\dset/i.test(code)) { lastWinner = null; pendingServer = null; continue; }
+      const side = code[0] === '*' ? 0 : code[0] === 'a' ? 1 : -1;
+      if (side < 0) continue;
+      const pm = code.match(/^[*a]P(\d+)/);
+      if (pm) { setter[side] = +pm[1]; continue; }
+      if (!setN) continue;
+      if (setN !== curSet) { curSet = setN; lastWinner = null; pendingServer = null; }
+      const s = getSet(setN);
+      if (!s.setters[side] && setter[side] != null) s.setters[side] = setter[side];
+      const rz = [parseInt(f[9], 10), parseInt(f[10], 10)];
+      const sk = code.match(/^[*a](\d\d)([SREABDF])[A-Z~]?([#+!\-\/=])?/);
+      if (sk) {
+        const st = ps(side, +sk[1]), ev = sk[3];
+        if (sk[2] === 'A') { st.aN++; if (ev === '#') st.aK++; else if (ev === '=') st.aE++; else if (ev === '/') st.aB++; }
+        else if (sk[2] === 'S') { st.sN++; if (ev === '#') st.sA++; else if (ev === '=') st.sE++; }
+        else if (sk[2] === 'B') { if (ev === '#') st.bK++; }
+        else if (sk[2] === 'R') { st.rN++; if (ev === '#' || ev === '+') st.rG++; else if (ev === '=') st.rE++; }
+      }
+      if (waitAtt >= 0 && /^[*a](\d\d|\$\$)[A-Z]/.test(code) && !/^[*a]\d\dR/.test(code)) {
+        if (side !== waitAtt) waitAtt = -1;
+        else if (code[3] === 'A') {
+          const fz = parseInt(code[9], 10);
+          att = { num: +code.slice(1, 3), from: fz >= 1 && fz <= 9 ? fz : 0, ev: code[5] || '', combo: code.slice(6, 8).replace(/~/g, '') };
+          waitAtt = -1;
+        }
+      }
+      if (/^[*a]\d\dR/.test(code)) {
+        const ez = parseInt(code[10], 10);
+        rec = { num: +code.slice(1, 3), ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0 };
+        waitAtt = side;
+        if (srv && !srv.ez) srv.ez = rec.ez;
+      }
+      if (/^[*a](\d\d|\$\$)S/.test(code)) {
+        pendingServer = side;
+        { const num = code.slice(1, 3) === '$$' ? -1 : +code.slice(1, 3), ez = parseInt(code[10], 10);
+          const sz = parseInt(code[9], 10);
+          srv = { num, type: code[4] || '', ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0, sz: sz >= 1 && sz <= 9 ? sz : 0 }; rec = null; att = null; waitAtt = -1; }
+        if (!s.start && rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6) {
+          s.start = rz.slice(); s.firstServe = side;
+          s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)];
+        }
+        continue;
+      }
+      const pt = code.match(/^[*a]p(\d+):(\d+)/);
+      if (pt) {
+        const winner = side;
+        let server = pendingServer != null ? pendingServer : lastWinner;
+        if (!(rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6)) { lastWinner = winner; pendingServer = null; continue; }
+        if (!s.start) { s.start = rz.slice(); s.firstServe = server; s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)]; }
+        if (server != null) s.rallies.push(srv && pendingServer === server ? [server, winner, rz[0], rz[1], srv.num, srv.type, srv.ev, srv.ez, rec ? rec.num : -1, rec ? rec.ev : '', srv.sz, att ? att.num : -1, att ? att.from : 0, att ? att.ev : '', att ? att.combo : ''] : [server, winner, rz[0], rz[1]]);
+        [0, 1].forEach(sd => {
+          const z = f.slice(14 + sd * 6, 20 + sd * 6).map(x => parseInt(x, 10));
+          if (z.some(isNaN)) return;
+          const L = (lineups[sd][rz[sd]] = lineups[sd][rz[sd]] || {}); const k = z.join(',');
+          L[k] = (L[k] || 0) + 1;
+        });
+        s.final = [+pt[1], +pt[2]];
+        lastWinner = winner; pendingServer = null; srv = null; rec = null; att = null; waitAtt = -1;
+      }
+    }
+
+    const setList = Object.values(sets).filter(s => s.start && s.rallies.length).sort((a, b) => a.n - b.n);
+    setList.forEach(s => {
+      const [a, b] = s.final;
+      const target = s.n === 5 ? 15 : 25;
+      s.complete = Math.max(a, b) >= target && Math.abs(a - b) >= 2;
+      s.winner = s.complete ? (a > b ? 0 : 1) : null;
+      if (s.firstServe == null) s.firstServe = s.rallies[0] ? s.rallies[0][0] : null;
+      delete s.lineup;
+    });
+    return {
+      id: teams.map(t => t.key).join('-') + '|' + (mf[0] || '').trim() + '|' + setList.map(s => s.final.join('-')).join(','), file: fileName, date: (mf[0] || '').trim(), season: (mf[2] || '').trim(),
+      competition: (mf[3] || '').trim(), teams, sets: setList, players, pstats, lineups
+    };
+  }
+
+  // ---------- giocatrici ----------
+  function teamPlayers(matches, key) {
+    const out = {};
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0 || !m.players) return;
+      Object.entries(m.players[side]).forEach(([n, p]) => { out[n] = out[n] || { num: +n, ...p, aN: 0, aK: 0, aE: 0, aB: 0, sN: 0, sA: 0, sE: 0, bK: 0, rN: 0, rG: 0, rE: 0, matches: 0 }; Object.assign(out[n], { last: p.last, first: p.first, role: p.role || out[n].role }); });
+      Object.entries((m.pstats || [])[side] || {}).forEach(([n, s]) => {
+        const o = out[n] = out[n] || { num: +n, last: '#' + n, first: '', role: 0, aN: 0, aK: 0, aE: 0, aB: 0, sN: 0, sA: 0, sE: 0, bK: 0, rN: 0, rG: 0, rE: 0, matches: 0 };
+        for (const k in s) o[k] += s[k]; o.matches++;
+      });
+    });
+    Object.values(out).forEach(p => { p.eff = p.aN ? (p.aK - p.aE - p.aB) / p.aN : null; p.kill = p.aN ? p.aK / p.aN : null; });
+    return out;
+  }
+
+  // ---------- battuta / ricezione ----------
+  const POS = e => e === '#' || e === '+';
+  // le nostre battitrici
+  function serverStats(matches, key) {
+    const out = {}; const byRot = {}; for (let r = 1; r <= 6; r++) byRot[r] = {};
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
+      m.sets.forEach(s => s.rallies.forEach(ra => {
+        if (ra[0] !== side || ra.length < 5 || ra[4] < 0) return;
+        const n = ra[4], o = out[n] = out[n] || { num: n, n: 0, won: 0, ace: 0, err: 0, rec: 0, recPos: 0, types: {}, zones: {}, from: {} };
+        const fgz = fromGroup(ra[10]); if (fgz) o.from[fgz] = (o.from[fgz] || 0) + 1;
+        o.n++; if (ra[1] === side) o.won++;
+        if (ra[6] === '#') o.ace++; if (ra[6] === '=') o.err++;
+        if (ra[5]) o.types[ra[5]] = (o.types[ra[5]] || 0) + 1;
+        if (ra[7]) o.zones[ra[7]] = (o.zones[ra[7]] || 0) + 1;
+        if (ra[8] >= 0 && ra[9]) { o.rec++; if (POS(ra[9])) o.recPos++; }
+        const rr = byRot[ra[2 + side]]; rr[n] = (rr[n] || 0) + 1;
+      }));
+    });
+    const servers = {}; for (let r = 1; r <= 6; r++) { const e = Object.entries(byRot[r]).sort((a, b) => b[1] - a[1]); servers[r] = e.length ? +e[0][0] : null; }
+    return { players: out, byRot: servers };
+  }
+  // la loro ricezione, per rotazione e per giocatrice
+  function receptionStats(matches, key) {
+    const mk = () => ({ n: 0, so: 0, pos: 0, perf: 0, err: 0 });
+    const rot = {}; for (let r = 1; r <= 6; r++) rot[r] = { all: mk(), rcv: {}, zones: {}, rcvZone: {} };
+    const players = {}, zones = {}, all = mk();
+    const add = (o, ra, side) => { o.n++; if (ra[1] === side) o.so++; if (ra[9] === '#') o.perf++; if (POS(ra[9])) o.pos++; if (ra[9] === '=') o.err++; };
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
+      m.sets.forEach(s => s.rallies.forEach(ra => {
+        if (ra[0] === side || ra.length < 5) return;
+        const R = rot[ra[2 + side]];
+        if (ra[6] === '=') return; // errore in battuta: nessuna ricezione
+        add(R.all, ra, side); add(all, ra, side);
+        if (ra[7]) { add(R.zones[ra[7]] = R.zones[ra[7]] || mk(), ra, side); add(zones[ra[7]] = zones[ra[7]] || mk(), ra, side); }
+        if (ra[8] >= 0) {
+          add(R.rcv[ra[8]] = R.rcv[ra[8]] || mk(), ra, side); add(players[ra[8]] = players[ra[8]] || mk(), ra, side);
+          if (ra[7]) { const z = R.rcvZone[ra[8]] = R.rcvZone[ra[8]] || {}; z[ra[7]] = (z[ra[7]] || 0) + 1; }
+        }
+      }));
+    });
+    return { rot, players, zones, all };
+  }
+  // piano di battuta per una rotazione avversaria in ricezione
+  function serveTarget(rs, b, K = 8) {
+    const R = rs.rot[b], base = rs.all.n ? rs.all.so / rs.all.n : 0.6;
+    const pso = (loc, glob) => { const g = glob && glob.n ? (glob.so + K * base) / (glob.n + K) : base; return (loc.so + K * g) / (loc.n + K); };
+    const rcv = Object.entries(R.rcv).filter(([, o]) => o.n >= Math.max(2, R.all.n * 0.12)).map(([num, o]) => {
+      const zc = R.rcvZone[num] || {}; const zm = Object.entries(zc).sort((a, b) => b[1] - a[1])[0];
+      return { num: +num, n: o.n, share: o.n / Math.max(1, R.all.n), so: pso(o, rs.players[num]), raw: o, glob: rs.players[num], zone: zm ? +zm[0] : null };
+    }).sort((x, y) => x.so - y.so);
+    const zones = Object.entries(R.zones).map(([z, o]) => ({ z: +z, n: o.n, so: pso(o, rs.zones[z]) })).sort((x, y) => x.so - y.so);
+    return { n: R.all.n, so: R.all.n ? R.all.so / R.all.n : null, pos: R.all.n ? R.all.pos / R.all.n : null, rcv, zones, zoneMap: Object.fromEntries(zones.map(z => [z.z, z])) };
+  }
+
+  // ---------- distribuzione dell'alzata dopo ricezione ----------
+  const SETZ = ['4', '3', '2', 'P', '1', '5', 'D'];
+  const setGroup = (z, role) => role === 5 ? 'D' : z === 4 ? '4' : z === 3 ? '3' : z === 2 ? '2' : z === 8 ? 'P' : (z === 9 || z === 1) ? '1' : (z === 7 || z === 5 || z === 6) ? '5' : null;
+  const fromGroup = z => (z === 1 || z === 9) ? '1' : z === 6 ? '6' : (z === 5 || z === 7) ? '5' : null;
+  const qGroup = e => (e === '#' || e === '+') ? 'pos' : e === '!' ? 'mid' : (e === '-' || e === '/') ? 'neg' : null;
+  const laneOf = z => [1, 9, 2].includes(z) ? '1' : [6, 8, 3].includes(z) ? '6' : [5, 7, 4].includes(z) ? '5' : null;
+  function setStats(matches, key) {
+    const mk = () => ({ n: 0, c: {} });
+    const rot = {}; for (let r = 1; r <= 6; r++) rot[r] = { all: mk(), cell: {}, who: {}, land: {} };
+    const team = mk();
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
+      const roster = (m.players || [])[side] || {};
+      m.sets.forEach(s => s.rallies.forEach(ra => {
+        if (ra[0] === side || ra.length < 12 || ra[11] < 0) return;
+        const g = setGroup(ra[12], (roster[ra[11]] || {}).role); if (!g) return;
+        const R = rot[ra[2 + side]], z = ra[7] || 0, ln = laneOf(z), qg = qGroup(ra[9]);
+        const inc = o => { o.n++; o.c[g] = (o.c[g] || 0) + 1; };
+        inc(team); inc(R.all);
+        if (z) R.land[z] = (R.land[z] || 0) + 1;
+        const where = ['*']; if (ln) where.push('l' + ln); if (z) where.push('z' + z);
+        const qs = ['*']; if (qg) qs.push(qg);
+        where.forEach(w => qs.forEach(q => inc(R.cell[w + '|' + q] = R.cell[w + '|' + q] || mk())));
+        const w = (R.who[g] = R.who[g] || {}); const p = (w[ra[11]] = w[ra[11]] || { n: 0, k: 0, e: 0 });
+        p.n++; if (ra[13] === '#') p.k++; else if (ra[13] === '=' || ra[13] === '/') p.e++;
+      }));
+    });
+    return { rot, team };
+  }
+  // distribuzione stimata, dal generale al particolare: rotazione -> qualità -> corsia -> zona di arrivo
+  function setDistribution(st, b, zone = 0, qg = '*', K = 6) {
+    const norm = (o, prior, k) => { const d = {}; SETZ.forEach(z => d[z] = ((o ? o.c[z] || 0 : 0) + k * prior[z]) / ((o ? o.n : 0) + k)); return d; };
+    const flat = {}; SETZ.forEach(z => flat[z] = 1 / SETZ.length);
+    const R = st.rot[b];
+    let d = norm(R.all, norm(st.team, flat, 2), K), n = R.all.n;
+    const chain = []; if (qg !== '*') chain.push('*|' + qg);
+    if (zone) { const ln = laneOf(zone); if (ln) chain.push('l' + ln + '|' + qg); chain.push('z' + zone + '|' + qg); }
+    chain.forEach(k => { const c = R.cell[k]; d = norm(c, d, K); n = c ? c.n : 0; });
+    const who = {}; SETZ.forEach(z => { const e = Object.entries(R.who[z] || {}).sort((x, y) => y[1].n - x[1].n)[0]; if (e) who[z] = { num: +e[0], ...e[1] }; });
+    return { d, n, nRot: R.all.n, who, land: R.land };
+  }
+
+  // formazione più frequente per ogni rotazione (zone 1..6 -> numero)
+  function teamLineups(matches, key) {
+    const agg = {}; for (let r = 1; r <= 6; r++) agg[r] = {};
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0 || !m.lineups) return;
+      for (let r = 1; r <= 6; r++) Object.entries(m.lineups[side][r] || {}).forEach(([k, c]) => { agg[r][k] = (agg[r][k] || 0) + c; });
+    });
+    const out = {};
+    for (let r = 1; r <= 6; r++) {
+      const e = Object.entries(agg[r]).sort((a, b) => b[1] - a[1]);
+      const tot = e.reduce((s, x) => s + x[1], 0);
+      out[r] = e.length ? { zones: e[0][0].split(',').map(Number), share: e[0][1] / tot, n: tot } : null;
+    }
+    return out;
+  }
+
+  // ---------- statistiche per rotazione ----------
+  // per la squadra key: SO (ricezione) e BP (battuta) per rotazione 1..6
+  function rotStats(matches, key) {
+    const r = {}; for (let i = 1; i <= 6; i++) r[i] = { soW: 0, soN: 0, bpW: 0, bpN: 0 };
+    let soW = 0, soN = 0, bpW = 0, bpN = 0;
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
+      m.sets.forEach(s => s.rallies.forEach(ra => {
+        const st = r[ra[2 + side]];
+        if (ra[0] === side) { st.bpN++; bpN++; if (ra[1] === side) { st.bpW++; bpW++; } }
+        else { st.soN++; soN++; if (ra[1] === side) { st.soW++; soW++; } }
+      }));
+    });
+    return { rot: r, so: soN ? soW / soN : null, bp: bpN ? bpW / bpN : null, soN, bpN };
+  }
+
+  // pool di tutti i rally (media "lega") per log5
+  function leagueSO(matches) {
+    let w = 0, n = 0;
+    matches.forEach(m => m.sets.forEach(s => s.rallies.forEach(ra => { n++; if (ra[1] !== ra[0]) w++; })));
+    return n ? w / n : 0.6;
+  }
+
+  // stima con shrinkage verso la media della squadra
+  function shrunk(stats, M = 12) {
+    const out = { so: {}, bp: {} };
+    for (let i = 1; i <= 6; i++) {
+      const s = stats.rot[i];
+      out.so[i] = (s.soW + M * stats.so) / (s.soN + M);
+      out.bp[i] = (s.bpW + M * stats.bp) / (s.bpN + M);
+    }
+    return out;
+  }
+
+  const log5 = (x, y, L) => { const a = x * y / L, b = (1 - x) * (1 - y) / (1 - L); return a / (a + b); };
+
+  // P(ricevente fa sideout) dati SO ricevente e BP battitore
+  function pSideout(soRec, bpSrv, L) { return log5(soRec, 1 - bpSrv, L); }
+
+  // ---------- simulazione set (Monte Carlo, RNG seminato) ----------
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  // A = mia squadra, B = avversario. est = {so:{1..6}, bp:{1..6}}
+  function buildP(A, B, L) {
+    // P[a][b][server] = prob che vinca A il rally
+    const P = {};
+    for (let a = 1; a <= 6; a++) { P[a] = {}; for (let b = 1; b <= 6; b++) {
+      P[a][b] = [1 - pSideout(B.so[b], A.bp[a], L), pSideout(A.so[a], B.bp[b], L)];
+    } }
+    return P;
+  }
+
+  function simSet(P, a0, b0, firstServer, target, n, seed) {
+    const R = rng(seed); let wins = 0;
+    for (let k = 0; k < n; k++) {
+      let a = a0, b = b0, sv = firstServer, sa = 0, sb = 0;
+      while (true) {
+        const pA = P[a][b][sv];
+        if (R() < pA) { if (sv === 1) { a = nextRot(a); sv = 0; } sa++; }
+        else { if (sv === 0) { b = nextRot(b); sv = 1; } sb++; }
+        if ((sa >= target || sb >= target) && Math.abs(sa - sb) >= 2) break;
+      }
+      if (sa > sb) wins++;
+    }
+    return wins / n;
+  }
+
+  // matrice 6x6: M[a][b] prob vittoria set per A, con server iniziale (0 = A batte, 1 = B batte)
+  function matrix(A, B, L, firstServer, target = 25, n = 4000) {
+    const P = buildP(A, B, L); const M = {};
+    for (let a = 1; a <= 6; a++) { M[a] = {}; for (let b = 1; b <= 6; b++) M[a][b] = simSet(P, a, b, firstServer, target, n, 1000 + a * 7 + b); }
+    return M;
+  }
+
+  // ---------- storico partenze di una squadra ----------
+  function startHistory(matches, key) {
+    const rows = [];
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
+      const opp = m.teams[1 - side];
+      let prev = null;
+      m.sets.forEach(s => {
+        const row = {
+          match: m.id, date: m.date, opp: opp.name, oppKey: opp.key, set: s.n,
+          start: s.start[side], oppStart: s.start[1 - side],
+          serveFirst: s.firstServe == null ? null : s.firstServe === side,
+          won: s.winner == null ? null : s.winner === side,
+          score: side === 0 ? s.final : [s.final[1], s.final[0]], complete: s.complete,
+          prevStart: prev ? prev.start : null, prevOppStart: prev ? prev.oppStart : null,
+          prevWon: prev ? prev.won : null
+        };
+        row.offset = ((row.start - row.oppStart) % 6 + 6) % 6; // allineamento relativo
+        rows.push(row); prev = row;
+      });
+    });
+    return rows;
+  }
+
+  // Rotazione "equivalente" = la rotazione con cui la squadra va al primo servizio.
+  // Chi riceve in P2 e fa cambio palla serve in P1: stesso schieramento di chi parte in battuta in P1.
+  const eqRot = (start, serveFirst) => (serveFirst === false ? nextRot(start) : start);
+  const fromEq = (eq, serveFirst) => (serveFirst === false ? (eq === 6 ? 1 : eq + 1) : eq);
+
+  function patterns(rows) {
+    const cnt = () => ({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 });
+    const all = cnt(), set1 = cnt(), serve = cnt(), recv = cnt(), eq = cnt();
+    let keepW = 0, nW = 0, keepL = 0, nL = 0, follow = 0, nFollow = 0;
+    const byOpp = {};
+    rows.forEach(r => {
+      r.eq = eqRot(r.start, r.serveFirst);
+      all[r.start]++; eq[r.eq]++;
+      if (r.set === 1) set1[r.eq]++;
+      if (r.serveFirst === true) serve[r.start]++; else if (r.serveFirst === false) recv[r.start]++;
+      (byOpp[r.opp] = byOpp[r.opp] || []).push(r);
+    });
+    rows.forEach((r, i) => {
+      const p = i > 0 && rows[i - 1].match === r.match ? rows[i - 1] : null;
+      r.prevEq = p ? p.eq : null;
+      if (!p) return;
+      if (p.won === true) { nW++; if (r.eq === p.eq) keepW++; }
+      if (p.won === false) { nL++; if (r.eq === p.eq) keepL++; }
+      // cambia per riprodurre l'allineamento del set precedente rispetto all'avversario?
+      nFollow++;
+      const prevOff = ((p.start - p.oppStart) % 6 + 6) % 6;
+      if (((r.start - p.oppStart) % 6 + 6) % 6 === prevOff && r.eq !== p.eq) follow++;
+    });
+    let top = 1; for (let i = 2; i <= 6; i++) if (eq[i] > eq[top]) top = i;
+    return { all, eq, set1, serve, recv, keepW, nW, keepL, nL, follow, nFollow, byOpp, top, topShare: rows.length ? eq[top] / rows.length : 0, n: rows.length };
+  }
+
+  // Previsione partenza avversaria. ctx: {set, prevEq, prevWon, oppServeFirst}
+  // Restituisce la distribuzione sulla partenza reale (P1..P6 sul foglietto).
+  function predict(rows, ctx) {
+    const pat = patterns(rows);
+    const w = {};
+    for (let i = 1; i <= 6; i++) w[i] = pat.eq[i] + (ctx.set === 1 ? pat.set1[i] : 0) + 0.25;
+    let tot = 0; for (let i = 1; i <= 6; i++) tot += w[i];
+    let dist = {}; for (let i = 1; i <= 6; i++) dist[i] = w[i] / tot;
+    let pKeep = null;
+    if (ctx.set > 1 && ctx.prevEq) {
+      const [k, n] = ctx.prevWon === true ? [pat.keepW, pat.nW] : ctx.prevWon === false ? [pat.keepL, pat.nL] : [pat.keepW + pat.keepL, pat.nW + pat.nL];
+      pKeep = (k + 1) / (n + 2);
+      const rest = 1 - dist[ctx.prevEq]; const d2 = {};
+      for (let i = 1; i <= 6; i++) d2[i] = i === ctx.prevEq ? pKeep : (rest > 0 ? dist[i] / rest : 0.2) * (1 - pKeep);
+      dist = d2;
+    }
+    const real = {}; for (let i = 1; i <= 6; i++) real[fromEq(i, ctx.oppServeFirst)] = dist[i];
+    return { eqDist: dist, dist: real, pKeep, pat };
+  }
+
+  // Sequenza degli incroci (rotazione mia vs loro) nel primo giro del set
+  function phases(A, B, L, a, b, firstServer) {
+    const P = buildP(A, B, L); const out = []; let sv = firstServer;
+    for (let k = 0; k < 12; k++) {
+      out.push({ a, b, sv, p: P[a][b][sv] });
+      if (sv === 0) { b = nextRot(b); sv = 1; } else { a = nextRot(a); sv = 0; }
+    }
+    return out;
+  }
+
+  return { SETZ, setStats, setDistribution, fromGroup, parseDVW, teamPlayers, teamLineups, serverStats, receptionStats, serveTarget, rotStats, leagueSO, shrunk, matrix, startHistory, patterns, predict, phases, eqRot, fromEq, nextRot, normName, pSideout };
+})();
+if (typeof module !== 'undefined') module.exports = RC;
+
+</script>
+<script>
+const SAMPLE = [];
+// ===== App =====
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pc = v => v == null || isNaN(v) ? '–' : Math.round(v * 100) + '%';
+const STORE = 'rotmatch.v1';
+
+function load() { try { return JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { return null; } }
+function save() {
+  try {
+    localStorage.setItem(STORE, JSON.stringify({
+      matches: S.customData ? S.matches : null, myKey: S.myKey, oppKey: S.oppKey, tab: S.tab, bench: S.bench, studyServe: S.studyServe
+    }));
+  } catch (e) { /* storage non disponibile: si lavora in memoria */ }
+}
+
+const freshBench = () => ({ set: 1, weServe: true, prevOppStart: null, prevOppWon: null, known: null, endOpp: null, endMy: null, endWin: null, log: [] });
+const saved = load() || {};
+const S = {
+  matches: (saved.matches && saved.matches.every(m => m.lineups && m.sets.every(st => !st.rallies.length || st.rallies[0].length > 12))) ? saved.matches : SAMPLE, customData: true,
+  myKey: saved.myKey, oppKey: saved.oppKey, tab: saved.tab || 'bench',
+  bench: Object.assign(freshBench(), saved.bench || {}), studyServe: saved.studyServe ?? 0, sel: null, hist: 'opp', srot: 1, sland: 0, sq: '*'
+};
+const cache = {};
+const invalidate = () => { for (const k in cache) delete cache[k]; };
+
+function teamList() {
+  const m = {};
+  S.matches.forEach(x => x.teams.forEach(t => {
+    m[t.key] = m[t.key] || { key: t.key, name: t.name, coach: '', n: 0 };
+    m[t.key].n++; if (t.coach && !m[t.key].coach) m[t.key].coach = t.coach;
+  }));
+  return Object.values(m).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
+}
+function ensureTeams() {
+  const tl = teamList(), keys = tl.map(t => t.key);
+  if (!keys.length) { $('#selMy').innerHTML = $('#selOpp').innerHTML = ''; return; }
+  if (!keys.includes(S.myKey)) S.myKey = keys.includes('AEL LIMASSOL') ? 'AEL LIMASSOL' : keys[0];
+  if (!keys.includes(S.oppKey) || S.oppKey === S.myKey) S.oppKey = keys.find(k => k === 'OLYMPIADA NEAPOLIS' && k !== S.myKey) || keys.find(k => k !== S.myKey);
+  const opt = sel => tl.map(t => `<option value="${esc(t.key)}"${t.key === sel ? ' selected' : ''}>${esc(t.name)}</option>`).join('');
+  $('#selMy').innerHTML = opt(S.myKey); $('#selOpp').innerHTML = opt(S.oppKey);
+}
+const teamName = k => (teamList().find(t => t.key === k) || {}).name || k;
+const coachOf = k => (teamList().find(t => t.key === k) || {}).coach || '';
+
+function fmtDate(d) {
+  const p = (d || '').split(/[\/.-]/); if (p.length < 3) return d || '';
+  let [a, b, y] = p.map(Number); let dd = b, mm = a; if (a > 12) { dd = a; mm = b; }
+  return `${String(dd).padStart(2, '0')}/${String(mm).padStart(2, '0')}/${String(y).slice(-2)}`;
+}
+
+// ---------- modello ----------
+function model() {
+  const k = S.myKey + '|' + S.oppKey;
+  if (cache.k === k && cache.model) return cache.model;
+  const L = RC.leagueSO(S.matches);
+  const mk = key => {
+    const st = RC.rotStats(S.matches, key);
+    if (st.so == null) { st.so = L; st.bp = 1 - L; }
+    if (st.bp == null) st.bp = 1 - L;
+    return { st, est: RC.shrunk(st) };
+  };
+  const A = mk(S.myKey), B = mk(S.oppKey);
+  cache.k = k; cache.mats = {};
+  cache.model = { L, A, B };
+  return cache.model;
+}
+function mat(firstServer, target) {
+  const m = model(); const key = firstServer + '|' + target;
+  if (!cache.mats[key]) cache.mats[key] = RC.matrix(m.A.est, m.B.est, m.L, firstServer, target, 4000);
+  return cache.mats[key];
+}
+function oppRows(withLive) {
+  const rows = RC.startHistory(S.matches, S.oppKey);
+  if (withLive) S.bench.log.forEach((l, i) => rows.push({
+    match: 'live', date: 'today', opp: teamName(S.myKey), set: l.set, start: l.oppStart, oppStart: l.myStart,
+    serveFirst: l.oppServe, won: l.oppWon, score: ['', '']
+  }));
+  return rows;
+}
+
+
+// ---------- giocatrici ----------
+const ROLE = { 1: ['L', 'Libero'], 2: ['H', 'Outside hitter'], 3: ['O', 'Opposite'], 4: ['M', 'Middle blocker'], 5: ['S', 'Setter'] };
+function people() {
+  const k = 'pp|' + S.myKey + '|' + S.oppKey;
+  if (cache.pp && cache.pp.k === k) return cache.pp;
+  cache.pp = { k, my: { P: RC.teamPlayers(S.matches, S.myKey), L: RC.teamLineups(S.matches, S.myKey) }, opp: { P: RC.teamPlayers(S.matches, S.oppKey), L: RC.teamLineups(S.matches, S.oppKey) } };
+  return cache.pp;
+}
+function slot(team, num, side) {
+  const p = team.P[num] || { num, last: '#' + num, role: 0 };
+  const r = ROLE[p.role] || ['?', ''];
+  const att = p.role !== 5 && p.role !== 1;
+  const effCls = p.eff == null ? '' : p.eff >= 0.25 ? 'hi' : p.eff < 0.12 ? 'lo' : '';
+  return `<div class="pl ${side}${att ? '' : ' set'}"><span class="rl" title="${r[1]}">${r[0]}</span><span class="nm"><b class="num">${num}</b> ${esc(p.last)}</span>${att && p.aN ? `<span class="ef num ${effCls}" title="Attack efficiency on ${p.aN} attacks">${Math.round(p.eff * 100)}%</span>` : `<span class="ef n">${p.role === 5 ? 'setter' : ''}</span>`}</div>`;
+}
+// prima linea dopo i cambi: palleggiatrice/opposto in 2, centrale in 3, schiacciatrice in 4
+function frontSwitched(team, zones) {
+  const pos = { 4: zones[3], 3: zones[2], 2: zones[1] };
+  const want = n => { const r = (team.P[n] || {}).role; return r === 5 || r === 3 ? 2 : r === 4 ? 3 : r === 2 ? 4 : null; };
+  const out = {}, left = [];
+  [pos[4], pos[3], pos[2]].forEach(n => { const w = want(n); if (w && !out[w]) out[w] = n; else left.push(n); });
+  [4, 3, 2].forEach(z => { if (!out[z]) out[z] = left.shift(); });
+  return out;
+}
+function attackers(team, zones) { return [1, 2, 3].filter(i => { const p = team.P[zones[i]]; return !p || (p.role !== 5 && p.role !== 1); }).length; }
+// rete: colonne allineate (nostra Z4 contro loro Z2, Z3 contro Z3, nostra Z2 contro loro Z4)
+function netView(a, b, sv) {
+  const pp = people(), lm = pp.my.L[a], lo = pp.opp.L[b];
+  if (!lm || !lo) return '<p class="note">No lineup in the files for this rotation.</p>';
+  const zm = lm.zones, zo = lo.zones;
+  const fm = frontSwitched(pp.my, zm), fo = frontSwitched(pp.opp, zo);
+  const cols = [[4, 2], [3, 3], [2, 4]]; // zona d'attacco: nostra, loro
+  const server = sv === 0 ? pp.my.P[zm[0]] : pp.opp.P[zo[0]];
+  const srvNum = sv === 0 ? zm[0] : zo[0];
+  return `<div class="net">
+    <div class="netrow">${cols.map(([, o]) => slot(pp.opp, fo[o], 'them')).join('')}</div>
+    <div class="netline"><span>net</span></div>
+    <div class="netrow">${cols.map(([m]) => slot(pp.my, fm[m], 'us')).join('')}</div>
+    <div class="netfoot"><span>Front-row attackers: <b>${attackers(pp.my, zm)}</b> us · <b>${attackers(pp.opp, zo)}</b> them</span><span>Serving: ${sv === 0 ? 'us' : 'them'} #${srvNum} ${esc(server ? server.last : '')}${server && server.sN ? ` (${server.sA} aces, ${server.sE} errors in ${server.sN})` : ''}</span></div>
+  </div>`;
+}
+function phaseNets(a, b, firstServer, M) {
+  const m = model();
+  const ph = RC.phases(m.A.est, m.B.est, m.L, a, b, firstServer);
+  return `<div class="nets">${ph.map((x, i) => `<div class="phn"><div class="phh"><b>${i + 1}. Us P${x.a} vs them P${x.b}</b><span class="num ${x.p >= 0.5 ? 'hi' : 'lo'}">${pc(x.p)} rallies</span></div>${netView(x.a, x.b, x.sv)}</div>`).join('')}</div>
+  <p class="note" style="margin-top:8px">First pass through the rotations. Each column is a matchup at the net after the switch (outside hitter in 4, middle in 3, opposite or setter in 2): our zone 4 against their zone 2, middle against middle, our zone 2 against their zone 4. The percentage next to each name is attack efficiency (kills minus errors and blocked, over attempts). Lineup: the one used most in each rotation in the files.</p>`;
+}
+function rosterTable(key, team) {
+  const list = Object.values(team.P).filter(p => p.aN + p.sN + p.rN > 0).sort((x, y) => (x.role === 1) - (y.role === 1) || y.aN - x.aN);
+  const r = v => v == null ? '–' : Math.round(v * 100) + '%';
+  return `<div class="panel"><h3>${esc(teamName(key))}</h3><div class="tbl-wrap"><table>
+    <thead><tr><th>No.</th><th>Player</th><th>Role</th><th class="r">Att.</th><th class="r">Kill%</th><th class="r">Eff.</th><th class="r">Aces</th><th class="r">Serve err.</th><th class="r">Blocks</th><th class="r">Pos. pass</th></tr></thead>
+    <tbody>${list.map(p => `<tr><td class="num">${p.num}</td><td>${esc(p.last)} <span class="n">${esc(p.first)}</span></td><td>${(ROLE[p.role] || ['', '–'])[1]}</td><td class="r num">${p.aN || ''}</td><td class="r num">${p.aN ? r(p.kill) : ''}</td><td class="r num ${p.eff == null ? '' : p.eff >= 0.25 ? 'hi' : p.eff < 0.12 ? 'lo' : ''}">${p.aN ? r(p.eff) : ''}</td><td class="r num">${p.sN ? p.sA : ''}</td><td class="r num">${p.sN ? p.sE : ''}</td><td class="r num">${p.bK || ''}</td><td class="r num">${p.rN ? r(p.rG / p.rN) + ` <span class="n">${p.rN}</span>` : ''}</td></tr>`).join('') || '<tr><td colspan="10" class="empty">Reload the .dvw files to see the players.</td></tr>'}</tbody></table></div></div>`;
+}
+
+
+// ---------- battuta ----------
+const STYPE = { M: 'jump float', Q: 'jump spin', H: 'float', T: 'flat', O: 'other' };
+function serveData() {
+  const k = 'sv|' + S.myKey + '|' + S.oppKey;
+  if (cache.sv && cache.sv.k === k) return cache.sv;
+  cache.sv = { k, ss: RC.serverStats(S.matches, S.myKey), rs: RC.receptionStats(S.matches, S.oppKey), sd: RC.setStats(S.matches, S.oppKey) };
+  return cache.sv;
+}
+const pname = (team, n) => {
+  const p = team.P[n]; if (!p) return `#${n}`;
+  const dup = Object.values(team.P).some(q => q.num !== p.num && q.last === p.last);
+  return `#${n} ${esc(p.last)}${dup && p.first ? ' ' + esc(p.first[0]) + '.' : ''}`;
+};
+const prole = (team, n) => { const p = team.P[n]; return p && ROLE[p.role] ? ROLE[p.role][1].toLowerCase() : ''; };
+// campo avversario visto dalla nostra battitrice: in alto il fondo (1 6 5), poi 9 8 7, sotto rete 2 3 4
+function miniCourt(t, best) {
+  const rows = [[1, 6, 5], [9, 8, 7], [2, 3, 4]];
+  const vals = t.zones.filter(z => z.n >= 2).map(z => z.so);
+  const mean = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0.5;
+  return `<div class="court" aria-label="Opponent court: side-out by serve landing zone">${rows.map(r => r.map(z => {
+    const o = t.zoneMap[z];
+    const bg = o && o.n >= 2 ? heatColor(1 - o.so, 1 - mean, 0.15) : 'var(--sunk)';
+    return `<span class="cz${z === best ? ' tg' : ''}" style="background:${bg}"><b>${z}</b>${o ? `<i class="num">${pc(o.so)}</i>` : ''}</span>`;
+  }).join('')).join('')}<span class="cnet">net</span></div>`;
+}
+function servePlan(a0, b0, firstServer) {
+  const m = model(), pp = people(), { ss, rs } = serveData();
+  if (!rs.all.n) return '<p class="note">The files have no reception data for this opponent.</p>';
+  const ph = RC.phases(m.A.est, m.B.est, m.L, a0, b0, firstServer).filter(x => x.sv === 0).slice(0, 6);
+  return `<div class="plan">${ph.map(({ a, b }) => {
+    const t = RC.serveTarget(rs, b);
+    const srv = ss.byRot[a] ?? (pp.my.L[a] ? pp.my.L[a].zones[0] : null);
+    const sp = srv != null ? ss.players[srv] : null;
+    const base = rs.all.n ? rs.all.so / rs.all.n : 0.55;
+    const so = (t.n * (t.so || 0) + 8 * base) / (t.n + 8); // cambio palla con battuta in campo, corretto verso la media
+    const risk = so >= 0.6 ? ['push', 'Go hard', `With the serve in, they side out ${pc(so)}: take risks, an error costs little.`]
+      : so <= 0.47 ? ['safe', 'Keep it in', `They struggle here (${pc(so)} side-out): safe serve on the target, don't give away the point.`]
+      : ['aim', 'Aimed', `With the serve in, they side out ${pc(so)}, about average: full serve, but aimed.`];
+    const goodZ = t.zones.filter(z => z.n >= 3);
+    const bestZ = goodZ.length ? goodZ[0].z : null;
+    const [t1, t2] = t.rcv;
+    const tgt = r => `${pname(pp.opp, r.num)}<span class="n"> ${prole(pp.opp, r.num)}</span>`;
+    const typ = sp ? Object.entries(sp.types).sort((x, y) => y[1] - x[1]).map(([k]) => STYPE[k] || k).join(' / ') : '';
+    return `<div class="pc">
+      <div class="pch"><b>Them P${b} receiving</b><span class="risk ${risk[0]}">${risk[1]}</span></div>
+      <p class="srv">Server: ${srv != null ? pname(pp.my, srv) : '?'} <span class="n">(us in P${a}${typ ? ' · ' + typ : ''}${sp ? ` · ${sp.ace} aces, ${sp.err} errors in ${sp.n}` : ''})</span></p>
+      <div class="pcb">
+        <div class="tg-list">
+          ${t1 ? `<p><span class="lbl">Target</span><br><b>${tgt(t1)}</b><br><span class="n">Side-out ${pc(t1.raw.so / t1.raw.n)} when she passes (${t1.n} passes in P${b})${t1.zone ? `, usually in zone ${t1.zone}` : ''}</span></p>` : '<p class="n">Not enough passes in this rotation.</p>'}
+          ${t2 ? `<p><span class="lbl">Alternative</span><br>${tgt(t2)} <span class="n">${pc(t2.raw.so / t2.raw.n)} (${t2.n})</span></p>` : ''}
+          ${bestZ ? `<p><span class="lbl">Zone</span><br>zone ${bestZ} <span class="n">side-out ${pc(t.zoneMap[bestZ].so)}</span></p>` : ''}
+        </div>
+        ${miniCourt(t, bestZ)}
+      </div>
+      ${setLine(b, bestZ || (t1 && t1.zone) || 0)}
+      <p class="n">${risk[2]}</p>
+    </div>`;
+  }).join('')}</div>
+  <p class="note" style="margin-top:8px">The 6 serves of the first pass with this pair of starting rotations. The court is seen from the server: back row at the top (zones 1, 6, 5), net at the bottom; color shows where their reception does worst (green = lowest side-out). With little data for a zone or player, values are pulled toward the team average.</p>`;
+}
+function serveTables() {
+  const pp = people(), { ss, rs } = serveData();
+  const r = v => v == null || isNaN(v) ? '–' : Math.round(v * 100) + '%';
+  const sv = Object.values(ss.players).filter(p => p.n >= 3).sort((a, b) => b.n - a.n);
+  const rc = Object.entries(rs.players).filter(([, o]) => o.n >= 5).map(([n, o]) => ({ num: +n, ...o })).sort((a, b) => b.n - a.n);
+  return `<section class="grid2">
+    <div class="panel"><h3>Our servers · ${esc(teamName(S.myKey))}</h3><div class="tbl-wrap"><table>
+      <thead><tr><th>Player</th><th class="r">Serves</th><th class="r">Aces</th><th class="r">Err.</th><th class="r">Break pt.</th><th class="r" title="Opponent pass rated positive or perfect">Opp. pos. pass</th></tr></thead>
+      <tbody>${sv.map(p => `<tr><td>${pname(pp.my, p.num)}</td><td class="r num">${p.n}</td><td class="r num">${p.ace}</td><td class="r num">${p.err}</td><td class="r num">${r(p.won / p.n)}</td><td class="r num ${p.rec && p.recPos / p.rec <= 0.25 ? 'hi' : p.rec && p.recPos / p.rec >= 0.45 ? 'lo' : ''}">${r(p.recPos / p.rec)}</td></tr>`).join('') || '<tr><td colspan="6" class="empty">No data</td></tr>'}</tbody></table></div></div>
+    <div class="panel"><h3>Their reception · ${esc(teamName(S.oppKey))}</h3><div class="tbl-wrap"><table>
+      <thead><tr><th>Player</th><th class="r">Passes</th><th class="r">Perfect</th><th class="r">Positive</th><th class="r">Errors</th><th class="r">Side-out</th></tr></thead>
+      <tbody>${rc.map(o => `<tr><td>${pname(pp.opp, o.num)} <span class="n">${prole(pp.opp, o.num)}</span></td><td class="r num">${o.n}</td><td class="r num">${r(o.perf / o.n)}</td><td class="r num ${o.pos / o.n <= 0.25 ? 'hi' : ''}">${r(o.pos / o.n)}</td><td class="r num">${o.err}</td><td class="r num ${o.so / o.n <= 0.45 ? 'hi' : o.so / o.n >= 0.6 ? 'lo' : ''}">${r(o.so / o.n)}</td></tr>`).join('') || '<tr><td colspan="6" class="empty">No data</td></tr>'}</tbody></table></div></div>
+  </section>`;
+}
+
+
+// ---------- distribuzione alzata ----------
+const SL = { '4': 'Zone 4', '3': 'Middle', '2': 'Zone 2', 'P': 'Pipe', '1': 'Back row from 1', '5': 'Back row from 5', 'D': 'Setter dump' };
+const SLS = { '4': 'Z4', '3': 'Middle', '2': 'Z2', 'P': 'Pipe', '1': 'Back row 1', '5': 'Back row 5', 'D': 'Dump' };
+function setLine(b, zone) {
+  const { sd } = serveData(); const r = RC.setDistribution(sd, b, zone || 0, '*');
+  if (!r.nRot) return '';
+  const top = RC.SETZ.filter(z => r.d[z] >= 0.08).sort((x, y) => r.d[y] - r.d[x]);
+  return `<p class="setl"><span class="lbl">Likely set${zone ? ` if the serve lands in zone ${zone}` : ''}</span><br>${top.map(z => `<b>${SLS[z]}</b> <span class="num">${pc(r.d[z])}</span>`).join(' · ')} <span class="n">(${r.n} attacks)</span></p>`;
+}
+function setSection() {
+  const pp = people(), { sd } = serveData();
+  const b = S.srot, r = RC.setDistribution(sd, b, S.sland, S.sq);
+  if (!r.nRot) return '<p class="note">The files have no attacks after reception for this rotation.</p>';
+  const max = Math.max(...RC.SETZ.map(z => r.d[z]));
+  const cell = z => { const w = r.who[z]; const v = r.d[z];
+    return `<div class="sz${v === max ? ' top' : ''}" style="--a:${Math.round(Math.min(1, v / Math.max(0.01, max)) * 60)}%"><span class="szl">${SL[z]}</span><b class="num">${pc(v)}</b>${w ? `<span class="szw">${pname(pp.opp, w.num)}</span><span class="n num">${w.k}/${w.n} kills</span>` : '<span class="n">–</span>'}</div>`; };
+  const lineup = pp.opp.L[b];
+  return `
+    <div class="row" style="margin-bottom:12px">
+      <div class="field"><span class="lbl">Their rotation in reception</span><div class="chips">${[1, 2, 3, 4, 5, 6].map(i => chip('srot', i, S.srot, 'P' + i)).join('')}</div></div>
+      <div class="field"><span class="lbl">Their pass</span><div class="chips">${chip('sq', '*', S.sq, 'All', 'wide')}${chip('sq', 'pos', S.sq, 'Positive', 'wide')}${chip('sq', 'mid', S.sq, 'Average', 'wide')}${chip('sq', 'neg', S.sq, 'Negative', 'wide')}</div></div>
+    </div>
+    <div class="setgrid">
+      <div class="landpick">
+        <span class="lbl">Where our serve lands</span>
+        <div class="court big">${[[1, 6, 5], [9, 8, 7], [2, 3, 4]].map(row => row.map(z => `<button class="cz pick" data-sland="${z}" aria-pressed="${String(S.sland === z)}"><b>${z}</b><i class="num">${r.land[z] || 0} serves</i></button>`).join('')).join('')}<span class="cnet">net</span></div>
+        <button class="chip wide" data-sland="0" aria-pressed="${String(!S.sland)}">All zones</button>
+        <p class="n">Seen from the server: their back court at the top. The number is how many serves landed there in this rotation.</p>
+      </div>
+      <div class="setcourt" aria-label="Opponent court seen from our side">
+        <div class="szrow">${cell('1')}${cell('P')}${cell('5')}</div>
+        <div class="szrow">${cell('2')}${cell('3')}${cell('4')}</div>
+        <div class="netline"><span>net · our side</span></div>
+        ${r.d.D >= 0.03 ? `<p class="n" style="margin-top:6px">${SL.D}: <b class="num">${pc(r.d.D)}</b></p>` : ''}
+      </div>
+      <div class="setinfo">
+        <p><b>${r.n}</b> attacks after reception ${S.sland ? `with the serve in zone ${S.sland}` : 'in this rotation'}${S.sq !== '*' ? ' and a ' + ({ pos: 'positive', mid: 'average', neg: 'negative' })[S.sq] + ' pass' : ''} (${r.nRot} in P${b} overall). ${r.n < 8 ? 'Little data: the estimate leans mostly on the rotation average.' : ''}</p>
+        ${lineup ? (() => { const f = frontSwitched(pp.opp, lineup.zones); return `<p class="n">Front row after the switch: ${[4, 3, 2].map(z => pname(pp.opp, f[z]) + ' in ' + z).join(', ')}. Setter in rotation zone ${b}.</p>`; })() : ''}
+        <p class="note">The court is seen from your side of the net: their front row at the bottom (zone 2 on the left, zone 4 on the right), back row at the top. For each zone: share of first attacks after reception, most frequent hitter and kills over attacks.</p>
+      </div>
+    </div>`;
+}
+
+// ---------- render ----------
+function render() {
+  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab)));
+  const main = $('#main');
+  if (!S.matches.length && S.tab !== 'data') { main.innerHTML = `<section class="panel"><h2>No matches loaded</h2><p class="note" style="margin-bottom:12px">Go to the Data tab and load the .dvw files of your matches and your opponent's. They stay on this device only.</p><button class="btn" data-tab="data">Go to Data</button></section>`; save(); return; }
+  if (S.tab === 'bench') main.innerHTML = renderBench();
+  else if (S.tab === 'study') main.innerHTML = renderStudy();
+  else main.innerHTML = renderData();
+  save();
+}
+
+const chip = (attr, val, cur, label, cls = '') => `<button class="chip ${cls}" data-${attr}="${val}" aria-pressed="${String(cur === val)}">${label}</button>`;
+const pChips = (attr, cur, cls) => [1, 2, 3, 4, 5, 6].map(i => chip(attr, i, cur, 'P' + i, cls)).join('');
+
+function renderBench() {
+  const b = S.bench;
+  if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">Pick two different teams at the top.</p></section>`;
+  const target = b.set === 5 ? 15 : 25;
+  const M = mat(b.weServe ? 0 : 1, target);
+  const rows = oppRows(true);
+  const prevLog = b.log.find(l => l.set === b.set - 1);
+  const prevOppServe = prevLog ? prevLog.oppServe : (b.set === 5 ? null : b.weServe);
+  const prevEq = b.set > 1 && b.prevOppStart ? RC.eqRot(b.prevOppStart, prevOppServe == null ? true : prevOppServe) : null;
+  const pr = RC.predict(rows, { set: b.set, prevEq, prevWon: b.set > 1 ? b.prevOppWon : null, oppServeFirst: !b.weServe });
+  const dist = b.known ? Object.fromEntries([1, 2, 3, 4, 5, 6].map(i => [i, i === b.known ? 1 : 0])) : pr.dist;
+  const exp = {}; for (let a = 1; a <= 6; a++) { exp[a] = 0; for (let x = 1; x <= 6; x++) exp[a] += dist[x] * M[a][x]; }
+  const order = [1, 2, 3, 4, 5, 6].sort((x, y) => exp[y] - exp[x]);
+  const best = order[0], worst = order[5];
+  const topOpp = [1, 2, 3, 4, 5, 6].sort((x, y) => dist[y] - dist[x]);
+  const bestVs = x => { let a = 1; for (let i = 2; i <= 6; i++) if (M[i][x] > M[a][x]) a = i; return a; };
+
+  const myBars = order.map(a => `<div class="bar${a === best ? ' best' : ''}"><b>P${a}</b><span class="t"><i style="width:${(exp[a] * 100).toFixed(1)}%"></i><span class="mid"></span></span><span class="v num">${pc(exp[a])}</span></div>`).join('');
+  const oppBars = [1, 2, 3, 4, 5, 6].map(x => `<div class="bar"><b>P${x}</b><span class="t"><i style="width:${(dist[x] * 100).toFixed(1)}%;background:var(--hot)"></i></span><span class="v num">${pc(dist[x])}</span></div>`).join('');
+  const nSets = rows.length;
+  const likely = topOpp.filter(x => dist[x] >= 0.12).slice(0, 3);
+
+  const endOpp = b.endOpp ?? b.known ?? topOpp[0], endMy = b.endMy ?? best;
+  return `
+  <section class="panel">
+    <h2>Set ${b.set}</h2>
+    <div class="bench-form">
+      <div class="row">
+        <div class="field"><span class="lbl">Set</span><div class="chips">${[1, 2, 3, 4, 5].map(i => chip('set', i, b.set, i)).join('')}</div></div>
+        <div class="field"><span class="lbl">Serving first</span><div class="chips">${chip('serve', 1, b.weServe ? 1 : 0, 'Us', 'wide')}${chip('serve', 0, b.weServe ? 1 : 0, 'Them', 'wide')}</div></div>
+      </div>
+      ${b.set > 1 ? `<div class="row">
+        <div class="field"><span class="lbl">Their start in set ${b.set - 1}</span><div class="chips">${pChips('prev', b.prevOppStart)}</div></div>
+        <div class="field"><span class="lbl">Set ${b.set - 1} won by</span><div class="chips">${chip('pwon', 0, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, 'Us', 'wide')}${chip('pwon', 1, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, 'Them', 'wide')}</div></div>
+      </div>` : ''}
+      <div class="field"><span class="lbl">Opponent start already known (optional)</span><div class="chips">${pChips('known', b.known, 'ghost')}</div></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="panel">
+      <div class="verdict">
+        <span class="big">P${best}</span>
+        <span class="k">Start in P${best}</span>
+        <span class="s">Estimated chance of winning the set: <b class="num">${pc(exp[best])}</b>. Avoid: P${worst} (${pc(exp[worst])}).</span>
+      </div>
+      <h3 style="margin-top:14px">Your 6 starting rotations</h3>
+      <div class="bars">${myBars}</div>
+      <p class="note" style="margin-top:10px">${likely.map(x => `If they start in P${x}: best is P${bestVs(x)} (${pc(M[bestVs(x)][x])}).`).join(' ')}</p>
+    </div>
+    <div class="panel">
+      <h3>${b.known ? 'Known opponent start' : 'Predicted start · ' + esc(teamName(S.oppKey))}</h3>
+      <div class="bars">${oppBars}</div>
+      <p class="note" style="margin-top:10px">${b.known ? 'You entered their start: the pick uses only that.' :
+        `Based on ${nSets} sets${pr.pKeep != null ? `; after ${b.prevOppWon ? 'winning' : b.prevOppWon === false ? 'losing' : 'a'} set they keep the same alignment ${pc(pr.pKeep)} of the time` : ''}.${nSets < 8 ? ' Little data: treat the prediction as a rough guide.' : ''}`}</p>
+    </div>
+  </section>
+
+  <details class="panel" id="benchPlan"${S.planOpen ? ' open' : ''}>
+    <summary><h2 style="display:inline">Serve plan</h2> <span class="n">us P${best} vs them P${b.known || topOpp[0]}</span></summary>
+    ${servePlan(best, b.known || topOpp[0], b.weServe ? 0 : 1)}
+  </details>
+
+  <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}>
+    <summary><h2 style="display:inline">Setter distribution</h2> <span class="n">them P${S.srot} receiving</span></summary>
+    ${setSection()}
+  </details>
+
+  <details class="panel" id="benchNets"${S.netsOpen ? ' open' : ''}>
+    <summary><h2 style="display:inline">Player matchups</h2> <span class="n">us P${best} vs them P${b.known || topOpp[0]}</span></summary>
+    ${phaseNets(best, b.known || topOpp[0], b.weServe ? 0 : 1, M)}
+  </details>
+
+  <section class="panel">
+    <h2>End of set ${b.set}</h2>
+    <div class="endset">
+      <div class="row">
+        <div class="field"><span class="lbl">They started in</span><div class="chips">${pChips('eopp', endOpp)}</div></div>
+        <div class="field"><span class="lbl">We started in</span><div class="chips">${pChips('emy', endMy)}</div></div>
+      </div>
+      <div class="row" style="align-items:flex-end">
+        <div class="field"><span class="lbl">Set won by</span><div class="chips">${chip('ewin', 'noi', b.endWin, 'Us', 'wide')}${chip('ewin', 'loro', b.endWin, 'Them', 'wide')}</div></div>
+        <div class="field" style="flex:0 1 auto"><button class="btn" data-act="endset"${b.endWin ? '' : ' disabled style="opacity:.5"'}>Save and go to set ${Math.min(5, b.set + 1)}</button></div>
+      </div>
+      ${b.log.length ? `<div class="log">${b.log.map(l => `<div><b>Set ${l.set}</b><span>Them P${l.oppStart}${l.oppServe ? ' (serving)' : ' (receiving)'}</span><span>Us P${l.myStart}</span><span class="tag ${l.oppWon ? 'l' : 'w'}">${l.oppWon ? 'Lost' : 'Won'}</span></div>`).join('')}</div>
+      <div><button class="btn sec small" data-act="newmatch">New match</button></div>` : '<p class="note">Sets saved here update the prediction for the next set.</p>'}
+    </div>
+  </section>`;
+}
+
+function rotTable(key, st) {
+  const rows = [1, 2, 3, 4, 5, 6].map(i => {
+    const r = st.rot[i]; const so = r.soN ? r.soW / r.soN : null, bp = r.bpN ? r.bpW / r.bpN : null;
+    const cls = (v, avg) => v == null ? '' : v - avg >= 0.08 ? 'hi' : avg - v >= 0.08 ? 'lo' : '';
+    const cell = (v, n, avg) => `<td class="r"><span class="pct"><s style="width:${v == null ? 0 : Math.round(v * 40)}px"></s><span class="num ${cls(v, avg)}">${pc(v)}</span></span> <span class="n num">${n}</span></td>`;
+    return `<tr><td><b class="rh">P${i}</b></td>${cell(so, r.soN, st.so)}${cell(bp, r.bpN, st.bp)}</tr>`;
+  }).join('');
+  return `<div class="panel"><h3>${esc(teamName(key))}</h3><div class="tbl-wrap"><table>
+    <thead><tr><th>Rot.</th><th class="r">Side-out</th><th class="r">Break point</th></tr></thead>
+    <tbody>${rows}<tr><td><b>Tot</b></td><td class="r num">${pc(st.so)} <span class="n">${st.soN}</span></td><td class="r num">${pc(st.bp)} <span class="n">${st.bpN}</span></td></tr></tbody></table></div></div>`;
+}
+
+function findings(rows) {
+  const p = RC.patterns(rows);
+  if (!p.n) return `<p class="empty">No sets for this team in the loaded files.</p>`;
+  const L = [];
+  const t = p.top, tr = t === 6 ? 1 : t + 1;
+  L.push([p.topShare >= 0.6, `Usual alignment: goes to its first serve in <b>P${t}</b> in <b>${p.eq[t]} of ${p.n} sets</b>. In practice it starts in P${t} when serving and in P${tr} when receiving.`]);
+  const list = o => [1, 2, 3, 4, 5, 6].filter(i => o[i]).map(i => `P${i} ×${o[i]}`).join(', ') || '–';
+  L.push([false, `When serving first: ${list(p.serve)}. When receiving first: ${list(p.recv)}.`]);
+  if (p.nW + p.nL) {
+    const kw = p.nW ? p.keepW / p.nW : null, kl = p.nL ? p.keepL / p.nL : null;
+    let read = '';
+    if (kw != null && kl != null) {
+      if (kw >= 0.7 && kl >= 0.7) read = ' Does not change based on the result.';
+      else if (kw >= 0.6 && kl < 0.5) read = ' Keeps it after a win, changes after a loss.';
+      else if (kw < 0.5 && kl < 0.5) read = ' Changes often between sets.';
+    }
+    L.push([read === ' Does not change based on the result.' || read.startsWith(' Keeps'), `After a set won it keeps the alignment ${p.keepW}/${p.nW} times, after a set lost ${p.keepL}/${p.nL}.${read}`]);
+  }
+  const diff = Object.entries(p.byOpp).map(([o, rs]) => {
+    const c = {}; rs.forEach(r => c[r.eq] = (c[r.eq] || 0) + 1);
+    const mode = +Object.keys(c).sort((a, b) => c[b] - c[a])[0];
+    return { o, rs, mode };
+  });
+  const odd = diff.filter(d => d.mode !== t);
+  L.push([odd.length > 0, odd.length ? `Against ${odd.map(d => `<b>${esc(d.o)}</b> (alignment P${d.mode} at first serve)`).join(', ')} it changed from the usual: a sign of adapting to the opponent.` : `Uses the same alignment against every opponent in the files (${diff.length}).`]);
+  if (p.follow) L.push([false, `In ${p.follow} of ${p.nFollow} cases it shifted its start to recreate the previous set's matchup against the opponent.`]);
+  return `<ul class="findings">${L.map(([s, x]) => `<li class="${s ? 'strong' : ''}">${x}</li>`).join('')}</ul>`;
+}
+
+function heatColor(v, mean, dev) {
+  const d = (v - mean) / dev; const amt = Math.min(70, Math.abs(d) * 70);
+  return `color-mix(in oklab, var(${d >= 0 ? '--good' : '--bad'}) ${amt.toFixed(0)}%, var(--sunk))`;
+}
+
+function renderStudy() {
+  if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">Pick two different teams at the top.</p></section>`;
+  const m = model();
+  const M = mat(S.studyServe, 25);
+  const vals = []; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) vals.push(M[a][b]);
+  const mean = vals.reduce((s, v) => s + v, 0) / 36, dev = Math.max(0.03, ...vals.map(v => Math.abs(v - mean)));
+  let heat = `<span></span>${[1, 2, 3, 4, 5, 6].map(b => `<span class="h">Them P${b}</span>`).join('')}`;
+  for (let a = 1; a <= 6; a++) {
+    heat += `<span class="rh">P${a}</span>` + [1, 2, 3, 4, 5, 6].map(b => `<button data-cell="${a}-${b}" aria-pressed="${String(S.sel === a + '-' + b)}" style="background:${heatColor(M[a][b], mean, dev)}" aria-label="Us P${a} vs them P${b}: ${pc(M[a][b])}">${Math.round(M[a][b] * 100)}</button>`).join('');
+  }
+  let phases = '';
+  if (S.sel) {
+    const [a, b] = S.sel.split('-').map(Number);
+    phases = `<h3 style="margin-top:16px">Player matchups: us P${a} vs them P${b}, ${S.studyServe === 0 ? 'we serve first' : 'they serve first'}</h3>` + phaseNets(a, b, S.studyServe, M);
+  }
+  let planA, planB, planLabel;
+  if (S.sel) { [planA, planB] = S.sel.split('-').map(Number); planLabel = `Selected matchup: us P${planA} vs them P${planB}, ${S.studyServe === 0 ? 'we serve first' : 'they serve first'}.`; }
+  else {
+    const pr = RC.predict(RC.startHistory(S.matches, S.oppKey), { set: 1, oppServeFirst: S.studyServe === 1 });
+    planB = [1, 2, 3, 4, 5, 6].sort((x, y) => pr.dist[y] - pr.dist[x])[0];
+    const ex = a => [1, 2, 3, 4, 5, 6].reduce((t, x) => t + pr.dist[x] * M[a][x], 0);
+    planA = [1, 2, 3, 4, 5, 6].sort((x, y) => ex(y) - ex(x))[0];
+    planLabel = `Recommended start P${planA} against their most likely P${planB} (set 1, ${S.studyServe === 0 ? 'we serve first' : 'they serve first'}). Tap a cell in the table for another matchup.`;
+  }
+  const key = S.hist === 'opp' ? S.oppKey : S.myKey;
+  const rows = RC.startHistory(S.matches, key);
+  const coach = coachOf(S.oppKey);
+  const anyMy = m.A.st.soN + m.A.st.bpN, anyOpp = m.B.st.soN + m.B.st.bpN;
+  const jumps = [['st-pattern', 'Pattern'], ['st-matchup', 'Matchup'], ['st-battuta', 'Serve plan'], ['st-alzata', 'Setter'], ['st-battitrici', 'Serve & pass'], ['st-rot', 'Rotations'], ['st-rose', 'Players'], ['st-storico', 'History']];
+  return `
+  <nav class="jump" aria-label="Study sections">${jumps.map(([id, l]) => `<button class="chip wide" data-jump="${id}">${l}</button>`).join('')}</nav>
+
+  <section class="panel" id="st-pattern">
+    <h2>${esc(teamName(S.oppKey))} pattern${coach ? ` <span class="n" style="font-family:var(--f-body);text-transform:none;font-size:14px;font-weight:500">coach ${esc(coach)}</span>` : ''}</h2>
+    ${findings(RC.startHistory(S.matches, S.oppKey))}
+  </section>
+
+  <section class="panel" id="st-matchup">
+    <h2>Starting rotation matchup</h2>
+    <div class="row" style="margin-bottom:12px"><div class="field"><span class="lbl">Serving first</span><div class="chips">${chip('sserve', 0, S.studyServe, 'Us', 'wide')}${chip('sserve', 1, S.studyServe, 'Them', 'wide')}</div></div></div>
+    <div class="tbl-wrap"><div class="heat">${heat}</div></div>
+    <div class="legend"><span>Chance of winning the set (%). Rows: our start.</span><span>worse</span><i></i><span>better than the table average</span></div>
+    ${phases || '<p class="note" style="margin-top:10px">Tap a cell to see the player-by-player matchups, rotation by rotation.</p>'}
+    ${(!anyMy || !anyOpp) ? '<p class="warn" style="margin-top:10px">One of the two teams has no rallies in the files: the average of all loaded matches is used for it.</p>' : ''}
+  </section>
+
+  <section class="panel" id="st-battuta">
+    <h2>Serve plan</h2>
+    <p class="note" style="margin-bottom:10px">${planLabel}</p>
+    ${servePlan(planA, planB, S.studyServe)}
+  </section>
+
+  <section class="panel" id="st-alzata">
+    <h2>Setter distribution</h2>
+    ${setSection()}
+  </section>
+
+  <div id="st-battitrici">${serveTables()}</div>
+
+
+  <section class="grid2" id="st-rot">${rotTable(S.myKey, m.A.st)}${rotTable(S.oppKey, m.B.st)}</section>
+  <section style="display:grid;gap:18px" id="st-rose">${rosterTable(S.myKey, people().my)}${rosterTable(S.oppKey, people().opp)}</section>
+  <p class="note">Rotation = setter position (P1 = setter in zone 1), as in DataVolley. The small numbers are rallies played in that rotation; the model pulls toward the team average when there are few.</p>
+
+  <section class="panel" id="st-storico">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">Starting rotation history</h2>
+      <div class="chips">${chip('hist', 'opp', S.hist, esc(teamName(S.oppKey)), 'wide')}${chip('hist', 'my', S.hist, esc(teamName(S.myKey)), 'wide')}</div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Date</th><th>Against</th><th>Set</th><th>Start</th><th>Began</th><th>At serve</th><th>Opponent</th><th class="r">Score</th></tr></thead>
+      <tbody>${rows.map((r, i) => { const eq = RC.eqRot(r.start, r.serveFirst); const first = i === 0 || rows[i - 1].match !== r.match;
+        return `<tr${first && i ? ' style="border-top:2px solid var(--line)"' : ''}><td class="num">${first ? fmtDate(r.date) : ''}</td><td>${first ? esc(r.opp) : ''}</td><td class="num">${r.set}</td><td><b>P${r.start}</b></td><td>${r.serveFirst ? 'Serving' : 'Receiving'}</td><td>P${eq}</td><td>P${r.oppStart}</td><td class="r"><span class="tag ${r.won ? 'w' : r.won === false ? 'l' : ''}">${r.score.join('-')}</span></td></tr>`; }).join('') || '<tr><td colspan="8" class="empty">No data</td></tr>'}</tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">"At serve" is the rotation the team is in at its first serve: a team receiving in P2 that sides out serves in P1, so it is the same alignment as starting in P1 on serve.</p>
+  </section>`;
+}
+
+function renderData() {
+  const list = S.matches.map((m, i) => `<div class="match"><span class="t"><b>${esc(m.teams[0].name)}</b> – <b>${esc(m.teams[1].name)}</b><br><span class="n">${fmtDate(m.date)} · ${m.sets.map(s => s.final.join('-')).join(', ')} · ${esc(m.competition)}</span></span><button class="btn sec small" data-del="${i}">Remove</button></div>`).join('');
+  return `
+  <section class="panel">
+    <h2>DataVolley files</h2>
+    <label class="drop" id="drop" for="fileIn">
+      <b>Drop .dvw files here or tap to choose them</b>
+      <span class="note">You can load several at once. Files stay on this device.</span>
+      <input id="fileIn" type="file" accept=".dvw" multiple hidden>
+    </label>
+    <p class="note" id="loadMsg" style="margin-top:8px"></p>
+  </section>
+  <section class="panel">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2 style="margin:0">Loaded matches (${S.matches.length})</h2>
+      ${S.customData && SAMPLE.length ? '<button class="btn sec small" data-act="reset">Restore the 7 original matches</button>' : ''}
+    </div>
+    <div class="matches">${list || '<p class="empty">No matches.</p>'}</div>
+  </section>`;
+}
+
+async function addFiles(files) {
+  const msg = []; let added = 0;
+  for (const f of files) {
+    try {
+      const txt = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f, 'windows-1252'); });
+      const m = RC.parseDVW(txt, f.name);
+      if (!m.sets.length) { msg.push(`${f.name}: no sets with rallies found.`); continue; }
+      if (S.matches.some(x => x.id === m.id)) { msg.push(`${f.name}: already loaded.`); continue; }
+      S.matches = S.matches.concat([m]); added++;
+    } catch (e) { msg.push(`${f.name}: could not read the file (${e.message}).`); }
+  }
+  if (added) { S.customData = true; invalidate(); ensureTeams(); }
+  render();
+  const el = $('#loadMsg'); if (el) el.textContent = `${added} matches added.` + (msg.length ? ' ' + msg.join(' ') : '');
+}
+
+// ---------- eventi ----------
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  const d = t.dataset, b = S.bench;
+  if (d.tab) { S.tab = d.tab; window.scrollTo({ top: 0 }); return render(); }
+  if (d.jump) { const el = document.getElementById(d.jump); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  if (d.set) { b.set = +d.set; b.endWin = null; b.endOpp = null; b.endMy = null; }
+  else if (d.serve) b.weServe = d.serve === '1';
+  else if (d.prev) b.prevOppStart = +d.prev;
+  else if (d.pwon) b.prevOppWon = d.pwon === '1';
+  else if (d.known) b.known = b.known === +d.known ? null : +d.known;
+  else if (d.eopp) b.endOpp = +d.eopp;
+  else if (d.emy) b.endMy = +d.emy;
+  else if (d.ewin) b.endWin = d.ewin;
+  else if (d.act === 'endset') {
+    if (!b.endWin) return;
+    const oppStart = +t.closest('.endset').querySelector('[data-eopp][aria-pressed="true"]').dataset.eopp;
+    const myStart = +t.closest('.endset').querySelector('[data-emy][aria-pressed="true"]').dataset.emy;
+    b.log = b.log.filter(l => l.set !== b.set).concat([{ set: b.set, oppStart, myStart, oppServe: !b.weServe, oppWon: b.endWin === 'loro' }]).sort((x, y) => x.set - y.set);
+    b.prevOppStart = oppStart; b.prevOppWon = b.endWin === 'loro';
+    if (b.set < 5) { b.set++; if (b.set < 5) b.weServe = !b.weServe; }
+    b.known = null; b.endOpp = null; b.endMy = null; b.endWin = null;
+    window.scrollTo({ top: 0 });
+  }
+  else if (d.act === 'newmatch') S.bench = freshBench();
+  else if (d.sserve) { S.studyServe = +d.sserve; }
+  else if (d.cell) S.sel = S.sel === d.cell ? null : d.cell;
+  else if (d.hist) S.hist = d.hist;
+  else if (d.srot) S.srot = +d.srot;
+  else if (d.sland != null) S.sland = +d.sland;
+  else if (d.sq) S.sq = d.sq;
+  else if (d.del != null) { S.matches = S.matches.filter((_, i) => i !== +d.del); S.customData = true; invalidate(); ensureTeams(); }
+  else if (d.act === 'reset') { S.matches = SAMPLE; S.customData = false; invalidate(); ensureTeams(); }
+  else return;
+  render();
+});
+document.addEventListener('toggle', e => { if (e.target.id === 'benchNets') S.netsOpen = e.target.open; if (e.target.id === 'benchPlan') S.planOpen = e.target.open; if (e.target.id === 'benchSet') S.setOpen = e.target.open; }, true);
+document.addEventListener('change', e => {
+  if (e.target.id === 'selMy') { S.myKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
+  if (e.target.id === 'selOpp') { S.oppKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
+  if (e.target.id === 'fileIn') addFiles([...e.target.files]);
+});
+['dragover', 'dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => {
+  const z = e.target.closest && e.target.closest('#drop'); if (!z) return;
+  e.preventDefault(); z.classList.toggle('over', ev === 'dragover');
+  if (ev === 'drop') addFiles([...e.dataTransfer.files].filter(f => /\.dvw$/i.test(f.name)));
+}));
+
+ensureTeams();
+render();
+
+</script>
+
+<script>
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>
