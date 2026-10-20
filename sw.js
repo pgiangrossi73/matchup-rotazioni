@@ -1,5 +1,5 @@
 // Funzionamento offline: guscio dell'app in cache, font Google in cache al primo uso
-const VERSION = 'rot-v6';
+const VERSION = 'rot-v7';
 const SHELL = ['./', './index.html', './en.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {

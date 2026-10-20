@@ -205,7 +205,7 @@ details.panel > summary { cursor: pointer; list-style-position: outside; margin-
 .duo { display: grid; gap: 12px 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch }
 @media (max-width: 680px) { .duo { grid-template-columns: minmax(0, 1fr) } }
 .tcol { display: grid; gap: 12px; align-content: start; min-width: 0 }
-.tcard { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; min-width: 0 }
+.tcard { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; min-width: 0; align-content: start }
 .tcard.rec, .tcard.pred { background: var(--sunk); border-color: transparent }
 .tcard.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent) }
 .tcard.real.active { border-color: var(--hot); box-shadow: 0 0 0 3px color-mix(in oklab, var(--hot) 22%, transparent) }
@@ -249,6 +249,43 @@ details.panel > summary { cursor: pointer; list-style-position: outside; margin-
 .ptbtn.us { background: var(--accent); color: var(--accent-ink) }
 .ptbtn.them { background: var(--hot) }
 .ptbtn:active { transform: scale(.98) }
+/* foglietto modificabile */
+button.sc { font: inherit; color: inherit; text-align: left; cursor: pointer; min-height: 52px }
+button.sc:hover { background: var(--bg) }
+.sc.chg { background: color-mix(in oklab, var(--accent) 14%, var(--surface)); border-width: 2px }
+.sc.them.chg { background: color-mix(in oklab, var(--hot) 14%, var(--surface)) }
+.sc.open { outline: 3px solid var(--ink); outline-offset: -1px }
+.picker { border: 2px solid var(--line); border-radius: 12px; padding: 10px; display: grid; gap: 10px; background: var(--bg) }
+.pkh { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.pklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px }
+.pk { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; text-align: left; min-height: 52px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font: inherit; color: inherit; cursor: pointer }
+.pk b { grid-row: span 2; font-family: var(--f-display); font-size: 22px }
+.pk span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px }
+.pk.cur { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--surface)) }
+/* chiamate, muro e difesa, palla calda, avvisi, report */
+.cnt { font-family: var(--f-mono); font-size: 11px; opacity: .75 }
+.adv { font-weight: 600; margin: 0 0 10px }
+.bks { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)) }
+.bk { background: var(--bg); border-radius: 10px; padding: 10px; display: grid; gap: 6px; align-content: start; min-width: 0 }
+.bkh { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; align-items: baseline }
+.bkh .n { font-family: var(--f-body) }
+.bkh b { font-family: var(--f-display); font-size: 18px; text-transform: uppercase; white-space: nowrap }
+.ocourt { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding-top: 8px; max-width: 240px }
+.onet { position: absolute; top: 0; left: 0; right: 0; border-top: 3px solid var(--ink) }
+.oz { height: 44px; border-radius: 5px; display: grid; place-items: center; align-content: center; background: color-mix(in oklab, var(--hot) var(--a), var(--sunk)); line-height: 1.1 }
+.oz b { font-size: 12px; opacity: .7 } .oz i { font-style: normal; font-size: 12px; font-weight: 600 }
+.oz.top { outline: 2px solid var(--ink); outline-offset: -2px }
+.alarm { margin: 0 0 10px; padding: 12px 14px; border-radius: 12px; font-weight: 700; font-size: 17px }
+.alarm.bad { background: var(--bad); color: #fff }
+.alarm.warn { background: var(--hot); color: #fff }
+.alarm.good { background: color-mix(in oklab, var(--good) 20%, var(--surface)); color: var(--good) }
+@media print {
+  :root, :root[data-theme] { --bg: #fff; --surface: #fff; --sunk: #f1f0f5; --ink: #111; --muted: #555; --line: #ccc; color-scheme: light }
+  body { background: #fff } body::before, header.top, .no-print, nav.jump { display: none !important }
+  main { padding-block: 0; gap: 10px } .panel { break-inside: auto; box-shadow: none; padding: 10px }
+  h2, h3 { break-after: avoid } .plan { grid-template-columns: repeat(2, minmax(0, 1fr)) } .grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .pc, .bk, tr { break-inside: avoid }
+}
 .lang { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 6px 4px }
 @media (max-width: 520px) { .verdict .big { font-size: 52px } .brand { font-size: 21px } nav.tabs { width: 100% } nav.tabs button { flex: 1 } }
 @media (prefers-reduced-motion: no-preference) { .bar .t i { transition: width .25s ease } }
@@ -268,6 +305,7 @@ details.panel > summary { cursor: pointer; list-style-position: outside; margin-
     <nav class="tabs" role="tablist">
       <button role="tab" id="tab-bench" aria-selected="true" data-tab="bench">Panchina</button>
       <button role="tab" id="tab-study" aria-selected="false" data-tab="study">Studio</button>
+      <button role="tab" id="tab-report" aria-selected="false" data-tab="report">Report</button>
       <button role="tab" id="tab-data" aria-selected="false" data-tab="data">Dati</button>
     </nav>
   </div>
@@ -320,7 +358,8 @@ const RC = (() => {
 
     const scout = section(lines, 'SCOUT');
     const sets = {};
-    let lastWinner = null, curSet = 0, pendingServer = null, setter = [null, null], srv = null, rec = null, waitAtt = -1, att = null;
+    let lastWinner = null, curSet = 0, pendingServer = null, setter = [null, null], srv = null, rec = null, waitAtt = -1, att = null, call = null, score = [0, 0];
+    const attacks = []; // [lato, num, rot, da, a, sottozona, esito, fase 0=ricezione 1=transizione, punti propri, punti avversari, ricezione, chiamata, set, combinazione]
     const getSet = n => (sets[n] = sets[n] || { n, rallies: [], start: null, firstServe: null, lineup: null, setters: [null, null] });
 
     for (const raw of scout) {
@@ -334,7 +373,7 @@ const RC = (() => {
       const pm = code.match(/^[*a]P(\d+)/);
       if (pm) { setter[side] = +pm[1]; continue; }
       if (!setN) continue;
-      if (setN !== curSet) { curSet = setN; lastWinner = null; pendingServer = null; }
+      if (setN !== curSet) { curSet = setN; lastWinner = null; pendingServer = null; score = [0, 0]; }
       const s = getSet(setN);
       if (!s.setters[side] && setter[side] != null) s.setters[side] = setter[side];
       const rz = [parseInt(f[9], 10), parseInt(f[10], 10)];
@@ -346,7 +385,12 @@ const RC = (() => {
         else if (sk[2] === 'B') { if (ev === '#') st.bK++; }
         else if (sk[2] === 'R') { st.rN++; if (ev === '#' || ev === '+') st.rG++; else if (ev === '=') st.rE++; }
       }
+      if (/^[*a]\d\dA/.test(code) && rz[side] >= 1 && rz[side] <= 6) {
+        const first = waitAtt === side, fz = parseInt(code[9], 10), tz = parseInt(code[10], 10);
+        attacks.push([side, +code.slice(1, 3), rz[side], fz >= 1 && fz <= 9 ? fz : 0, tz >= 1 && tz <= 9 ? tz : 0, /[A-D]/.test(code[11] || '') ? code[11] : '', code[5] || '', first ? 0 : 1, score[side], score[1 - side], first && rec ? rec.ev : '', first ? (call || '') : '', setN, code.slice(6, 8).replace(/~/g, '')]);
+      }
       if (waitAtt >= 0 && /^[*a](\d\d|\$\$)[A-Z]/.test(code) && !/^[*a]\d\dR/.test(code)) {
+        if (side === waitAtt && code[3] === 'E' && /^K[A-Z0-9]$/.test(code.slice(6, 8))) call = code.slice(6, 8);
         if (side !== waitAtt) waitAtt = -1;
         else if (code[3] === 'A') {
           const fz = parseInt(code[9], 10);
@@ -364,7 +408,7 @@ const RC = (() => {
         pendingServer = side;
         { const num = code.slice(1, 3) === '$$' ? -1 : +code.slice(1, 3), ez = parseInt(code[10], 10);
           const sz = parseInt(code[9], 10);
-          srv = { num, type: code[4] || '', ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0, sz: sz >= 1 && sz <= 9 ? sz : 0 }; rec = null; att = null; waitAtt = -1; }
+          srv = { num, type: code[4] || '', ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0, sz: sz >= 1 && sz <= 9 ? sz : 0 }; rec = null; att = null; waitAtt = -1; call = null; }
         if (!s.start && rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6) {
           s.start = rz.slice(); s.firstServe = side;
           s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)];
@@ -377,7 +421,7 @@ const RC = (() => {
         let server = pendingServer != null ? pendingServer : lastWinner;
         if (!(rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6)) { lastWinner = winner; pendingServer = null; continue; }
         if (!s.start) { s.start = rz.slice(); s.firstServe = server; s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)]; }
-        if (server != null) s.rallies.push(srv && pendingServer === server ? [server, winner, rz[0], rz[1], srv.num, srv.type, srv.ev, srv.ez, rec ? rec.num : -1, rec ? rec.ev : '', srv.sz, att ? att.num : -1, att ? att.from : 0, att ? att.ev : '', att ? att.combo : ''] : [server, winner, rz[0], rz[1]]);
+        if (server != null) s.rallies.push(srv && pendingServer === server ? [server, winner, rz[0], rz[1], srv.num, srv.type, srv.ev, srv.ez, rec ? rec.num : -1, rec ? rec.ev : '', srv.sz, att ? att.num : -1, att ? att.from : 0, att ? att.ev : '', att ? att.combo : '', att ? (call || '') : ''] : [server, winner, rz[0], rz[1]]);
         [0, 1].forEach(sd => {
           const z = f.slice(14 + sd * 6, 20 + sd * 6).map(x => parseInt(x, 10));
           if (z.some(isNaN)) return;
@@ -385,7 +429,7 @@ const RC = (() => {
           L[k] = (L[k] || 0) + 1;
         });
         s.final = [+pt[1], +pt[2]];
-        lastWinner = winner; pendingServer = null; srv = null; rec = null; att = null; waitAtt = -1;
+        lastWinner = winner; pendingServer = null; srv = null; rec = null; att = null; waitAtt = -1; call = null; score = [+pt[1], +pt[2]];
       }
     }
 
@@ -400,7 +444,7 @@ const RC = (() => {
     });
     return {
       id: teams.map(t => t.key).join('-') + '|' + (mf[0] || '').trim() + '|' + setList.map(s => s.final.join('-')).join(','), file: fileName, date: (mf[0] || '').trim(), season: (mf[2] || '').trim(),
-      competition: (mf[3] || '').trim(), teams, sets: setList, players, pstats, lineups
+      competition: (mf[3] || '').trim(), teams, sets: setList, players, pstats, lineups, attacks
     };
   }
 
@@ -481,9 +525,12 @@ const RC = (() => {
   const fromGroup = z => (z === 1 || z === 9) ? '1' : z === 6 ? '6' : (z === 5 || z === 7) ? '5' : null;
   const qGroup = e => (e === '#' || e === '+') ? 'pos' : e === '!' ? 'mid' : (e === '-' || e === '/') ? 'neg' : null;
   const laneOf = z => [1, 9, 2].includes(z) ? '1' : [6, 8, 3].includes(z) ? '6' : [5, 7, 4].includes(z) ? '5' : null;
+  // gruppi di chiamata della centrale: K7 da sola, K1 con KC, KF da sola, il resto insieme
+  const callGroup = c => !c ? null : c === 'K7' ? 'K7' : (c === 'K1' || c === 'KC') ? 'K1C' : c === 'KF' ? 'KF' : 'ALT';
+  const CALLS = ['K7', 'K1C', 'KF', 'ALT'];
   function setStats(matches, key) {
     const mk = () => ({ n: 0, c: {} });
-    const rot = {}; for (let r = 1; r <= 6; r++) rot[r] = { all: mk(), cell: {}, who: {}, land: {} };
+    const rot = {}; for (let r = 1; r <= 6; r++) rot[r] = { all: mk(), cell: {}, who: {}, land: {}, calls: {} };
     const team = mk();
     matches.forEach(m => {
       const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
@@ -491,30 +538,78 @@ const RC = (() => {
       m.sets.forEach(s => s.rallies.forEach(ra => {
         if (ra[0] === side || ra.length < 12 || ra[11] < 0) return;
         const g = setGroup(ra[12], (roster[ra[11]] || {}).role); if (!g) return;
-        const R = rot[ra[2 + side]], z = ra[7] || 0, ln = laneOf(z), qg = qGroup(ra[9]);
+        const R = rot[ra[2 + side]], z = ra[7] || 0, ln = laneOf(z), qg = qGroup(ra[9]), cg = callGroup(ra[15]);
         const inc = o => { o.n++; o.c[g] = (o.c[g] || 0) + 1; };
         inc(team); inc(R.all);
         if (z) R.land[z] = (R.land[z] || 0) + 1;
+        if (cg) R.calls[cg] = (R.calls[cg] || 0) + 1;
         const where = ['*']; if (ln) where.push('l' + ln); if (z) where.push('z' + z);
         const qs = ['*']; if (qg) qs.push(qg);
-        where.forEach(w => qs.forEach(q => inc(R.cell[w + '|' + q] = R.cell[w + '|' + q] || mk())));
+        const cs = ['*']; if (cg) cs.push(cg);
+        where.forEach(w => qs.forEach(q => cs.forEach(c => { const k = w + '|' + q + '|' + c; inc(R.cell[k] = R.cell[k] || mk()); })));
         const w = (R.who[g] = R.who[g] || {}); const p = (w[ra[11]] = w[ra[11]] || { n: 0, k: 0, e: 0 });
         p.n++; if (ra[13] === '#') p.k++; else if (ra[13] === '=' || ra[13] === '/') p.e++;
       }));
     });
     return { rot, team };
   }
-  // distribuzione stimata, dal generale al particolare: rotazione -> qualità -> corsia -> zona di arrivo
-  function setDistribution(st, b, zone = 0, qg = '*', K = 6) {
+  // distribuzione stimata, dal generale al particolare: rotazione -> qualità -> chiamata -> corsia -> zona di arrivo
+  function setDistribution(st, b, zone = 0, qg = '*', cg = '*', K = 6) {
     const norm = (o, prior, k) => { const d = {}; SETZ.forEach(z => d[z] = ((o ? o.c[z] || 0 : 0) + k * prior[z]) / ((o ? o.n : 0) + k)); return d; };
     const flat = {}; SETZ.forEach(z => flat[z] = 1 / SETZ.length);
     const R = st.rot[b];
     let d = norm(R.all, norm(st.team, flat, 2), K), n = R.all.n;
-    const chain = []; if (qg !== '*') chain.push('*|' + qg);
-    if (zone) { const ln = laneOf(zone); if (ln) chain.push('l' + ln + '|' + qg); chain.push('z' + zone + '|' + qg); }
+    const chain = [];
+    if (qg !== '*') chain.push('*|' + qg + '|*');
+    if (cg !== '*') chain.push('*|' + qg + '|' + cg);
+    if (zone) { const ln = laneOf(zone); if (ln) chain.push('l' + ln + '|' + qg + '|' + cg); chain.push('z' + zone + '|' + qg + '|' + cg); }
     chain.forEach(k => { const c = R.cell[k]; d = norm(c, d, K); n = c ? c.n : 0; });
     const who = {}; SETZ.forEach(z => { const e = Object.entries(R.who[z] || {}).sort((x, y) => y[1].n - x[1].n)[0]; if (e) who[z] = { num: +e[0], ...e[1] }; });
-    return { d, n, nRot: R.all.n, who, land: R.land };
+    return { d, n, nRot: R.all.n, who, land: R.land, calls: R.calls };
+  }
+
+  // ---------- attacchi: posizioni reali, direzioni, palla calda ----------
+  // zona d'attacco abituale di ogni giocatrice in prima linea, per rotazione (dopo la ricezione)
+  function attackZones(matches, key) {
+    const c = {}; for (let r = 1; r <= 6; r++) c[r] = {};
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0 || !m.attacks) return;
+      m.attacks.forEach(a => { if (a[0] !== side || a[7] !== 0 || ![2, 3, 4].includes(a[3])) return; const o = (c[a[2]][a[1]] = c[a[2]][a[1]] || {}); o[a[3]] = (o[a[3]] || 0) + 1; });
+    });
+    const out = {};
+    for (let r = 1; r <= 6; r++) { out[r] = {}; Object.entries(c[r]).forEach(([n, o]) => { const e = Object.entries(o).sort((x, y) => y[1] - x[1]); const tot = e.reduce((s, x) => s + x[1], 0); if (tot >= 2) out[r][n] = +e[0][0]; }); }
+    return out;
+  }
+  // dove cadono i loro attacchi (zone del nostro campo), per rotazione e zona di partenza
+  function attackDirections(matches, key) {
+    const rot = {}; for (let r = 1; r <= 6; r++) rot[r] = {};
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0 || !m.attacks) return;
+      const roster = (m.players || [])[side] || {};
+      m.attacks.forEach(a => {
+        if (a[0] !== side || !a[4]) return;
+        const g = setGroup(a[3], (roster[a[1]] || {}).role); if (!g || g === 'D') return;
+        const o = (rot[a[2]][g] = rot[a[2]][g] || { n: 0, to: {}, k: 0, who: {} });
+        o.n++; o.to[a[4]] = (o.to[a[4]] || 0) + 1; if (a[6] === '#') o.k++; o.who[a[1]] = (o.who[a[1]] || 0) + 1;
+      });
+    });
+    return rot;
+  }
+  // palla calda: a chi va la palla da 20 in su e dopo una ricezione negativa
+  function hotBall(matches, key) {
+    const mk = () => ({ n: 0, p: {} });
+    const all = mk(), clutch = mk(), neg = mk();
+    const add = (o, a) => { o.n++; const p = (o.p[a[1]] = o.p[a[1]] || { n: 0, k: 0, e: 0, z: {} }); p.n++; if (a[6] === '#') p.k++; else if (a[6] === '=' || a[6] === '/') p.e++; p.z[a[3]] = (p.z[a[3]] || 0) + 1; };
+    matches.forEach(m => {
+      const side = m.teams.findIndex(t => t.key === key); if (side < 0 || !m.attacks) return;
+      m.attacks.forEach(a => {
+        if (a[0] !== side) return;
+        add(all, a);
+        if (Math.max(a[8], a[9]) >= 20 && a[12] < 5 || a[12] === 5 && Math.max(a[8], a[9]) >= 10) add(clutch, a);
+        if (a[7] === 0 && (a[10] === '-' || a[10] === '/')) add(neg, a);
+      });
+    });
+    return { all, clutch, neg };
   }
 
   // formazione più frequente per ogni rotazione (zone 1..6 -> numero)
@@ -693,7 +788,7 @@ const RC = (() => {
     return out;
   }
 
-  return { SETZ, setStats, setDistribution, fromGroup, parseDVW, teamPlayers, teamLineups, serverStats, receptionStats, serveTarget, rotStats, leagueSO, shrunk, matrix, startHistory, patterns, predict, phases, eqRot, fromEq, nextRot, normName, pSideout };
+  return { SETZ, CALLS, callGroup, attackZones, attackDirections, hotBall, setStats, setDistribution, fromGroup, parseDVW, teamPlayers, teamLineups, serverStats, receptionStats, serveTarget, rotStats, leagueSO, shrunk, matrix, startHistory, patterns, predict, phases, eqRot, fromEq, nextRot, normName, pSideout };
 })();
 if (typeof module !== 'undefined') module.exports = RC;
 
@@ -720,7 +815,7 @@ const saved = load() || {};
 const S = {
   matches: (saved.matches && saved.matches.every(m => m.lineups && m.sets.every(st => !st.rallies.length || st.rallies[0].length > 12))) ? saved.matches : SAMPLE, customData: true,
   myKey: saved.myKey, oppKey: saved.oppKey, tab: saved.tab || 'bench',
-  bench: Object.assign(freshBench(), saved.bench || {}, { points: (saved.bench && saved.bench.points) || [], phase: (saved.bench && saved.bench.phase) || 'sheet' }), studyServe: saved.studyServe ?? 0, sel: null, hist: 'opp', srot: 1, sland: 0, sq: '*'
+  bench: Object.assign(freshBench(), saved.bench || {}, { points: (saved.bench && saved.bench.points) || [], phase: (saved.bench && saved.bench.phase) || 'sheet' }), studyServe: saved.studyServe ?? 0, sel: null, hist: 'opp', srot: 1, sland: 0, sq: '*', scall: '*', drot: 1
 };
 const cache = {};
 const invalidate = () => { for (const k in cache) delete cache[k]; };
@@ -787,12 +882,12 @@ function oppRows(withLive) {
 const ROLE = { 1: ['L', 'Libero'], 2: ['S', 'Schiacciatrice'], 3: ['O', 'Opposto'], 4: ['C', 'Centrale'], 5: ['P', 'Palleggiatrice'] };
 function people(base) {
   const k = 'pp|' + S.myKey + '|' + S.oppKey;
-  if (!cache.pp || cache.pp.k !== k) cache.pp = { k, my: { P: RC.teamPlayers(S.matches, S.myKey), L: RC.teamLineups(S.matches, S.myKey) }, opp: { P: RC.teamPlayers(S.matches, S.oppKey), L: RC.teamLineups(S.matches, S.oppKey) } };
+  if (!cache.pp || cache.pp.k !== k) cache.pp = { k, my: { P: RC.teamPlayers(S.matches, S.myKey), L: RC.teamLineups(S.matches, S.myKey), AZ: RC.attackZones(S.matches, S.myKey) }, opp: { P: RC.teamPlayers(S.matches, S.oppKey), L: RC.teamLineups(S.matches, S.oppKey), AZ: RC.attackZones(S.matches, S.oppKey) } };
   const o = S.bench.ovr;
-  if (base || S.tab !== 'bench' || !o || (!o.my && !o.opp)) return cache.pp;
+  if (base || !o || (!o.my && !o.opp)) return cache.pp;
   return {
-    my: o.my ? { P: cache.pp.my.P, L: rotateLineups(o.myRot, o.my), ovr: true } : cache.pp.my,
-    opp: o.opp ? { P: cache.pp.opp.P, L: rotateLineups(o.oppRot, o.opp), ovr: true } : cache.pp.opp
+    my: o.my ? { P: cache.pp.my.P, AZ: cache.pp.my.AZ, L: rotateLineups(o.myRot, o.my), ovr: true } : cache.pp.my,
+    opp: o.opp ? { P: cache.pp.opp.P, AZ: cache.pp.opp.AZ, L: rotateLineups(o.oppRot, o.opp), ovr: true } : cache.pp.opp
   };
 }
 function slot(team, num, side) {
@@ -803,12 +898,16 @@ function slot(team, num, side) {
   return `<div class="pl ${side}${att ? '' : ' set'}"><span class="rl" title="${r[1]}">${r[0]}</span><span class="nm"><b class="num">${num}</b> ${esc(p.last)}</span>${att && p.aN ? `<span class="ef num ${effCls}" title="Efficienza in attacco su ${p.aN} attacchi">${Math.round(p.eff * 100)}%</span>` : `<span class="ef n">${p.role === 5 ? 'alzatrice' : ''}</span>`}</div>`;
 }
 // prima linea dopo i cambi: palleggiatrice/opposto in 2, centrale in 3, schiacciatrice in 4
-function frontSwitched(team, zones) {
-  const pos = { 4: zones[3], 3: zones[2], 2: zones[1] };
+// prima linea dopo i cambi: prima la zona d'attacco reale dai file, poi il ruolo, poi la posizione
+function frontSwitched(team, zones, rot) {
+  const front = [zones[3], zones[2], zones[1]];
+  const az = (team.AZ && rot && team.AZ[rot]) || {};
   const want = n => { const r = (team.P[n] || {}).role; return r === 5 || r === 3 ? 2 : r === 4 ? 3 : r === 2 ? 4 : null; };
-  const out = {}, left = [];
-  [pos[4], pos[3], pos[2]].forEach(n => { const w = want(n); if (w && !out[w]) out[w] = n; else left.push(n); });
-  [4, 3, 2].forEach(z => { if (!out[z]) out[z] = left.shift(); });
+  const out = {};
+  let left = [];
+  front.forEach(n => { const w = az[n]; if (w && !out[w]) out[w] = n; else left.push(n); });
+  const left2 = []; left.forEach(n => { const w = want(n); if (w && !out[w]) out[w] = n; else left2.push(n); });
+  [4, 3, 2].forEach(z => { if (!out[z]) out[z] = left2.shift(); });
   return out;
 }
 function attackers(team, zones) { return [1, 2, 3].filter(i => { const p = team.P[zones[i]]; return !p || (p.role !== 5 && p.role !== 1); }).length; }
@@ -817,7 +916,7 @@ function netView(a, b, sv) {
   const pp = people(), lm = pp.my.L[a], lo = pp.opp.L[b];
   if (!lm || !lo) return '<p class="note">Formazione non disponibile nei file per questa rotazione.</p>';
   const zm = lm.zones, zo = lo.zones;
-  const fm = frontSwitched(pp.my, zm), fo = frontSwitched(pp.opp, zo);
+  const fm = frontSwitched(pp.my, zm, a), fo = frontSwitched(pp.opp, zo, b);
   const cols = [[4, 2], [3, 3], [2, 4]]; // zona d'attacco: nostra, loro
   const server = sv === 0 ? pp.my.P[zm[0]] : pp.opp.P[zo[0]];
   const srvNum = sv === 0 ? zm[0] : zo[0];
@@ -930,7 +1029,7 @@ function setLine(b, zone) {
 }
 function setSection() {
   const pp = people(), { sd } = serveData();
-  const b = S.srot, r = RC.setDistribution(sd, b, S.sland, S.sq);
+  const b = S.srot, r = RC.setDistribution(sd, b, S.sland, S.sq, S.scall);
   if (!r.nRot) return '<p class="note">Nei file non ci sono attacchi dopo ricezione per questa rotazione.</p>';
   const max = Math.max(...RC.SETZ.map(z => r.d[z]));
   const cell = z => { const w = r.who[z]; const v = r.d[z];
@@ -940,6 +1039,7 @@ function setSection() {
     <div class="row" style="margin-bottom:12px">
       <div class="field"><span class="lbl">Loro rotazione in ricezione</span><div class="chips">${[1, 2, 3, 4, 5, 6].map(i => chip('srot', i, S.srot, 'P' + i)).join('')}</div></div>
       <div class="field"><span class="lbl">Loro ricezione</span><div class="chips">${chip('sq', '*', S.sq, 'Tutte', 'wide')}${chip('sq', 'pos', S.sq, 'Positiva', 'wide')}${chip('sq', 'mid', S.sq, 'Media', 'wide')}${chip('sq', 'neg', S.sq, 'Negativa', 'wide')}</div></div>
+      ${callChips(r)}
     </div>
     <div class="setgrid">
       <div class="landpick">
@@ -955,8 +1055,9 @@ function setSection() {
         ${r.d.D >= 0.03 ? `<p class="n" style="margin-top:6px">${SL.D}: <b class="num">${pc(r.d.D)}</b></p>` : ''}
       </div>
       <div class="setinfo">
-        <p><b>${r.n}</b> attacchi dopo ricezione ${S.sland ? `con battuta in zona ${S.sland}` : 'in questa rotazione'}${S.sq !== '*' ? ' e ricezione ' + ({ pos: 'positiva', mid: 'media', neg: 'negativa' })[S.sq] : ''} (${r.nRot} in P${b} in totale). ${r.n < 8 ? 'Pochi dati: la stima si appoggia soprattutto alla media della rotazione.' : ''}</p>
-        ${lineup ? (() => { const f = frontSwitched(pp.opp, lineup.zones); return `<p class="n">Prima linea dopo i cambi: ${[4, 3, 2].map(z => pname(pp.opp, f[z]) + ' in ' + z).join(', ')}. Palleggiatrice in zona ${b} di rotazione.</p>`; })() : ''}
+        <p><b>${r.n}</b> attacchi dopo ricezione ${S.sland ? `con battuta in zona ${S.sland}` : 'in questa rotazione'}${S.sq !== '*' ? ' e ricezione ' + ({ pos: 'positiva', mid: 'media', neg: 'negativa' })[S.sq] : ''}${S.scall !== '*' ? ' · ' + X('call' + S.scall) : ''} (${r.nRot} in P${b} in totale). ${r.n < 8 ? 'Pochi dati: la stima si appoggia soprattutto alla media della rotazione.' : ''}</p>
+        ${lineup ? (() => { const f = frontSwitched(pp.opp, lineup.zones, b); return `<p class="n">Prima linea dopo i cambi: ${[4, 3, 2].map(z => pname(pp.opp, f[z]) + ' in ' + z).join(', ')}. Palleggiatrice in zona ${b} di rotazione.</p>`; })() : ''}
+        <p class="note">${X('callNote')}</p>
         <p class="note">Il campo è visto dal vostro lato della rete: in basso la loro prima linea (zona 2 a sinistra, zona 4 a destra), in alto la seconda linea. Per ogni zona: quota di primi attacchi dopo ricezione, attaccante più frequente e punti fatti su attacchi.</p>
       </div>
     </div>`;
@@ -993,7 +1094,8 @@ const TT = {
     reset: 'Ripristina', ourTeam: 'Noi', theirTeam: 'Loro', lost: 'Perso', won: 'Vinto',
     basedOn: n => `Basata su ${n} set.`, keep: (w, p) => `Dopo un set ${w ? 'vinto' : 'perso'} confermano lo schieramento nel ${p} dei casi.`,
     few: 'Pochi dati: previsione indicativa.', pickWith: 'contro la prevista', pickReal: 'contro la reale',
-    sameTeams: 'Scegli due squadre diverse in alto.'
+    sameTeams: 'Scegli due squadre diverse in alto.',
+    replace: (pos, n) => `Posizione ${pos}: chi entra al posto di ${n}?`, close: 'Chiudi', tapToChange: 'Tocca una giocatrice per cambiarla.', resetPlayers: 'Ripristina giocatrici', changed: 'cambiata'
   },
   en: {
     set: 'Set', serveFirst: 'Serving first', us: 'Us', them: 'Them',
@@ -1023,7 +1125,8 @@ const TT = {
     reset: 'Reset', ourTeam: 'Us', theirTeam: 'Them', lost: 'Lost', won: 'Won',
     basedOn: n => `Based on ${n} sets.`, keep: (w, p) => `After ${w ? 'winning' : 'losing'} a set they keep the same alignment ${p} of the time.`,
     few: 'Little data: treat it as a rough guide.', pickWith: 'vs predicted', pickReal: 'vs actual',
-    sameTeams: 'Pick two different teams at the top.'
+    sameTeams: 'Pick two different teams at the top.',
+    replace: (pos, n) => `Position ${pos}: who comes in for ${n}?`, close: 'Close', tapToChange: 'Tap a player to change her.', resetPlayers: 'Reset players', changed: 'changed'
   }
 };
 const T = (k, ...a) => { const v = TT[LANG][k]; return typeof v === 'function' ? v(...a) : v; };
@@ -1036,11 +1139,29 @@ function rotateLineups(startRot, zones) {
   return L;
 }
 // foglietto: IV III II davanti, V VI I dietro
-function sheetGrid(team, r, side) {
+function sheetGrid(team, r, side, editKey) {
   const l = team.L[r];
   if (!l) return '';
-  const cell = i => { const n = l.zones[i], p = team.P[n]; return `<div class="sc ${side}"><span class="rn">${ROMAN[i]}</span><b class="num">${n}</b><span class="sn" title="${p ? esc(p.last) : ''}">${p ? esc(p.last) : ''}</span></div>`; };
-  return `<div class="sheet">${[3, 2, 1, 4, 5, 0].map(cell).join('')}</div>`;
+  const base = editKey ? people(true)[editKey].L[r] : null;
+  const cell = i => {
+    const n = l.zones[i], p = team.P[n];
+    const chg = base && base.zones[i] !== n;
+    const open = editKey && S.slotEdit && S.slotEdit.side === editKey && S.slotEdit.i === i;
+    const inner = `<span class="rn">${ROMAN[i]}</span><b class="num">${n}</b><span class="sn" title="${p ? esc(p.last) : ''}">${p ? esc(p.last) : ''}</span>`;
+    return editKey ? `<button class="sc ${side}${chg ? ' chg' : ''}${open ? ' open' : ''}" data-bslot="${editKey}|${i}|${r}" aria-label="${ROMAN[i]} ${n} ${p ? esc(p.last) : ''}${chg ? ' (' + T('changed') + ')' : ''}">${inner}</button>` : `<div class="sc ${side}">${inner}</div>`;
+  };
+  let html = `<div class="sheet">${[3, 2, 1, 4, 5, 0].map(cell).join('')}</div>`;
+  if (editKey) {
+    html += S.slotEdit && S.slotEdit.side === editKey ? slotPicker(team, l.zones, editKey) : `<p class="n">${T('tapToChange')}</p>`;
+    if (S.bench.ovr && S.bench.ovr[editKey]) html += `<div><button class="bchip sm" data-bact="ovrreset" data-v="${editKey}">${T('resetPlayers')}</button></div>`;
+  }
+  return html;
+}
+function slotPicker(team, zones, key) {
+  const i = S.slotEdit.i, cur = zones[i];
+  const list = Object.values(team.P).filter(p => p.role !== 1).sort((x, y) => x.num - y.num);
+  return `<div class="picker"><div class="pkh"><b>${T('replace', ROMAN[i], team.P[cur] ? `${esc(team.P[cur].last)} (${cur})` : cur)}</b><button class="bchip sm" data-bslotx="1">${T('close')}</button></div>
+    <div class="pklist">${list.map(p => { const on = zones.indexOf(p.num); return `<button class="pk${p.num === cur ? ' cur' : ''}" data-bswap="${key}|${i}|${p.num}"><b class="num">${p.num}</b><span>${esc(p.last)}</span><span class="n">${(ROLE[p.role] || ['', ''])[1]}${on >= 0 && p.num !== cur ? ' · ' + ROMAN[on] : ''}</span></button>`; }).join('')}</div></div>`;
 }
 // riproduce il set dai punti toccati
 function replay(b) {
@@ -1151,7 +1272,7 @@ function renderBench() {
       <div class="tcard pick${sheetPhase ? ' active' : ''}"><span class="tlbl">${T('pickTitle')}</span>
         ${sheetPhase ? bigP('bpick', pick) : ''}
         <div class="tbig"><b>P${pick}</b><span><b class="num">${pc(pctPick)}</b> ${T('winSet')}<br><span class="n">${pick === best ? T('same') : T('diff', d)}</span></span></div>
-        ${pick !== best ? sheetGrid(pp.my, pick, 'us') : ''}</div>`;
+        ${sheetGrid(pp.my, pick, 'us', 'my')}</div>`;
   const predCard = `
       <div class="tcard pred"><span class="tlbl">${T('predTitle')}</span>
         <div class="tbig"><b>P${topOpp[0]}</b><span><b class="num">${pc(dist[topOpp[0]])}</b>${altOpp.length ? `<br><span class="n">${T('alts')}: ${altOpp.map(x => `P${x} ${pc(dist[x])}`).join(' · ')}</span>` : ''}</span></div>
@@ -1160,7 +1281,7 @@ function renderBench() {
   const realCard = `
       <div class="tcard real${sheetPhase || !real ? ' active' : ''}"><span class="tlbl">${T('realTitle')}</span>
         ${bigP('breal', real, 'hot')}
-        ${real ? `<div class="tbig"><b class="hot">P${real}</b><span class="n">${real === topOpp[0] ? '✓' : ''}</span></div>${sheetGrid(pp.opp, real, 'them')}` : `<p class="n">${sheetPhase ? T('notKnown') : T('realPrompt')}</p>`}</div>`;
+        ${real ? `<div class="tbig"><b class="hot">P${real}</b><span class="n">${real === topOpp[0] ? '✓' : ''}</span></div>${sheetGrid(pp.opp, real, 'them', 'opp')}` : `<p class="n">${sheetPhase ? T('notKnown') : T('realPrompt')}</p>`}</div>`;
   const teams = `<section class="duo">${recCard}${predCard}${pickCard}${realCard}</section>`;
 
   if (sheetPhase) {
@@ -1193,6 +1314,7 @@ function counterBlock() {
       <div class="side${r.sv === 0 ? ' srv' : ''}"><span class="tn">${n1}</span><b class="num">${r.su}</b><span class="rot">P${r.a}${r.sv === 0 ? ` · ${T('serving')}` : ''}</span></div>
       <div class="side them${r.sv === 1 ? ' srv' : ''}"><span class="tn">${n2}</span><b class="num">${r.so}</b><span class="rot">P${r.o}${r.sv === 1 ? ` · ${T('serving')}` : ''}</span></div>
     </div>
+    ${alarms().map(([k, t]) => `<p class="alarm ${k}">${t}</p>`).join('')}
     <div class="ptbtns"><button class="ptbtn us" data-bact="pt" data-v="U">${T('pointUs')}</button><button class="ptbtn them" data-bact="pt" data-v="T">${T('pointThem')}</button></div>
     <div class="brow wrap" style="margin-top:10px"><button class="bchip sm" data-bact="undo"${b.points.length ? '' : ' disabled'}>${T('undo')}</button><button class="bchip sm" data-bact="fixtoggle" aria-pressed="${String(!!S.fixOpen)}">${T('fix')}</button></div>
     ${S.fixOpen ? `<div class="brow wrap" style="margin-top:10px">
@@ -1260,20 +1382,33 @@ function playersBlock(pick, oppRot) {
 }
 
 function details(pick, oppRot, M) {
-  return playersBlock(pick, oppRot) + `
+  const cur = S.bench.points.length && S.bench.oppReal && S.bench.phase === 'live' ? replay(S.bench).o : oppRot;
+  if (S.bench.points.length && S.bench.phase === 'live') S.srot = cur;
+  return `
   <details class="panel" id="benchPlan"${S.planOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('plan')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${servePlan(pick, oppRot, S.bench.weServe ? 0 : 1)}</details>
   <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('setDist')}</h2> <span class="n">P${S.srot}</span></summary>${setSection()}</details>
+  <details class="panel" id="benchBlock"${S.blockOpen ? ' open' : ''}><summary><h2 style="display:inline">${X('blockTitle')}</h2> <span class="n">P${cur}</span></summary>${blockSection(cur, true)}</details>
+  <details class="panel" id="benchHot"${S.hotOpen ? ' open' : ''}><summary><h2 style="display:inline">${X('hotTitle')}</h2></summary>${hotSection(true)}</details>
   <details class="panel" id="benchNets"${S.netsOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('nets')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${phaseNets(pick, oppRot, S.bench.weServe ? 0 : 1, M)}</details>`;
 }
 
 function benchClick(d, t) {
   const b = S.bench;
-  if (d.bset) { const n = +d.bset; if (n !== b.set) { b.set = n; b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; b.ovr = null; if (n === 5) b.weServe = null; } return true; }
+  if (d.bset) { const n = +d.bset; if (n !== b.set) { b.set = n; b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; S.slotEdit = null; if (n === 5) b.weServe = null; } return true; }
   if (d.bserve != null) { b.weServe = d.bserve === '1'; return true; }
   if (d.bprev) { b.prevOppStart = +d.bprev; return true; }
   if (d.bpwon != null) { b.prevOppWon = d.bpwon === '1'; return true; }
-  if (d.bpick) { b.myPick = +d.bpick; b.ovr = b.ovr ? { ...b.ovr, my: null } : null; return true; }
-  if (d.breal) { b.oppReal = +d.breal; b.ovr = b.ovr ? { ...b.ovr, opp: null } : null; S.srot = b.oppReal; return true; }
+  if (d.bpick) { b.myPick = +d.bpick; S.slotEdit = null; return true; }
+  if (d.breal) { b.oppReal = +d.breal; S.srot = b.oppReal; S.slotEdit = null; return true; }
+  if (d.bslot) { const [k, i, r] = d.bslot.split('|'); S.slotEdit = S.slotEdit && S.slotEdit.side === k && S.slotEdit.i === +i ? null : { side: k, i: +i, r: +r }; return true; }
+  if (d.bslotx) { S.slotEdit = null; return true; }
+  if (d.bswap) {
+    const [k, i, num] = d.bswap.split('|').map((x, j) => j ? +x : x);
+    const rot = S.slotEdit ? S.slotEdit.r : null; if (!rot) return true;
+    const zones = people()[k].L[rot].zones.slice(); const j = zones.indexOf(num);
+    if (j >= 0 && j !== i) zones[j] = zones[i];
+    zones[i] = num; b.ovr = Object.assign({}, b.ovr || {}, { [k]: zones, [k + 'Rot']: rot }); S.slotEdit = null; return true;
+  }
   if (d.bwin) { b.endWin = d.bwin; return true; }
   if (d.bfixmy) { b.points.push({ fix: 'my', to: +d.bfixmy }); return true; }
   if (d.bfixop) { b.points.push({ fix: 'op', to: +d.bfixop }); return true; }
@@ -1283,7 +1418,7 @@ function benchClick(d, t) {
   else if (act === 'pt') { b.points.push(d.v); }
   else if (act === 'undo') { b.points.pop(); }
   else if (act === 'fixtoggle') { S.fixOpen = !S.fixOpen; }
-  else if (act === 'ovrreset') { b.ovr = null; }
+  else if (act === 'ovrreset') { if (d.v && b.ovr) { b.ovr = Object.assign({}, b.ovr, { [d.v]: null }); } else b.ovr = null; S.slotEdit = null; }
   else if (act === 'save') {
     const r = replay(b), target = b.set === 5 ? 15 : 25;
     const auto = (r.su >= target || r.so >= target) && Math.abs(r.su - r.so) >= 2 ? (r.su > r.so ? 'noi' : 'loro') : null;
@@ -1294,13 +1429,183 @@ function benchClick(d, t) {
   }
   else if (act === 'next') {
     const last = b.log[b.log.length - 1];
-    b.set = Math.min(5, last.set + 1); b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; b.ovr = null; S.fixOpen = false;
+    b.set = Math.min(5, last.set + 1); b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; S.fixOpen = false; S.slotEdit = null;
     b.weServe = b.set === 5 ? null : last.oppServe; // chi ha ricevuto per primo nel set prima, batte per primo
     window.scrollTo({ top: 0 });
   }
   else if (act === 'newmatch') { S.bench = freshBench(); invalidate(); }
   else return false;
   return true;
+}
+
+// ---------- nuove funzioni: chiamate, muro e difesa, palla calda, allarmi, report ----------
+const TX = {
+  it: {
+    calls: 'Chiamata della centrale', callAll: 'Tutte', callK7: 'K7', callK1C: 'K1 + KC', callKF: 'KF', callALT: 'Altre',
+    callNote: 'Chiamata fatta dalla palleggiatrice alla centrale prima dell\'alzata (dal file DataVolley). "Altre" comprende anche KO, la palla alta senza primo tempo.',
+    blockTitle: 'Muro e difesa', blockRot: 'Loro rotazione', blockFrom: z => `Da ${z}`, blockShare: 'degli attacchi', kills: 'punti',
+    line: 'Lungolinea', diag: 'Diagonale', center: 'Centro', blockAdv: (z, p) => `Muro: aiuto verso ${z} (${p} degli attacchi).`,
+    defAdv: (z, p) => `Difesa: la palla cade più spesso in zona ${z} (${p}).`, ourCourt: 'Nostro campo, rete in alto',
+    blockNote: 'Tutti gli attacchi della squadra in quella rotazione, in ricezione e in transizione. Zone del vostro campo come in DataVolley: 4 3 2 a rete, 5 6 1 in fondo.',
+    hotTitle: 'Palla calda', hotAll: 'Di solito', hot20: 'Da 20 in su', hotNeg: 'Dopo ricezione negativa',
+    hotLead: (who, p, base) => `Da 20 in su la palla va soprattutto a ${who}: ${p} (di solito ${base}).`,
+    hotNegLead: (who, p, base) => `Dopo una ricezione negativa: ${who}, ${p} (di solito ${base}).`,
+    hotNote: 'Quota degli attacchi di ogni giocatrice. Nel quinto set conta da 10 in su. Freccia: almeno 5 punti percentuali in più del solito.',
+    alarms: 'Avvisi', runThem: n => `Parziale di ${n} punti per loro: valuta il timeout.`, runUs: n => `Parziale di ${n} punti per voi.`,
+    soLow: (r, w, n) => `Nella vostra P${r} oggi cambio palla ${w} su ${n}: valuta un cambio o una ricezione diversa.`,
+    soHigh: (r, w, n) => `Nella loro P${r} oggi fanno cambio palla ${w} su ${n}: spingi di più la battuta.`,
+    report: 'Report', reportTitle: 'Report pre-gara', print: 'Stampa o salva in PDF',
+    printNote: 'Nell\'app installata: tocca il pulsante e scegli "Salva come PDF". Nella pagina dentro Claude la stampa non è disponibile.',
+    repStart: 'Partenza', repWeServe: 'Se battiamo noi', repTheyServe: 'Se battono loro', repRec: (a, b, p) => `Consigliata P${a} contro la loro più probabile P${b} (${p} di vincere il set)`,
+    repSet: 'Alzata dopo ricezione, per rotazione', repBlock: 'Muro e difesa, per rotazione', repMain: 'Attacco principale', repWhere: 'Dove cade',
+    playersStudy: 'Giocatrici in campo', playersStudyNote: 'Cambia chi è diverso dal solito: tutte le analisi di Studio usano queste formazioni.',
+    jumpBlock: 'Muro e difesa', jumpHot: 'Palla calda', jumpPlayers: 'In campo'
+  },
+  en: {
+    calls: 'Middle blocker call', callAll: 'All', callK7: 'K7', callK1C: 'K1 + KC', callKF: 'KF', callALT: 'Other',
+    callNote: 'Call made by the setter to the middle before the set (from the DataVolley file). "Other" also includes KO, the high ball with no quick.',
+    blockTitle: 'Block and defense', blockRot: 'Their rotation', blockFrom: z => `From ${z}`, blockShare: 'of attacks', kills: 'kills',
+    line: 'Line', diag: 'Cross', center: 'Middle', blockAdv: (z, p) => `Block: help towards ${z} (${p} of attacks).`,
+    defAdv: (z, p) => `Defense: the ball lands most often in zone ${z} (${p}).`, ourCourt: 'Our court, net at the top',
+    blockNote: 'All attacks by the team in that rotation, in reception and transition. Zones of your court as in DataVolley: 4 3 2 at the net, 5 6 1 at the back.',
+    hotTitle: 'Hot ball', hotAll: 'Usually', hot20: 'From 20 on', hotNeg: 'After a poor pass',
+    hotLead: (who, p, base) => `From 20 on the ball goes mostly to ${who}: ${p} (usually ${base}).`,
+    hotNegLead: (who, p, base) => `After a poor pass: ${who}, ${p} (usually ${base}).`,
+    hotNote: 'Share of attacks for each player. In the fifth set it counts from 10 on. Arrow: at least 5 percentage points above usual.',
+    alarms: 'Alerts', runThem: n => `They are on a ${n}-point run: consider a timeout.`, runUs: n => `You are on a ${n}-point run.`,
+    soLow: (r, w, n) => `In your P${r} today you side out ${w} of ${n}: consider a sub or a different reception.`,
+    soHigh: (r, w, n) => `In their P${r} today they side out ${w} of ${n}: serve more aggressively.`,
+    report: 'Report', reportTitle: 'Pre-match report', print: 'Print or save as PDF',
+    printNote: 'In the installed app: tap the button and choose "Save as PDF". Inside Claude printing is not available.',
+    repStart: 'Starting rotation', repWeServe: 'If we serve first', repTheyServe: 'If they serve first', repRec: (a, b, p) => `Recommended P${a} against their most likely P${b} (${p} to win the set)`,
+    repSet: 'Set after reception, by rotation', repBlock: 'Block and defense, by rotation', repMain: 'Main attack', repWhere: 'Where it lands',
+    playersStudy: 'Players on court', playersStudyNote: 'Change whoever differs from usual: every Study analysis uses these line-ups.',
+    jumpBlock: 'Block & defense', jumpHot: 'Hot ball', jumpPlayers: 'On court'
+  }
+};
+const X = (k, ...a) => { const v = TX[LANG][k]; return typeof v === 'function' ? v(...a) : v; };
+
+function extraData() {
+  const k = 'ex|' + S.myKey + '|' + S.oppKey;
+  if (cache.ex && cache.ex.k === k) return cache.ex;
+  cache.ex = { k, dir: RC.attackDirections(S.matches, S.oppKey), hot: RC.hotBall(S.matches, S.oppKey) };
+  return cache.ex;
+}
+
+// chiamate della centrale: pulsanti per la distribuzione dell'alzata
+function callChips(r) {
+  const n = c => r.calls && r.calls[c] ? ` <span class="cnt">${r.calls[c]}</span>` : '';
+  return `<div class="field"><span class="lbl">${X('calls')}</span><div class="chips">${chip('scall', '*', S.scall, X('callAll'), 'wide')}${RC.CALLS.map(c => chip('scall', c, S.scall, X('call' + c) + n(c), 'wide')).join('')}</div></div>`;
+}
+
+// nostro campo visto dalla panchina, rete in alto: 4 3 2 / 7 8 9 / 5 6 1
+function ourCourt(to, n, hi) {
+  const rows = [[4, 3, 2], [7, 8, 9], [5, 6, 1]];
+  const max = Math.max(1, ...Object.values(to));
+  return `<div class="ocourt" aria-label="${X('ourCourt')}"><span class="onet"></span>${rows.map(r => r.map(z => {
+    const v = to[z] || 0, p = n ? v / n : 0;
+    return `<span class="oz${z === hi ? ' top' : ''}" style="--a:${Math.round(v / max * 70)}%"><b>${z}</b><i class="num">${v ? pc(p) : ''}</i></span>`;
+  }).join('')).join('')}</div>`;
+}
+const LANES = { '4': { line: [1, 9], diag: [5, 7], center: [6, 8, 3] }, '2': { line: [5, 7], diag: [1, 9], center: [6, 8, 3] } };
+
+function blockSection(b, compact) {
+  const pp = people(), d = extraData().dir[b] || {};
+  const groups = Object.entries(d).sort((x, y) => y[1].n - x[1].n);
+  const tot = groups.reduce((s, [, o]) => s + o.n, 0);
+  if (!tot) return '<p class="note">—</p>';
+  const top = groups.slice(0, compact ? 2 : 3);
+  const cards = top.map(([g, o]) => {
+    const whoNum = +Object.entries(o.who).sort((x, y) => y[1] - x[1])[0][0];
+    const land = Object.entries(o.to).sort((x, y) => y[1] - x[1]);
+    const hz = land.length ? +land[0][0] : null;
+    let lanes = '';
+    if (LANES[g]) {
+      const sum = zs => zs.reduce((s, z) => s + (o.to[z] || 0), 0);
+      lanes = `<p class="n">${X('line')} ${pc(sum(LANES[g].line) / o.n)} · ${X('diag')} ${pc(sum(LANES[g].diag) / o.n)} · ${X('center')} ${pc(sum(LANES[g].center) / o.n)}</p>`;
+    }
+    return `<div class="bk"><div class="bkh"><b>${X('blockFrom', SL[g])}</b><span class="num">${pc(o.n / tot)} <span class="n">${X('blockShare')}</span></span></div>
+      <p>${pname(pp.opp, whoNum)} <span class="n">· ${o.k}/${o.n} ${X('kills')}</span></p>
+      ${ourCourt(o.to, o.n, hz)}${lanes}
+      ${hz ? `<p class="n">${X('defAdv', hz, pc((o.to[hz] || 0) / o.n))}</p>` : ''}</div>`;
+  }).join('');
+  const [g0, o0] = groups[0];
+  return `<p class="adv">${X('blockAdv', SL[g0], pc(o0.n / tot))}</p><div class="bks">${cards}</div>${compact ? '' : `<p class="note" style="margin-top:8px">${X('blockNote')}</p>`}`;
+}
+
+function hotSection(compact) {
+  const pp = people(), h = extraData().hot;
+  if (!h.all.n) return '<p class="note">—</p>';
+  const share = (o, n) => o.n ? (o.p[n] ? o.p[n].n / o.n : 0) : null;
+  const nums = Object.keys(h.all.p).map(Number).filter(n => h.all.p[n].n / h.all.n >= 0.05).sort((x, y) => h.all.p[y].n - h.all.p[x].n);
+  const lead = (o, key) => {
+    if (!o.n) return '';
+    const best = Object.keys(o.p).map(Number).sort((x, y) => o.p[y].n - o.p[x].n)[0];
+    return `<p class="adv">${X(key, pname(pp.opp, best), pc(share(o, best)), pc(share(h.all, best)))}</p>`;
+  };
+  const arrow = (v, base) => v != null && base != null && v - base >= 0.05 ? ' ▲' : '';
+  const rows = nums.map(n => { const a = share(h.all, n), c = share(h.clutch, n), g = share(h.neg, n);
+    return `<tr><td>${pname(pp.opp, n)} <span class="n">${prole(pp.opp, n)}</span></td><td class="r num">${pc(a)}</td><td class="r num ${c - a >= 0.05 ? 'hi' : ''}">${pc(c)}${arrow(c, a)}</td><td class="r num ${g - a >= 0.05 ? 'hi' : ''}">${pc(g)}${arrow(g, a)}</td></tr>`; }).join('');
+  return `${lead(h.clutch, 'hotLead')}${lead(h.neg, 'hotNegLead')}
+    <div class="tbl-wrap"><table><thead><tr><th></th><th class="r">${X('hotAll')} <span class="n">${h.all.n}</span></th><th class="r">${X('hot20')} <span class="n">${h.clutch.n}</span></th><th class="r">${X('hotNeg')} <span class="n">${h.neg.n}</span></th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${compact ? '' : `<p class="note" style="margin-top:8px">${X('hotNote')}</p>`}`;
+}
+
+// avvisi dal conta punti: questo set + set già registrati oggi
+function alarms() {
+  const b = S.bench, r = replay(b), out = [];
+  const rs = r.rallies;
+  let run = 0, who = null;
+  for (let i = rs.length - 1; i >= 0; i--) { if (who == null) who = rs[i].w; if (rs[i].w !== who) break; run++; }
+  if (run >= 3 && who === 1) out.push(['bad', X('runThem', run)]);
+  const today = rs.slice();
+  b.log.forEach(l => { if (l.points && l.points.length) today.push(...replay({ myPick: l.myStart, oppReal: l.oppStart, weServe: !l.oppServe, points: l.points }).rallies); });
+  if (r.sv === 1) { const x = today.filter(q => q.a === r.a && q.sv === 1); const w = x.filter(q => q.w === 0).length; if (x.length >= 3 && w / x.length <= 0.34) out.push(['warn', X('soLow', r.a, w, x.length)]); }
+  if (r.sv === 0) { const x = today.filter(q => q.b === r.o && q.sv === 0); const w = x.filter(q => q.w === 1).length; if (x.length >= 3 && w / x.length >= 0.75) out.push(['warn', X('soHigh', r.o, w, x.length)]); }
+  if (run >= 3 && who === 0) out.push(['good', X('runUs', run)]);
+  return out.slice(0, 2);
+}
+
+function studyPlayers(planA, planB) {
+  const pp = people();
+  return `<section class="panel" id="st-players"><h2>${X('playersStudy')}</h2><p class="note" style="margin-bottom:10px">${X('playersStudyNote')}</p>
+    <div class="grid2"><div><h3>${esc(teamName(S.myKey))} · P${planA}</h3>${sheetGrid(pp.my, planA, 'us', 'my')}</div><div><h3>${esc(teamName(S.oppKey))} · P${planB}</h3>${sheetGrid(pp.opp, planB, 'them', 'opp')}</div></div></section>`;
+}
+
+function renderReport() {
+  if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">${T('sameTeams')}</p></section>`;
+  const rows = RC.startHistory(S.matches, S.oppKey);
+  const rec = sv => {
+    const M = mat(sv, 25), pr = RC.predict(rows, { set: 1, oppServeFirst: sv === 1 });
+    const bOpp = [1, 2, 3, 4, 5, 6].sort((x, y) => pr.dist[y] - pr.dist[x])[0];
+    const ex = a => [1, 2, 3, 4, 5, 6].reduce((t, x) => t + pr.dist[x] * M[a][x], 0);
+    const a = [1, 2, 3, 4, 5, 6].sort((x, y) => ex(y) - ex(x))[0];
+    return { a, b: bOpp, p: ex(a) };
+  };
+  const r0 = rec(0), r1 = rec(1);
+  const { sd } = serveData(), pp = people();
+  const setRows = [1, 2, 3, 4, 5, 6].map(b => { const r = RC.setDistribution(sd, b); if (!r.nRot) return ''; const top = RC.SETZ.filter(z => r.d[z] >= 0.1).sort((x, y) => r.d[y] - r.d[x]);
+    return `<tr><td><b>P${b}</b></td><td>${top.map(z => `${SLS[z]} <b class="num">${pc(r.d[z])}</b>${r.who[z] ? ` <span class="n">${pname(pp.opp, r.who[z].num)}</span>` : ''}`).join(' · ')}</td><td class="r n num">${r.nRot}</td></tr>`; }).join('');
+  const dir = extraData().dir;
+  const blockRows = [1, 2, 3, 4, 5, 6].map(b => { const g = Object.entries(dir[b] || {}).sort((x, y) => y[1].n - x[1].n); if (!g.length) return ''; const tot = g.reduce((s, [, o]) => s + o.n, 0); const [k, o] = g[0];
+    const land = Object.entries(o.to).sort((x, y) => y[1] - x[1]).slice(0, 2).map(([z, v]) => `${z} <b class="num">${pc(v / o.n)}</b>`).join(' · ');
+    const who = +Object.entries(o.who).sort((x, y) => y[1] - x[1])[0][0];
+    return `<tr><td><b>P${b}</b></td><td>${SL[k]} <b class="num">${pc(o.n / tot)}</b> <span class="n">${pname(pp.opp, who)}</span></td><td>${land}</td></tr>`; }).join('');
+  const m = model();
+  return `
+  <section class="panel rep-head"><div class="row" style="justify-content:space-between;align-items:center">
+    <div><h2 style="margin:0">${X('reportTitle')}</h2><p class="n">${esc(teamName(S.myKey))} – ${esc(teamName(S.oppKey))}${coachOf(S.oppKey) ? ' · coach ' + esc(coachOf(S.oppKey)) : ''} · ${new Date().toLocaleDateString(LANG === 'it' ? 'it-IT' : 'en-GB')}</p></div>
+    <button class="bigbtn no-print" data-act="print" style="flex:0 1 auto">${X('print')}</button></div>
+    <p class="note no-print" style="margin-top:8px">${X('printNote')}</p></section>
+  <section class="panel"><h2>${X('repStart')}</h2><ul class="findings">
+    <li class="strong"><b>${X('repWeServe')}:</b> ${X('repRec', r0.a, r0.b, pc(r0.p))}</li>
+    <li class="strong"><b>${X('repTheyServe')}:</b> ${X('repRec', r1.a, r1.b, pc(r1.p))}</li></ul>
+    <div style="margin-top:10px">${findings(rows)}</div></section>
+  <section class="panel"><h2>${T('plan')}</h2>${servePlan(r0.a, r0.b, 0)}</section>
+  <section class="panel"><h2>${X('repSet')}</h2><div class="tbl-wrap"><table><tbody>${setRows}</tbody></table></div></section>
+  <section class="panel"><h2>${X('repBlock')}</h2><div class="tbl-wrap"><table><thead><tr><th></th><th>${X('repMain')}</th><th>${X('repWhere')}</th></tr></thead><tbody>${blockRows}</tbody></table></div></section>
+  <section class="panel"><h2>${X('hotTitle')}</h2>${hotSection(true)}</section>
+  <section class="grid2">${rotTable(S.myKey, m.A.st)}${rotTable(S.oppKey, m.B.st)}</section>`;
 }
 
 // ---------- render ----------
@@ -1310,6 +1615,7 @@ function render() {
   if (!S.matches.length && S.tab !== 'data') { main.innerHTML = `<section class="panel"><h2>Nessuna partita caricata</h2><p class="note" style="margin-bottom:12px">Vai alla scheda Dati e carica i file .dvw delle vostre partite e di quelle dell'avversario. Restano solo su questo dispositivo.</p><button class="btn" data-tab="data">Vai a Dati</button></section>`; save(); return; }
   if (S.tab === 'bench') main.innerHTML = renderBench();
   else if (S.tab === 'study') main.innerHTML = renderStudy();
+  else if (S.tab === 'report') main.innerHTML = renderReport();
   else main.innerHTML = renderData();
   save();
 }
@@ -1392,8 +1698,11 @@ function renderStudy() {
   const coach = coachOf(S.oppKey);
   const anyMy = m.A.st.soN + m.A.st.bpN, anyOpp = m.B.st.soN + m.B.st.bpN;
   const jumps = [['st-pattern', 'Pattern'], ['st-matchup', 'Matchup'], ['st-battuta', 'Piano di battuta'], ['st-alzata', 'Alzata'], ['st-battitrici', 'Battuta e ricezione'], ['st-rot', 'Rotazioni'], ['st-rose', 'Giocatrici'], ['st-storico', 'Storico']];
+  jumps.unshift(['st-players', X('jumpPlayers')]); jumps.splice(5, 0, ['st-block', X('jumpBlock')], ['st-hot', X('jumpHot')]);
   return `
   <nav class="jump" aria-label="Sezioni di Studio">${jumps.map(([id, l]) => `<button class="chip wide" data-jump="${id}">${l}</button>`).join('')}</nav>
+
+  ${studyPlayers(planA, planB)}
 
   <section class="panel" id="st-pattern">
     <h2>Pattern di ${esc(teamName(S.oppKey))}${coach ? ` <span class="n" style="font-family:var(--f-body);text-transform:none;font-size:14px;font-weight:500">coach ${esc(coach)}</span>` : ''}</h2>
@@ -1419,6 +1728,12 @@ function renderStudy() {
     <h2>Distribuzione dell'alzata</h2>
     ${setSection()}
   </section>
+
+  <section class="panel" id="st-block"><h2>${X('blockTitle')}</h2>
+    <div class="field" style="margin-bottom:12px"><span class="lbl">${X('blockRot')}</span><div class="chips">${[1, 2, 3, 4, 5, 6].map(i => chip('drot', i, S.drot, 'P' + i)).join('')}</div></div>
+    ${blockSection(S.drot)}</section>
+
+  <section class="panel" id="st-hot"><h2>${X('hotTitle')}</h2>${hotSection()}</section>
 
   <div id="st-battitrici">${serveTables()}</div>
 
@@ -1483,7 +1798,9 @@ document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset, b = S.bench;
   if (d.tab) { S.tab = d.tab; window.scrollTo({ top: 0 }); return render(); }
+  if (d.act === 'print') { try { window.print(); } catch (err) { /* stampa non disponibile */ } return; }
   if (d.jump) { const el = document.getElementById(d.jump); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  if ((d.bslot || d.bslotx || d.bswap || d.bact === 'ovrreset') && benchClick(d, t)) return render();
   if (S.tab === 'bench' && benchClick(d, t)) return render();
   if (false) {}
   else if (d.sserve) { S.studyServe = +d.sserve; }
@@ -1492,12 +1809,14 @@ document.addEventListener('click', e => {
   else if (d.srot) S.srot = +d.srot;
   else if (d.sland != null) S.sland = +d.sland;
   else if (d.sq) S.sq = d.sq;
+  else if (d.scall) S.scall = d.scall;
+  else if (d.drot) S.drot = +d.drot;
   else if (d.del != null) { S.matches = S.matches.filter((_, i) => i !== +d.del); S.customData = true; invalidate(); ensureTeams(); }
   else if (d.act === 'reset') { S.matches = SAMPLE; S.customData = false; invalidate(); ensureTeams(); }
   else return;
   render();
 });
-document.addEventListener('toggle', e => { if (e.target.id === 'benchPlayers') S.playersOpen = e.target.open; if (e.target.id === 'benchNets') S.netsOpen = e.target.open; if (e.target.id === 'benchPlan') S.planOpen = e.target.open; if (e.target.id === 'benchSet') S.setOpen = e.target.open; }, true);
+document.addEventListener('toggle', e => { if (e.target.id === 'benchPlayers') S.playersOpen = e.target.open; if (e.target.id === 'benchBlock') S.blockOpen = e.target.open; if (e.target.id === 'benchHot') S.hotOpen = e.target.open; if (e.target.id === 'benchNets') S.netsOpen = e.target.open; if (e.target.id === 'benchPlan') S.planOpen = e.target.open; if (e.target.id === 'benchSet') S.setOpen = e.target.open; }, true);
 document.addEventListener('change', e => {
   if (e.target.id === 'selMy') { S.myKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
   if (e.target.id === 'selOpp') { S.oppKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
