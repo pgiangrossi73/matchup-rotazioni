@@ -185,6 +185,69 @@ details.panel > summary { cursor: pointer; list-style-position: outside; margin-
 .jump { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin }
 .jump .chip { white-space: nowrap; flex: none }
 [id^="st-"], details.panel { scroll-margin-top: 170px }
+/* panchina: pulsanti grandi */
+.stage h2 { margin-bottom: 8px }
+.brow { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end }
+.brow.wrap { gap: 14px 28px }
+.bfield { display: grid; gap: 6px }
+.bchip { min-width: 64px; min-height: 56px; padding: 0 18px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg); font-size: 20px; font-weight: 700; font-family: var(--f-display); letter-spacing: .02em }
+.bchip.sm { min-height: 44px; min-width: 52px; font-size: 16px; padding: 0 12px }
+.bchip.xl { min-width: 140px; min-height: 72px; font-size: 26px }
+.bchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
+.bchip.hot[aria-pressed="true"] { background: var(--hot); border-color: var(--hot); color: #fff }
+.bchip:disabled { opacity: .4 }
+.pgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
+.pgrid .bchip { min-width: 0; padding: 0 }
+.ask { font-size: 26px }
+.steps { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px }
+.steps span { padding: 6px 12px; border-radius: 99px; background: var(--sunk); color: var(--muted); font-weight: 600; font-size: 13px }
+.steps span.on { background: var(--ink); color: var(--bg) }
+.duo { display: grid; gap: 12px 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); align-items: start }
+.tcol { display: grid; gap: 12px; align-content: start; min-width: 0 }
+.tcard { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; min-width: 0 }
+.tcard.rec, .tcard.pred { background: var(--sunk); border-color: transparent }
+.tcard.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent) }
+.tcard.real.active { border-color: var(--hot); box-shadow: 0 0 0 3px color-mix(in oklab, var(--hot) 22%, transparent) }
+.tlbl { font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: .08em; text-transform: uppercase }
+.tcard.rec .tlbl, .tcard.pick .tlbl { color: var(--accent) }
+.tcard.pred .tlbl, .tcard.real .tlbl { color: var(--hot) }
+.tbig { display: flex; gap: 14px; align-items: center }
+.tbig > b { font-family: var(--f-display); font-size: 58px; line-height: .9; color: var(--accent) }
+.tbig > b.hot, .tcard.pred .tbig > b { color: var(--hot) }
+.tbig span { font-size: 15px }
+.sheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px }
+.sc { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; display: grid; grid-template-columns: auto 1fr; column-gap: 6px; align-items: center; background: var(--surface); min-width: 0 }
+.sc.us { border-color: color-mix(in oklab, var(--accent) 40%, var(--line)) }
+.sc.them { border-color: color-mix(in oklab, var(--hot) 40%, var(--line)) }
+.sc .rn { grid-row: span 2; font-family: var(--f-display); font-weight: 700; font-size: 13px; color: var(--muted); min-width: 22px }
+.sc b { font-size: 17px }
+.sc .sn { font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0 }
+.sc > * { min-width: 0 }
+.sheet.edit .sc { grid-template-columns: auto minmax(0, 1fr) }
+.psel { font-size: 14px; padding: 6px; width: 100% }
+.bar-actions { display: flex; gap: 10px; flex-wrap: wrap }
+.bigbtn { flex: 1 1 240px; min-height: 64px; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-family: var(--f-display); font-weight: 700; font-size: 24px; letter-spacing: .03em; text-transform: uppercase }
+.bigbtn.sec { background: var(--sunk); color: var(--ink); min-height: 52px; font-size: 18px; flex: 0 1 auto; padding: 0 22px }
+.bigbtn:disabled { opacity: .4 }
+.matchhead { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: baseline }
+.matchhead > b { font-family: var(--f-display); font-size: 30px }
+.matchhead b.num { font-size: 22px; color: var(--hot) }
+.phl { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px }
+.phl div { display: grid; grid-template-columns: auto 1fr auto; column-gap: 8px; align-items: center; padding: 8px 10px; border-radius: 8px; background: var(--bg); font-size: 14px }
+.phl div .n:nth-child(3) { grid-column: 2; font-size: 12px }
+.phl div > :last-child { grid-row: 1 / span 2; grid-column: 3; font-size: 16px }
+.score { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 12px }
+.side { border-radius: 14px; padding: 12px; background: var(--sunk); display: grid; justify-items: center; gap: 2px; border: 3px solid transparent }
+.side.srv { border-color: var(--accent) }
+.side.them.srv { border-color: var(--hot) }
+.side .tn { font-size: 13px; font-weight: 600; color: var(--muted); text-align: center }
+.side b { font-family: var(--f-display); font-size: 64px; line-height: 1 }
+.side .rot { font-weight: 700 }
+.ptbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.ptbtn { min-height: 96px; border: 0; border-radius: 16px; font-family: var(--f-display); font-weight: 700; font-size: 30px; text-transform: uppercase; color: #fff }
+.ptbtn.us { background: var(--accent); color: var(--accent-ink) }
+.ptbtn.them { background: var(--hot) }
+.ptbtn:active { transform: scale(.98) }
 .lang { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 6px 4px }
 @media (max-width: 520px) { .verdict .big { font-size: 52px } .brand { font-size: 21px } nav.tabs { width: 100% } nav.tabs button { flex: 1 } }
 @media (prefers-reduced-motion: no-preference) { .bar .t i { transition: width .25s ease } }
@@ -651,12 +714,12 @@ function save() {
   } catch (e) { /* storage non disponibile: si lavora in memoria */ }
 }
 
-const freshBench = () => ({ set: 1, weServe: true, prevOppStart: null, prevOppWon: null, known: null, endOpp: null, endMy: null, endWin: null, log: [] });
+const freshBench = () => ({ set: 1, weServe: true, phase: 'sheet', myPick: null, oppReal: null, recommended: null, points: [], endWin: null, ovr: null, prevOppStart: null, prevOppWon: null, log: [] });
 const saved = load() || {};
 const S = {
   matches: (saved.matches && saved.matches.every(m => m.lineups && m.sets.every(st => !st.rallies.length || st.rallies[0].length > 12))) ? saved.matches : SAMPLE, customData: true,
   myKey: saved.myKey, oppKey: saved.oppKey, tab: saved.tab || 'bench',
-  bench: Object.assign(freshBench(), saved.bench || {}), studyServe: saved.studyServe ?? 0, sel: null, hist: 'opp', srot: 1, sland: 0, sq: '*'
+  bench: Object.assign(freshBench(), saved.bench || {}, { points: (saved.bench && saved.bench.points) || [], phase: (saved.bench && saved.bench.phase) || 'sheet' }), studyServe: saved.studyServe ?? 0, sel: null, hist: 'opp', srot: 1, sland: 0, sq: '*'
 };
 const cache = {};
 const invalidate = () => { for (const k in cache) delete cache[k]; };
@@ -688,11 +751,13 @@ function fmtDate(d) {
 
 // ---------- modello ----------
 function model() {
-  const k = S.myKey + '|' + S.oppKey;
+  const live = liveMatch();
+  const k = S.myKey + '|' + S.oppKey + '|' + S.bench.log.map(l => (l.points || []).length).join(',');
   if (cache.k === k && cache.model) return cache.model;
-  const L = RC.leagueSO(S.matches);
+  const ms = S.matches.concat(live);
+  const L = RC.leagueSO(ms);
   const mk = key => {
-    const st = RC.rotStats(S.matches, key);
+    const st = RC.rotStats(ms, key);
     if (st.so == null) { st.so = L; st.bp = 1 - L; }
     if (st.bp == null) st.bp = 1 - L;
     return { st, est: RC.shrunk(st) };
@@ -719,11 +784,15 @@ function oppRows(withLive) {
 
 // ---------- giocatrici ----------
 const ROLE = { 1: ['L', 'Libero'], 2: ['S', 'Schiacciatrice'], 3: ['O', 'Opposto'], 4: ['C', 'Centrale'], 5: ['P', 'Palleggiatrice'] };
-function people() {
+function people(base) {
   const k = 'pp|' + S.myKey + '|' + S.oppKey;
-  if (cache.pp && cache.pp.k === k) return cache.pp;
-  cache.pp = { k, my: { P: RC.teamPlayers(S.matches, S.myKey), L: RC.teamLineups(S.matches, S.myKey) }, opp: { P: RC.teamPlayers(S.matches, S.oppKey), L: RC.teamLineups(S.matches, S.oppKey) } };
-  return cache.pp;
+  if (!cache.pp || cache.pp.k !== k) cache.pp = { k, my: { P: RC.teamPlayers(S.matches, S.myKey), L: RC.teamLineups(S.matches, S.myKey) }, opp: { P: RC.teamPlayers(S.matches, S.oppKey), L: RC.teamLineups(S.matches, S.oppKey) } };
+  const o = S.bench.ovr;
+  if (base || S.tab !== 'bench' || !o || (!o.my && !o.opp)) return cache.pp;
+  return {
+    my: o.my ? { P: cache.pp.my.P, L: rotateLineups(o.myRot, o.my), ovr: true } : cache.pp.my,
+    opp: o.opp ? { P: cache.pp.opp.P, L: rotateLineups(o.oppRot, o.opp), ovr: true } : cache.pp.opp
+  };
 }
 function slot(team, num, side) {
   const p = team.P[num] || { num, last: '#' + num, role: 0 };
@@ -804,7 +873,7 @@ function servePlan(a0, b0, firstServer) {
   const ph = RC.phases(m.A.est, m.B.est, m.L, a0, b0, firstServer).filter(x => x.sv === 0).slice(0, 6);
   return `<div class="plan">${ph.map(({ a, b }) => {
     const t = RC.serveTarget(rs, b);
-    const srv = ss.byRot[a] ?? (pp.my.L[a] ? pp.my.L[a].zones[0] : null);
+    const srv = (pp.my.ovr && pp.my.L[a]) ? pp.my.L[a].zones[0] : (ss.byRot[a] ?? (pp.my.L[a] ? pp.my.L[a].zones[0] : null));
     const sp = srv != null ? ss.players[srv] : null;
     const base = rs.all.n ? rs.all.so / rs.all.n : 0.55;
     const so = (t.n * (t.so || 0) + 8 * base) / (t.n + 8); // cambio palla con battuta in campo, corretto verso la media
@@ -892,6 +961,347 @@ function setSection() {
     </div>`;
 }
 
+// ---------- Panchina: foglietto -> set in corso -> fine set ----------
+const LANG = 'it';
+const TT = {
+  it: {
+    set: 'Set', serveFirst: 'Batte per primo', us: 'Noi', them: 'Loro',
+    toss: n => `Sorteggio ${n}° set: chi batte per primo?`, tossNote: 'Al quinto set si rifà il sorteggio: scegli chi batte prima di tutto il resto.',
+    prevStart: n => `Loro partenza nel set ${n}`, prevWon: n => `Set ${n} vinto da`,
+    step1: 'Prima del foglietto', step2: 'Set in corso', step3: 'Fine set',
+    recTitle: 'Formazione consigliata', pickTitle: 'Scegli formazione', predTitle: 'Rotazione prevista', realTitle: 'Rotazione reale',
+    winSet: 'vittoria del set', vsPred: 'contro la loro rotazione prevista',
+    delta: (p, d) => `Scelta P${p}: ${d}`, same: 'È la formazione consigliata.', diff: d => `${d > 0 ? '+' : ''}${d}% rispetto alla consigliata`,
+    alts: 'Alternative', notKnown: 'Toccala appena vedi la loro formazione: puoi farlo anche prima di confermare.',
+    confirm: 'Conferma foglietto', edit: 'Modifica foglietto',
+    realPrompt: 'Tocca la loro rotazione reale appena vedi le formazioni.',
+    matchup: (a, b) => `Noi P${a} · Loro P${b}`, setProb: 'probabilità di vincere il set',
+    phases: 'Incroci del primo giro', srvUs: 'battiamo', srvThem: 'battono', rally: 'rally vinti',
+    counter: 'Conta punti (facoltativo)', counterNote: 'Tocca chi vince ogni punto: l\'app segue le rotazioni e a fine set ti dà il riassunto. Se non lo usi, il resto funziona lo stesso.',
+    pointUs: 'Punto noi', pointThem: 'Punto loro', undo: 'Annulla ultimo', fix: 'Correggi rotazione', nowUs: 'Noi ora in', nowThem: 'Loro ora in', serving: 'in battuta',
+    endLooks: w => `Il punteggio dice set finito: vinto da ${w}.`,
+    wonBy: 'Set vinto da', save: 'Registra set',
+    summary: n => `Riassunto set ${n}`, noPoints: 'Set registrato. Il riassunto compare solo se usi il conta punti.',
+    sumCols: ['Rot.', 'Cambio palla', 'Break point', 'Saldo'], sumUs: 'Noi', sumThem: 'Loro',
+    sumNote: 'Verde o rosso: almeno 10 punti percentuali sopra o sotto quanto atteso dai dati pre-gara.',
+    followed: (y, r) => y ? `Avete seguito il consiglio (P${r}).` : `Consiglio non seguito: era P${r}.`,
+    strong: 'Dove siete andati meglio', weak: 'Dove siete andati peggio',
+    next: n => `Vai al set ${n}`, newMatch: 'Nuova partita', log: 'Set giocati',
+    plan: 'Piano di battuta', setDist: "Distribuzione dell'alzata", nets: 'Incroci giocatrici', players: 'Giocatrici in campo',
+    playersNote: 'Formazione sul foglietto (posizioni I–VI). Cambia solo chi è diverso dal solito: incroci e piano di battuta si aggiornano.',
+    reset: 'Ripristina', ourTeam: 'Noi', theirTeam: 'Loro', lost: 'Perso', won: 'Vinto',
+    basedOn: n => `Basata su ${n} set.`, keep: (w, p) => `Dopo un set ${w ? 'vinto' : 'perso'} confermano lo schieramento nel ${p} dei casi.`,
+    few: 'Pochi dati: previsione indicativa.', pickWith: 'contro la prevista', pickReal: 'contro la reale',
+    sameTeams: 'Scegli due squadre diverse in alto.'
+  },
+  en: {
+    set: 'Set', serveFirst: 'Serving first', us: 'Us', them: 'Them',
+    toss: n => `Set ${n} coin toss: who serves first?`, tossNote: 'There is a new toss for the fifth set: choose who serves before anything else.',
+    prevStart: n => `Their start in set ${n}`, prevWon: n => `Set ${n} won by`,
+    step1: 'Before the line-up sheet', step2: 'Set in play', step3: 'End of set',
+    recTitle: 'Recommended line-up', pickTitle: 'Choose line-up', predTitle: 'Predicted rotation', realTitle: 'Actual rotation',
+    winSet: 'chance to win the set', vsPred: 'against their predicted rotation',
+    delta: (p, d) => `Chosen P${p}: ${d}`, same: 'This is the recommended line-up.', diff: d => `${d > 0 ? '+' : ''}${d}% vs recommended`,
+    alts: 'Alternatives', notKnown: 'Tap it as soon as you see their line-up: you can do it before confirming too.',
+    confirm: 'Confirm line-up sheet', edit: 'Edit line-up sheet',
+    realPrompt: 'Tap their actual rotation as soon as you see the line-ups.',
+    matchup: (a, b) => `Us P${a} · Them P${b}`, setProb: 'chance to win the set',
+    phases: 'Matchups in the first pass', srvUs: 'we serve', srvThem: 'they serve', rally: 'rallies won',
+    counter: 'Point counter (optional)', counterNote: 'Tap who wins each point: the app follows the rotations and gives you the set summary. If you skip it, everything else still works.',
+    pointUs: 'Our point', pointThem: 'Their point', undo: 'Undo last', fix: 'Fix rotation', nowUs: 'We are now in', nowThem: 'They are now in', serving: 'serving',
+    endLooks: w => `The score says the set is over: won by ${w}.`,
+    wonBy: 'Set won by', save: 'Save set',
+    summary: n => `Set ${n} summary`, noPoints: 'Set saved. The summary appears only if you use the point counter.',
+    sumCols: ['Rot.', 'Side-out', 'Break point', 'Balance'], sumUs: 'Us', sumThem: 'Them',
+    sumNote: 'Green or red: at least 10 percentage points above or below what the pre-match data expected.',
+    followed: (y, r) => y ? `You followed the recommendation (P${r}).` : `Recommendation not followed: it was P${r}.`,
+    strong: 'Where you did best', weak: 'Where you did worst',
+    next: n => `Go to set ${n}`, newMatch: 'New match', log: 'Sets played',
+    plan: 'Serve plan', setDist: 'Setter distribution', nets: 'Player matchups', players: 'Players on court',
+    playersNote: 'Line-up as on the sheet (positions I–VI). Change only who differs from usual: matchups and serve plan update.',
+    reset: 'Reset', ourTeam: 'Us', theirTeam: 'Them', lost: 'Lost', won: 'Won',
+    basedOn: n => `Based on ${n} sets.`, keep: (w, p) => `After ${w ? 'winning' : 'losing'} a set they keep the same alignment ${p} of the time.`,
+    few: 'Little data: treat it as a rough guide.', pickWith: 'vs predicted', pickReal: 'vs actual',
+    sameTeams: 'Pick two different teams at the top.'
+  }
+};
+const T = (k, ...a) => { const v = TT[LANG][k]; return typeof v === 'function' ? v(...a) : v; };
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+
+// formazioni per tutte le rotazioni a partire dalla formazione sul foglietto (zone 1..6)
+function rotateLineups(startRot, zones) {
+  const L = {}; let r = startRot, z = zones.slice();
+  for (let k = 0; k < 6; k++) { L[r] = { zones: z.slice(), share: 1, n: 0 }; r = RC.nextRot(r); z = [z[1], z[2], z[3], z[4], z[5], z[0]]; }
+  return L;
+}
+// foglietto: IV III II davanti, V VI I dietro
+function sheetGrid(team, r, side) {
+  const l = team.L[r];
+  if (!l) return '';
+  const cell = i => { const n = l.zones[i], p = team.P[n]; return `<div class="sc ${side}"><span class="rn">${ROMAN[i]}</span><b class="num">${n}</b><span class="sn" title="${p ? esc(p.last) : ''}">${p ? esc(p.last) : ''}</span></div>`; };
+  return `<div class="sheet">${[3, 2, 1, 4, 5, 0].map(cell).join('')}</div>`;
+}
+// riproduce il set dai punti toccati
+function replay(b) {
+  let a = b.myPick, o = b.oppReal, sv = b.weServe ? 0 : 1, su = 0, so = 0; const rallies = [];
+  if (!a || !o) return { a, o, sv, su, so, rallies };
+  for (const e of b.points) {
+    if (e === 'U' || e === 'T') {
+      const w = e === 'U' ? 0 : 1; rallies.push({ a, b: o, sv, w });
+      if (w === 0) { su++; if (sv === 1) { a = RC.nextRot(a); sv = 0; } }
+      else { so++; if (sv === 0) { o = RC.nextRot(o); sv = 1; } }
+    } else if (e && e.fix) { if (e.fix === 'my') a = e.to; else o = e.to; }
+  }
+  return { a, o, sv, su, so, rallies };
+}
+function setSummaryStats(rallies) {
+  const mk = () => { const o = {}; for (let r = 1; r <= 6; r++) o[r] = { soN: 0, soW: 0, bpN: 0, bpW: 0, pf: 0, pa: 0 }; return o; };
+  const us = mk(), th = mk();
+  rallies.forEach(x => {
+    const U = us[x.a], H = th[x.b];
+    if (x.sv === 0) { U.bpN++; H.soN++; if (x.w === 0) { U.bpW++; U.pf++; H.pa++; } else { H.soW++; H.pf++; U.pa++; } }
+    else { U.soN++; H.bpN++; if (x.w === 0) { U.soW++; U.pf++; H.pa++; } else { H.bpW++; H.pf++; U.pa++; } }
+  });
+  return { us, th };
+}
+function summaryTable(st, exp, label, invert) {
+  const rows = [1, 2, 3, 4, 5, 6].filter(r => st[r].soN + st[r].bpN).map(r => {
+    const s = st[r];
+    const cell = (w, n, e) => {
+      if (!n) return '<td class="r n">–</td>';
+      const v = w / n, d = v - e; const cls = n >= 3 ? (d >= 0.1 ? 'hi' : d <= -0.1 ? 'lo' : '') : '';
+      return `<td class="r num ${invert ? (cls === 'hi' ? 'lo' : cls === 'lo' ? 'hi' : '') : cls}">${pc(v)} <span class="n">${w}/${n}</span></td>`;
+    };
+    const bal = s.pf - s.pa;
+    return `<tr><td><b class="rh">P${r}</b></td>${cell(s.soW, s.soN, exp.so[r])}${cell(s.bpW, s.bpN, exp.bp[r])}<td class="r num ${invert ? (bal < 0 ? 'hi' : bal > 0 ? 'lo' : '') : (bal > 0 ? 'hi' : bal < 0 ? 'lo' : '')}"><b>${bal > 0 ? '+' : ''}${bal}</b></td></tr>`;
+  }).join('');
+  const c = T('sumCols');
+  return `<div class="panel"><h3>${label}</h3><div class="tbl-wrap"><table><thead><tr><th>${c[0]}</th><th class="r">${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function liveMatch() {
+  // set giocati oggi con il conta punti: entrano nel modello con peso doppio
+  const sets = S.bench.log.filter(l => l.points && l.points.length).map(l => ({ rallies: replay({ myPick: l.myStart, oppReal: l.oppStart, weServe: !l.oppServe, points: l.points }).rallies.map(x => [x.sv, x.w, x.a, x.b]) }));
+  if (!sets.length) return [];
+  const m = { id: 'live', teams: [{ key: S.myKey }, { key: S.oppKey }], sets };
+  return [m, m];
+}
+function baseEst(key) { const st = RC.rotStats(S.matches, key); if (st.so == null) return null; return RC.shrunk(st); }
+
+const bigChip = (attr, val, cur, label, cls = '') => `<button class="bchip ${cls}" data-${attr}="${val}" aria-pressed="${String(cur === val)}">${label}</button>`;
+const bigP = (attr, cur, cls = '') => `<div class="pgrid">${[1, 2, 3, 4, 5, 6].map(i => bigChip(attr, i, cur, 'P' + i, cls)).join('')}</div>`;
+
+function renderBench() {
+  const b = S.bench;
+  if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">${T('sameTeams')}</p></section>`;
+  const pp = people();
+  const setRow = `<div class="bfield"><span class="lbl">${T('set')}</span><div class="brow">${[1, 2, 3, 4, 5].map(i => bigChip('bset', i, b.set, i)).join('')}</div></div>`;
+
+  // 5° set: sorteggio prima di tutto
+  if (b.weServe == null) {
+    return `<section class="panel stage">${setRow}
+      <h2 class="ask">${T('toss', b.set)}</h2><p class="note">${T('tossNote')}</p>
+      <div class="brow">${bigChip('bserve', 1, -1, T('us'), 'xl')}${bigChip('bserve', 0, -1, T('them'), 'xl')}</div></section>${logBlock()}`;
+  }
+  const target = b.set === 5 ? 15 : 25;
+  const M = mat(b.weServe ? 0 : 1, target);
+  const prevLog = b.log.find(l => l.set === b.set - 1);
+  const prevStart = prevLog ? prevLog.oppStart : b.prevOppStart;
+  const prevServe = prevLog ? prevLog.oppServe : (b.set === 5 ? true : b.weServe);
+  const prevWon = prevLog ? prevLog.oppWon : b.prevOppWon;
+  const prevEq = b.set > 1 && prevStart ? RC.eqRot(prevStart, prevServe) : null;
+  const rows = oppRows(true);
+  const pr = RC.predict(rows, { set: b.set, prevEq, prevWon: b.set > 1 ? prevWon : null, oppServeFirst: !b.weServe });
+  const dist = pr.dist;
+  const exp = {}; for (let a = 1; a <= 6; a++) { exp[a] = 0; for (let x = 1; x <= 6; x++) exp[a] += dist[x] * M[a][x]; }
+  const real = b.oppReal;
+  // con la loro rotazione reale nota, la consigliata è la migliore contro quella
+  const score = a => real ? M[a][real] : exp[a];
+  const order = [1, 2, 3, 4, 5, 6].sort((x, y) => score(y) - score(x));
+  const best = order[0];
+  const topOpp = [1, 2, 3, 4, 5, 6].sort((x, y) => dist[y] - dist[x]);
+  const pick = b.myPick || best;
+  const oppRot = real || topOpp[0];
+  const pctPick = real ? M[pick][real] : exp[pick];
+  const pctBest = real ? M[best][real] : exp[best];
+
+  const head = `<section class="panel stage">
+    <div class="brow wrap">${setRow}
+      <div class="bfield"><span class="lbl">${T('serveFirst')}</span><div class="brow">${bigChip('bserve', 1, b.weServe ? 1 : 0, T('us'))}${bigChip('bserve', 0, b.weServe ? 1 : 0, T('them'))}</div></div>
+    </div>
+    ${b.set > 1 && !prevLog ? `<div class="brow wrap" style="margin-top:12px">
+      <div class="bfield"><span class="lbl">${T('prevStart', b.set - 1)}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bprev', i, b.prevOppStart, 'P' + i, 'sm')).join('')}</div></div>
+      <div class="bfield"><span class="lbl">${T('prevWon', b.set - 1)}</span><div class="brow">${bigChip('bpwon', 0, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, T('us'), 'sm')}${bigChip('bpwon', 1, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, T('them'), 'sm')}</div></div>
+    </div>` : ''}
+    <div class="steps">${['step1', 'step2', 'step3'].map((s, i) => `<span class="${['sheet', 'live', 'summary'].indexOf(b.phase) === i ? 'on' : ''}">${i + 1}. ${T(s)}</span>`).join('')}</div>
+  </section>`;
+
+  if (b.phase === 'summary') return head + summaryBlock() + logBlock();
+
+  // ---- squadre: consigliata/scelta e prevista/reale
+  const altOpp = topOpp.filter(x => x !== topOpp[0] && dist[x] >= 0.08).slice(0, 2);
+  const predNote = `${T('basedOn', rows.length)} ${pr.pKeep != null && prevWon != null ? T('keep', prevWon, pc(pr.pKeep)) : ''} ${rows.length < 8 ? T('few') : ''}`;
+  const d = Math.round((pctPick - pctBest) * 100);
+  const sheetPhase = b.phase === 'sheet';
+  const recCard = `
+      <div class="tcard rec"><span class="tlbl">${T('recTitle')}</span>
+        <div class="tbig"><b>P${best}</b><span><b class="num">${pc(pctBest)}</b> ${T('winSet')}<br><span class="n">${real ? T('pickReal') : T('vsPred')}</span></span></div>
+        ${sheetGrid(pp.my, best, 'us')}</div>`;
+  const pickCard = `
+      <div class="tcard pick${sheetPhase ? ' active' : ''}"><span class="tlbl">${T('pickTitle')}</span>
+        ${sheetPhase ? bigP('bpick', pick) : ''}
+        <div class="tbig"><b>P${pick}</b><span><b class="num">${pc(pctPick)}</b> ${T('winSet')}<br><span class="n">${pick === best ? T('same') : T('diff', d)}</span></span></div>
+        ${pick !== best ? sheetGrid(pp.my, pick, 'us') : ''}</div>`;
+  const predCard = `
+      <div class="tcard pred"><span class="tlbl">${T('predTitle')}</span>
+        <div class="tbig"><b>P${topOpp[0]}</b><span><b class="num">${pc(dist[topOpp[0]])}</b>${altOpp.length ? `<br><span class="n">${T('alts')}: ${altOpp.map(x => `P${x} ${pc(dist[x])}`).join(' · ')}</span>` : ''}</span></div>
+        <p class="n">${predNote}</p>
+        ${!real ? sheetGrid(pp.opp, topOpp[0], 'them') : ''}</div>`;
+  const realCard = `
+      <div class="tcard real${sheetPhase || !real ? ' active' : ''}"><span class="tlbl">${T('realTitle')}</span>
+        ${bigP('breal', real, 'hot')}
+        ${real ? `<div class="tbig"><b class="hot">P${real}</b><span class="n">${real === topOpp[0] ? '✓' : ''}</span></div>${sheetGrid(pp.opp, real, 'them')}` : `<p class="n">${sheetPhase ? T('notKnown') : T('realPrompt')}</p>`}</div>`;
+  const teams = `<section class="duo">${recCard}${predCard}${pickCard}${realCard}</section>`;
+
+  if (sheetPhase) {
+    return head + teams + `<div class="bar-actions"><button class="bigbtn" data-bact="confirm" data-v="${pick}" data-rec="${best}">${T('confirm')} · P${pick}</button></div>` + details(pick, oppRot, M) + logBlock();
+  }
+
+  // ---- set in corso
+  let live = '';
+  if (real) {
+    const m = model();
+    const ph = RC.phases(m.A.est, m.B.est, m.L, pick, real, b.weServe ? 0 : 1);
+    live += `<section class="panel"><div class="matchhead"><b>${T('matchup', pick, real)}</b><span><b class="num">${pc(M[pick][real])}</b> ${T('setProb')}</span></div>
+      <h3 style="margin-top:12px">${T('phases')}</h3>
+      <div class="phl">${ph.map((x, i) => `<div><span class="n num">${i + 1}</span><b>P${x.a}–P${x.b}</b><span class="n">${x.sv === 0 ? T('srvUs') : T('srvThem')}</span><span class="num ${x.p >= 0.5 ? 'hi' : 'lo'}">${pc(x.p)}</span></div>`).join('')}</div>
+      <p class="n" style="margin-top:6px">${T('rally')}: ${T('us').toLowerCase()} P – ${T('them').toLowerCase()} P</p></section>`;
+    live += counterBlock();
+  }
+  live += endBlock();
+  return head + teams + `<div class="bar-actions"><button class="bigbtn sec" data-bact="edit">${T('edit')}</button></div>` + live + (real ? details(pick, real, M) : '') + logBlock();
+}
+
+function counterBlock() {
+  const b = S.bench, r = replay(b);
+  const n1 = esc(teamName(S.myKey)), n2 = esc(teamName(S.oppKey));
+  const target = b.set === 5 ? 15 : 25;
+  const over = (r.su >= target || r.so >= target) && Math.abs(r.su - r.so) >= 2;
+  return `<section class="panel counter">
+    <h3>${T('counter')}</h3>
+    <div class="score">
+      <div class="side${r.sv === 0 ? ' srv' : ''}"><span class="tn">${n1}</span><b class="num">${r.su}</b><span class="rot">P${r.a}${r.sv === 0 ? ` · ${T('serving')}` : ''}</span></div>
+      <div class="side them${r.sv === 1 ? ' srv' : ''}"><span class="tn">${n2}</span><b class="num">${r.so}</b><span class="rot">P${r.o}${r.sv === 1 ? ` · ${T('serving')}` : ''}</span></div>
+    </div>
+    <div class="ptbtns"><button class="ptbtn us" data-bact="pt" data-v="U">${T('pointUs')}</button><button class="ptbtn them" data-bact="pt" data-v="T">${T('pointThem')}</button></div>
+    <div class="brow wrap" style="margin-top:10px"><button class="bchip sm" data-bact="undo"${b.points.length ? '' : ' disabled'}>${T('undo')}</button><button class="bchip sm" data-bact="fixtoggle" aria-pressed="${String(!!S.fixOpen)}">${T('fix')}</button></div>
+    ${S.fixOpen ? `<div class="brow wrap" style="margin-top:10px">
+      <div class="bfield"><span class="lbl">${T('nowUs')}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bfixmy', i, r.a, 'P' + i, 'sm')).join('')}</div></div>
+      <div class="bfield"><span class="lbl">${T('nowThem')}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bfixop', i, r.o, 'P' + i, 'sm')).join('')}</div></div></div>` : ''}
+    ${over ? `<p class="warn" style="margin-top:10px">${T('endLooks', r.su > r.so ? T('us') : T('them'))}</p>` : ''}
+    <p class="n" style="margin-top:8px">${T('counterNote')}</p>
+  </section>`;
+}
+
+function endBlock() {
+  const b = S.bench, r = replay(b);
+  const target = b.set === 5 ? 15 : 25;
+  const auto = (r.su >= target || r.so >= target) && Math.abs(r.su - r.so) >= 2 ? (r.su > r.so ? 'noi' : 'loro') : null;
+  const w = b.endWin || auto;
+  return `<section class="panel stage"><h2>${T('step3')} ${b.set}</h2>
+    <div class="bfield"><span class="lbl">${T('wonBy')}</span><div class="brow">${bigChip('bwin', 'noi', w, T('us'), 'xl')}${bigChip('bwin', 'loro', w, T('them'), 'xl')}</div></div>
+    <div class="bar-actions"><button class="bigbtn" data-bact="save"${w && b.oppReal ? '' : ' disabled'}>${T('save')}</button></div>
+    ${!b.oppReal ? `<p class="n">${T('realPrompt')}</p>` : ''}
+  </section>`;
+}
+
+function summaryBlock() {
+  const b = S.bench, l = b.log[b.log.length - 1];
+  if (!l) return '';
+  const nextN = Math.min(5, l.set + 1);
+  let body = `<p>${T('followed', l.myStart === l.recommended, l.recommended)}</p>`;
+  if (l.points && l.points.length) {
+    const r = replay({ myPick: l.myStart, oppReal: l.oppStart, weServe: !l.oppServe, points: l.points });
+    const st = setSummaryStats(r.rallies);
+    const eA = baseEst(S.myKey) || { so: {}, bp: {} }, eB = baseEst(S.oppKey) || { so: {}, bp: {} };
+    const bal = [1, 2, 3, 4, 5, 6].filter(x => st.us[x].soN + st.us[x].bpN).map(x => ({ x, v: st.us[x].pf - st.us[x].pa })).sort((p, q) => q.v - p.v);
+    if (bal.length) {
+      const hi = bal[0], lo = bal[bal.length - 1], sg = v => (v > 0 ? '+' : '') + v;
+      const parts = [];
+      if (hi.v > 0) parts.push(`<span class="tag w">${T('strong')}</span> P${hi.x} (${sg(hi.v)})`);
+      if (lo.v < hi.v && lo.v <= 0) parts.push(`<span class="tag l">${T('weak')}</span> P${lo.x} (${sg(lo.v)})`);
+      if (parts.length) body += `<p>${parts.join(' &nbsp; ')}</p>`;
+    }
+    body += `<section class="grid2" style="margin-top:12px">${summaryTable(st.us, eA, `${T('sumUs')} · ${esc(teamName(S.myKey))}`, false)}${summaryTable(st.th, eB, `${T('sumThem')} · ${esc(teamName(S.oppKey))}`, false)}</section><p class="n">${T('sumNote')}</p>`;
+  } else body += `<p class="n">${T('noPoints')}</p>`;
+  return `<section class="panel stage"><h2>${T('summary', l.set)} <span class="tag ${l.oppWon ? 'l' : 'w'}">${l.oppWon ? T('lost') : T('won')}${l.score ? ' ' + l.score : ''}</span></h2>${body}
+    <div class="bar-actions">${l.set < 5 ? `<button class="bigbtn" data-bact="next">${T('next', nextN)}</button>` : ''}<button class="bigbtn sec" data-bact="newmatch">${T('newMatch')}</button></div></section>`;
+}
+
+function logBlock() {
+  const b = S.bench; if (!b.log.length) return '';
+  return `<section class="panel"><h3>${T('log')}</h3><div class="log">${b.log.map(l => `<div><b>${T('set')} ${l.set}</b><span>${T('us')} P${l.myStart}</span><span>${T('them')} P${l.oppStart}</span>${l.score ? `<span class="num">${l.score}</span>` : ''}<span class="tag ${l.oppWon ? 'l' : 'w'}">${l.oppWon ? T('lost') : T('won')}</span></div>`).join('')}</div>
+    ${b.phase !== 'summary' ? `<div style="margin-top:10px"><button class="bchip sm" data-bact="newmatch">${T('newMatch')}</button></div>` : ''}</section>`;
+}
+
+function playersBlock(pick, oppRot) {
+  const b = S.bench, base = people(true);
+  const sel = (team, side, idx, cur) => `<select class="psel" data-bpl="${side}" data-i="${idx}">${Object.values(team.P).filter(p => p.role !== 1).sort((x, y) => x.num - y.num).map(p => `<option value="${p.num}"${p.num === cur ? ' selected' : ''}>${p.num} ${esc(p.last)}</option>`).join('')}</select>`;
+  const grid = (team, side, r) => {
+    const z = (b.ovr && b.ovr[side] && b.ovr[side + 'Rot'] === r) ? b.ovr[side] : (team.L[r] ? team.L[r].zones : null);
+    if (!z) return '';
+    return `<div class="sheet edit">${[3, 2, 1, 4, 5, 0].map(i => `<div class="sc ${side === 'my' ? 'us' : 'them'}"><span class="rn">${ROMAN[i]}</span>${sel(team, side, i, z[i])}</div>`).join('')}</div>`;
+  };
+  return `<details class="panel" id="benchPlayers"${S.playersOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('players')}</h2></summary>
+    <p class="n" style="margin:8px 0">${T('playersNote')}</p>
+    <div class="grid2"><div><h3>${T('ourTeam')} · P${pick}</h3>${grid(base.my, 'my', pick)}</div><div><h3>${T('theirTeam')} · P${oppRot}</h3>${grid(base.opp, 'opp', oppRot)}</div></div>
+    ${b.ovr && (b.ovr.my || b.ovr.opp) ? `<div style="margin-top:10px"><button class="bchip sm" data-bact="ovrreset">${T('reset')}</button></div>` : ''}
+  </details>`;
+}
+
+function details(pick, oppRot, M) {
+  return playersBlock(pick, oppRot) + `
+  <details class="panel" id="benchPlan"${S.planOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('plan')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${servePlan(pick, oppRot, S.bench.weServe ? 0 : 1)}</details>
+  <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('setDist')}</h2> <span class="n">P${S.srot}</span></summary>${setSection()}</details>
+  <details class="panel" id="benchNets"${S.netsOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('nets')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${phaseNets(pick, oppRot, S.bench.weServe ? 0 : 1, M)}</details>`;
+}
+
+function benchClick(d, t) {
+  const b = S.bench;
+  if (d.bset) { const n = +d.bset; if (n !== b.set) { b.set = n; b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; b.ovr = null; if (n === 5) b.weServe = null; } return true; }
+  if (d.bserve != null) { b.weServe = d.bserve === '1'; return true; }
+  if (d.bprev) { b.prevOppStart = +d.bprev; return true; }
+  if (d.bpwon != null) { b.prevOppWon = d.bpwon === '1'; return true; }
+  if (d.bpick) { b.myPick = +d.bpick; b.ovr = b.ovr ? { ...b.ovr, my: null } : null; return true; }
+  if (d.breal) { b.oppReal = +d.breal; b.ovr = b.ovr ? { ...b.ovr, opp: null } : null; S.srot = b.oppReal; return true; }
+  if (d.bwin) { b.endWin = d.bwin; return true; }
+  if (d.bfixmy) { b.points.push({ fix: 'my', to: +d.bfixmy }); return true; }
+  if (d.bfixop) { b.points.push({ fix: 'op', to: +d.bfixop }); return true; }
+  const act = d.bact; if (!act) return false;
+  if (act === 'confirm') { b.myPick = +d.v; b.recommended = +d.rec; b.phase = 'live'; window.scrollTo({ top: 0 }); }
+  else if (act === 'edit') { b.phase = 'sheet'; }
+  else if (act === 'pt') { b.points.push(d.v); }
+  else if (act === 'undo') { b.points.pop(); }
+  else if (act === 'fixtoggle') { S.fixOpen = !S.fixOpen; }
+  else if (act === 'ovrreset') { b.ovr = null; }
+  else if (act === 'save') {
+    const r = replay(b), target = b.set === 5 ? 15 : 25;
+    const auto = (r.su >= target || r.so >= target) && Math.abs(r.su - r.so) >= 2 ? (r.su > r.so ? 'noi' : 'loro') : null;
+    const w = b.endWin || auto; if (!w || !b.oppReal) return true;
+    const rec = b.recommended || b.myPick;
+    b.log = b.log.filter(l => l.set !== b.set).concat([{ set: b.set, myStart: b.myPick, oppStart: b.oppReal, oppServe: !b.weServe, oppWon: w === 'loro', points: b.points.slice(), recommended: rec, score: b.points.some(e => e === 'U' || e === 'T') ? `${r.su}-${r.so}` : '' }]).sort((x, y) => x.set - y.set);
+    b.phase = 'summary'; invalidate(); window.scrollTo({ top: 0 });
+  }
+  else if (act === 'next') {
+    const last = b.log[b.log.length - 1];
+    b.set = Math.min(5, last.set + 1); b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; b.ovr = null; S.fixOpen = false;
+    b.weServe = b.set === 5 ? null : last.oppServe; // chi ha ricevuto per primo nel set prima, batte per primo
+    window.scrollTo({ top: 0 });
+  }
+  else if (act === 'newmatch') { S.bench = freshBench(); invalidate(); }
+  else return false;
+  return true;
+}
+
 // ---------- render ----------
 function render() {
   document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab)));
@@ -905,96 +1315,6 @@ function render() {
 
 const chip = (attr, val, cur, label, cls = '') => `<button class="chip ${cls}" data-${attr}="${val}" aria-pressed="${String(cur === val)}">${label}</button>`;
 const pChips = (attr, cur, cls) => [1, 2, 3, 4, 5, 6].map(i => chip(attr, i, cur, 'P' + i, cls)).join('');
-
-function renderBench() {
-  const b = S.bench;
-  if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">Scegli due squadre diverse in alto.</p></section>`;
-  const target = b.set === 5 ? 15 : 25;
-  const M = mat(b.weServe ? 0 : 1, target);
-  const rows = oppRows(true);
-  const prevLog = b.log.find(l => l.set === b.set - 1);
-  const prevOppServe = prevLog ? prevLog.oppServe : (b.set === 5 ? null : b.weServe);
-  const prevEq = b.set > 1 && b.prevOppStart ? RC.eqRot(b.prevOppStart, prevOppServe == null ? true : prevOppServe) : null;
-  const pr = RC.predict(rows, { set: b.set, prevEq, prevWon: b.set > 1 ? b.prevOppWon : null, oppServeFirst: !b.weServe });
-  const dist = b.known ? Object.fromEntries([1, 2, 3, 4, 5, 6].map(i => [i, i === b.known ? 1 : 0])) : pr.dist;
-  const exp = {}; for (let a = 1; a <= 6; a++) { exp[a] = 0; for (let x = 1; x <= 6; x++) exp[a] += dist[x] * M[a][x]; }
-  const order = [1, 2, 3, 4, 5, 6].sort((x, y) => exp[y] - exp[x]);
-  const best = order[0], worst = order[5];
-  const topOpp = [1, 2, 3, 4, 5, 6].sort((x, y) => dist[y] - dist[x]);
-  const bestVs = x => { let a = 1; for (let i = 2; i <= 6; i++) if (M[i][x] > M[a][x]) a = i; return a; };
-
-  const myBars = order.map(a => `<div class="bar${a === best ? ' best' : ''}"><b>P${a}</b><span class="t"><i style="width:${(exp[a] * 100).toFixed(1)}%"></i><span class="mid"></span></span><span class="v num">${pc(exp[a])}</span></div>`).join('');
-  const oppBars = [1, 2, 3, 4, 5, 6].map(x => `<div class="bar"><b>P${x}</b><span class="t"><i style="width:${(dist[x] * 100).toFixed(1)}%;background:var(--hot)"></i></span><span class="v num">${pc(dist[x])}</span></div>`).join('');
-  const nSets = rows.length;
-  const likely = topOpp.filter(x => dist[x] >= 0.12).slice(0, 3);
-
-  const endOpp = b.endOpp ?? b.known ?? topOpp[0], endMy = b.endMy ?? best;
-  return `
-  <section class="panel">
-    <h2>Set ${b.set}</h2>
-    <div class="bench-form">
-      <div class="row">
-        <div class="field"><span class="lbl">Set</span><div class="chips">${[1, 2, 3, 4, 5].map(i => chip('set', i, b.set, i)).join('')}</div></div>
-        <div class="field"><span class="lbl">Batte per primo</span><div class="chips">${chip('serve', 1, b.weServe ? 1 : 0, 'Noi', 'wide')}${chip('serve', 0, b.weServe ? 1 : 0, 'Loro', 'wide')}</div></div>
-      </div>
-      ${b.set > 1 ? `<div class="row">
-        <div class="field"><span class="lbl">Loro partenza nel set ${b.set - 1}</span><div class="chips">${pChips('prev', b.prevOppStart)}</div></div>
-        <div class="field"><span class="lbl">Set ${b.set - 1} vinto da</span><div class="chips">${chip('pwon', 0, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, 'Noi', 'wide')}${chip('pwon', 1, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, 'Loro', 'wide')}</div></div>
-      </div>` : ''}
-      <div class="field"><span class="lbl">Partenza avversaria già nota (facoltativo)</span><div class="chips">${pChips('known', b.known, 'ghost')}</div></div>
-    </div>
-  </section>
-
-  <section class="grid2">
-    <div class="panel">
-      <div class="verdict">
-        <span class="big">P${best}</span>
-        <span class="k">Parti in P${best}</span>
-        <span class="s">Probabilità stimata di vincere il set: <b class="num">${pc(exp[best])}</b>. Da evitare: P${worst} (${pc(exp[worst])}).</span>
-      </div>
-      <h3 style="margin-top:14px">Le tue 6 partenze</h3>
-      <div class="bars">${myBars}</div>
-      <p class="note" style="margin-top:10px">${likely.map(x => `Se partono in P${x}: meglio P${bestVs(x)} (${pc(M[bestVs(x)][x])}).`).join(' ')}</p>
-    </div>
-    <div class="panel">
-      <h3>${b.known ? 'Partenza avversaria nota' : 'Previsione partenza ' + esc(teamName(S.oppKey))}</h3>
-      <div class="bars">${oppBars}</div>
-      <p class="note" style="margin-top:10px">${b.known ? 'Hai indicato la loro partenza: la scelta usa solo quella.' :
-        `Basata su ${nSets} set${pr.pKeep != null ? `; dopo un set ${b.prevOppWon ? 'vinto' : b.prevOppWon === false ? 'perso' : ''} confermano lo schieramento nel ${pc(pr.pKeep)} dei casi` : ''}.${nSets < 8 ? ' Pochi dati: considera la previsione indicativa.' : ''}`}</p>
-    </div>
-  </section>
-
-  <details class="panel" id="benchPlan"${S.planOpen ? ' open' : ''}>
-    <summary><h2 style="display:inline">Piano di battuta</h2> <span class="n">noi P${best} contro loro P${b.known || topOpp[0]}</span></summary>
-    ${servePlan(best, b.known || topOpp[0], b.weServe ? 0 : 1)}
-  </details>
-
-  <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}>
-    <summary><h2 style="display:inline">Distribuzione dell'alzata</h2> <span class="n">loro P${S.srot} in ricezione</span></summary>
-    ${setSection()}
-  </details>
-
-  <details class="panel" id="benchNets"${S.netsOpen ? ' open' : ''}>
-    <summary><h2 style="display:inline">Incroci giocatrici</h2> <span class="n">noi P${best} contro loro P${b.known || topOpp[0]}</span></summary>
-    ${phaseNets(best, b.known || topOpp[0], b.weServe ? 0 : 1, M)}
-  </details>
-
-  <section class="panel">
-    <h2>Fine set ${b.set}</h2>
-    <div class="endset">
-      <div class="row">
-        <div class="field"><span class="lbl">Loro sono partiti in</span><div class="chips">${pChips('eopp', endOpp)}</div></div>
-        <div class="field"><span class="lbl">Noi siamo partiti in</span><div class="chips">${pChips('emy', endMy)}</div></div>
-      </div>
-      <div class="row" style="align-items:flex-end">
-        <div class="field"><span class="lbl">Set vinto da</span><div class="chips">${chip('ewin', 'noi', b.endWin, 'Noi', 'wide')}${chip('ewin', 'loro', b.endWin, 'Loro', 'wide')}</div></div>
-        <div class="field" style="flex:0 1 auto"><button class="btn" data-act="endset"${b.endWin ? '' : ' disabled style="opacity:.5"'}>Registra e passa al set ${Math.min(5, b.set + 1)}</button></div>
-      </div>
-      ${b.log.length ? `<div class="log">${b.log.map(l => `<div><b>Set ${l.set}</b><span>Loro P${l.oppStart}${l.oppServe ? ' (battuta)' : ' (ricezione)'}</span><span>Noi P${l.myStart}</span><span class="tag ${l.oppWon ? 'l' : 'w'}">${l.oppWon ? 'Perso' : 'Vinto'}</span></div>`).join('')}</div>
-      <div><button class="btn sec small" data-act="newmatch">Nuova partita</button></div>` : '<p class="note">I set registrati qui aggiornano la previsione per il set successivo.</p>'}
-    </div>
-  </section>`;
-}
 
 function rotTable(key, st) {
   const rows = [1, 2, 3, 4, 5, 6].map(i => {
@@ -1163,25 +1483,8 @@ document.addEventListener('click', e => {
   const d = t.dataset, b = S.bench;
   if (d.tab) { S.tab = d.tab; window.scrollTo({ top: 0 }); return render(); }
   if (d.jump) { const el = document.getElementById(d.jump); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-  if (d.set) { b.set = +d.set; b.endWin = null; b.endOpp = null; b.endMy = null; }
-  else if (d.serve) b.weServe = d.serve === '1';
-  else if (d.prev) b.prevOppStart = +d.prev;
-  else if (d.pwon) b.prevOppWon = d.pwon === '1';
-  else if (d.known) b.known = b.known === +d.known ? null : +d.known;
-  else if (d.eopp) b.endOpp = +d.eopp;
-  else if (d.emy) b.endMy = +d.emy;
-  else if (d.ewin) b.endWin = d.ewin;
-  else if (d.act === 'endset') {
-    if (!b.endWin) return;
-    const oppStart = +t.closest('.endset').querySelector('[data-eopp][aria-pressed="true"]').dataset.eopp;
-    const myStart = +t.closest('.endset').querySelector('[data-emy][aria-pressed="true"]').dataset.emy;
-    b.log = b.log.filter(l => l.set !== b.set).concat([{ set: b.set, oppStart, myStart, oppServe: !b.weServe, oppWon: b.endWin === 'loro' }]).sort((x, y) => x.set - y.set);
-    b.prevOppStart = oppStart; b.prevOppWon = b.endWin === 'loro';
-    if (b.set < 5) { b.set++; if (b.set < 5) b.weServe = !b.weServe; }
-    b.known = null; b.endOpp = null; b.endMy = null; b.endWin = null;
-    window.scrollTo({ top: 0 });
-  }
-  else if (d.act === 'newmatch') S.bench = freshBench();
+  if (S.tab === 'bench' && benchClick(d, t)) return render();
+  if (false) {}
   else if (d.sserve) { S.studyServe = +d.sserve; }
   else if (d.cell) S.sel = S.sel === d.cell ? null : d.cell;
   else if (d.hist) S.hist = d.hist;
@@ -1193,11 +1496,17 @@ document.addEventListener('click', e => {
   else return;
   render();
 });
-document.addEventListener('toggle', e => { if (e.target.id === 'benchNets') S.netsOpen = e.target.open; if (e.target.id === 'benchPlan') S.planOpen = e.target.open; if (e.target.id === 'benchSet') S.setOpen = e.target.open; }, true);
+document.addEventListener('toggle', e => { if (e.target.id === 'benchPlayers') S.playersOpen = e.target.open; if (e.target.id === 'benchNets') S.netsOpen = e.target.open; if (e.target.id === 'benchPlan') S.planOpen = e.target.open; if (e.target.id === 'benchSet') S.setOpen = e.target.open; }, true);
 document.addEventListener('change', e => {
   if (e.target.id === 'selMy') { S.myKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
   if (e.target.id === 'selOpp') { S.oppKey = e.target.value; S.sel = null; invalidate(); ensureTeams(); render(); }
   if (e.target.id === 'fileIn') addFiles([...e.target.files]);
+  if (e.target.dataset && e.target.dataset.bpl) {
+    const side = e.target.dataset.bpl, i = +e.target.dataset.i, b = S.bench, base = people(true)[side];
+    const rot = side === 'my' ? (b.myPick || +document.querySelector('[data-bact=confirm]')?.dataset.v || 1) : (b.oppReal || +(document.querySelector('.tcard.pred .tbig b')?.textContent || 'P1').slice(1));
+    const cur = (b.ovr && b.ovr[side] && b.ovr[side + 'Rot'] === rot) ? b.ovr[side].slice() : (base.L[rot] ? base.L[rot].zones.slice() : [0, 0, 0, 0, 0, 0]);
+    cur[i] = +e.target.value; b.ovr = Object.assign({}, b.ovr || {}, { [side]: cur, [side + 'Rot']: rot }); render();
+  }
 });
 ['dragover', 'dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => {
   const z = e.target.closest && e.target.closest('#drop'); if (!z) return;
