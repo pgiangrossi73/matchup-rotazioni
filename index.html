@@ -758,24 +758,39 @@ const RC = (() => {
     return { all, eq, set1, serve, recv, keepW, nW, keepL, nL, follow, nFollow, byOpp, top, topShare: rows.length ? eq[top] / rows.length : 0, n: rows.length };
   }
 
-  // Previsione partenza avversaria. ctx: {set, prevEq, prevWon, oppServeFirst}
-  // Restituisce la distribuzione sulla partenza reale (P1..P6 sul foglietto).
+  // Previsione partenza avversaria. ctx: {set, prevEq, prevWon, oppServeFirst, vsKey}
+  // Pesi: set della partita in corso x3, partite contro lo stesso avversario x2, altre x1.
+  // La previsione si allarga quando il coach ha già cambiato schieramento in base all'avversario.
   function predict(rows, ctx) {
     const pat = patterns(rows);
-    const w = {};
-    for (let i = 1; i <= 6; i++) w[i] = pat.eq[i] + (ctx.set === 1 ? pat.set1[i] : 0) + 0.25;
-    let tot = 0; for (let i = 1; i <= 6; i++) tot += w[i];
-    let dist = {}; for (let i = 1; i <= 6; i++) dist[i] = w[i] / tot;
+    const wOf = r => r.match === 'live' ? 3 : (ctx.vsKey && r.oppKey === ctx.vsKey) ? 2 : 1;
+    const cnt = {}, c1 = {}; for (let i = 1; i <= 6; i++) { cnt[i] = 0; c1[i] = 0; }
+    let tot = 0;
+    rows.forEach(r => { const w = wOf(r); cnt[r.eq] += w; tot += w; if (r.set === 1) c1[r.eq] += w; });
+    // indice di adattamento: quota di avversari contro cui ha usato uno schieramento diverso dal solito
+    const opps = Object.values(pat.byOpp).map(rs => { const c = {}; rs.forEach(r => c[r.eq] = (c[r.eq] || 0) + 1); return +Object.keys(c).sort((a, b) => c[b] - c[a])[0]; });
+    const adapt = opps.length ? opps.filter(m => m !== pat.top).length / opps.length : 0;
+    const liveRows = rows.filter(r => r.match === 'live');
+    const liveChange = liveRows.length > 1 ? liveRows.slice(1).filter((r, i) => r.eq !== liveRows[i].eq).length / (liveRows.length - 1) : null;
+    const w = {}; let wt = 0;
+    for (let i = 1; i <= 6; i++) { w[i] = cnt[i] + (ctx.set === 1 ? c1[i] : 0) + 1; wt += w[i]; }
+    let dist = {}; for (let i = 1; i <= 6; i++) dist[i] = w[i] / wt;
     let pKeep = null;
     if (ctx.set > 1 && ctx.prevEq) {
-      const [k, n] = ctx.prevWon === true ? [pat.keepW, pat.nW] : ctx.prevWon === false ? [pat.keepL, pat.nL] : [pat.keepW + pat.keepL, pat.nW + pat.nL];
-      pKeep = (k + 1) / (n + 2);
+      // conferma dello schieramento dopo vittoria/sconfitta, con i set di oggi che pesano di più
+      let k = 0, n = 0;
+      rows.forEach((r, i) => { const p = i > 0 && rows[i - 1].match === r.match ? rows[i - 1] : null; if (!p || (ctx.prevWon != null && p.won !== ctx.prevWon)) return; const ww = wOf(r); n += ww; if (r.eq === p.eq) k += ww; });
+      pKeep = Math.min(0.8, (k + 1) / (n + 2));
+      if (liveChange != null) pKeep = Math.min(pKeep, 1 - liveChange * 0.8);
       const rest = 1 - dist[ctx.prevEq]; const d2 = {};
       for (let i = 1; i <= 6; i++) d2[i] = i === ctx.prevEq ? pKeep : (rest > 0 ? dist[i] / rest : 0.2) * (1 - pKeep);
       dist = d2;
     }
+    // allarga la previsione se il coach si adatta (o sta cambiando oggi)
+    const lambda = Math.min(0.5, 0.12 + 0.5 * adapt + (liveChange != null ? 0.25 * liveChange : 0));
+    for (let i = 1; i <= 6; i++) dist[i] = (1 - lambda) * dist[i] + lambda / 6;
     const real = {}; for (let i = 1; i <= 6; i++) real[fromEq(i, ctx.oppServeFirst)] = dist[i];
-    return { eqDist: dist, dist: real, pKeep, pat };
+    return { eqDist: dist, dist: real, pKeep, pat, adapt, lambda };
   }
 
   // Sequenza degli incroci (rotazione mia vs loro) nel primo giro del set
@@ -871,7 +886,7 @@ function mat(firstServer, target) {
 function oppRows(withLive) {
   const rows = RC.startHistory(S.matches, S.oppKey);
   if (withLive) S.bench.log.forEach((l, i) => rows.push({
-    match: 'live', date: 'oggi', opp: teamName(S.myKey), set: l.set, start: l.oppStart, oppStart: l.myStart,
+    match: 'live', date: 'oggi', opp: teamName(S.myKey), oppKey: S.myKey, set: l.set, start: l.oppStart, oppStart: l.myStart,
     serveFirst: l.oppServe, won: l.oppWon, score: ['', '']
   }));
   return rows;
@@ -1232,7 +1247,7 @@ function renderBench() {
   const prevWon = prevLog ? prevLog.oppWon : b.prevOppWon;
   const prevEq = b.set > 1 && prevStart ? RC.eqRot(prevStart, prevServe) : null;
   const rows = oppRows(true);
-  const pr = RC.predict(rows, { set: b.set, prevEq, prevWon: b.set > 1 ? prevWon : null, oppServeFirst: !b.weServe });
+  const pr = RC.predict(rows, { set: b.set, prevEq, prevWon: b.set > 1 ? prevWon : null, oppServeFirst: !b.weServe, vsKey: S.myKey });
   const dist = pr.dist;
   const exp = {}; for (let a = 1; a <= 6; a++) { exp[a] = 0; for (let x = 1; x <= 6; x++) exp[a] += dist[x] * M[a][x]; }
   const real = b.oppReal;
@@ -1576,7 +1591,7 @@ function renderReport() {
   if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">${T('sameTeams')}</p></section>`;
   const rows = RC.startHistory(S.matches, S.oppKey);
   const rec = sv => {
-    const M = mat(sv, 25), pr = RC.predict(rows, { set: 1, oppServeFirst: sv === 1 });
+    const M = mat(sv, 25), pr = RC.predict(rows, { set: 1, oppServeFirst: sv === 1, vsKey: S.myKey });
     const bOpp = [1, 2, 3, 4, 5, 6].sort((x, y) => pr.dist[y] - pr.dist[x])[0];
     const ex = a => [1, 2, 3, 4, 5, 6].reduce((t, x) => t + pr.dist[x] * M[a][x], 0);
     const a = [1, 2, 3, 4, 5, 6].sort((x, y) => ex(y) - ex(x))[0];
@@ -1687,7 +1702,7 @@ function renderStudy() {
   let planA, planB, planLabel;
   if (S.sel) { [planA, planB] = S.sel.split('-').map(Number); planLabel = `Incrocio selezionato: noi P${planA} contro loro P${planB}, ${S.studyServe === 0 ? 'battiamo per primi' : 'battono loro per primi'}.`; }
   else {
-    const pr = RC.predict(RC.startHistory(S.matches, S.oppKey), { set: 1, oppServeFirst: S.studyServe === 1 });
+    const pr = RC.predict(RC.startHistory(S.matches, S.oppKey), { set: 1, oppServeFirst: S.studyServe === 1, vsKey: S.myKey });
     planB = [1, 2, 3, 4, 5, 6].sort((x, y) => pr.dist[y] - pr.dist[x])[0];
     const ex = a => [1, 2, 3, 4, 5, 6].reduce((t, x) => t + pr.dist[x] * M[a][x], 0);
     planA = [1, 2, 3, 4, 5, 6].sort((x, y) => ex(y) - ex(x))[0];
@@ -1771,7 +1786,7 @@ function renderData() {
   <section class="panel">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
       <h2 style="margin:0">Partite caricate (${S.matches.length})</h2>
-      ${S.customData && SAMPLE.length ? '<button class="btn sec small" data-act="reset">Ripristina le 7 partite iniziali</button>' : ''}
+      ${S.customData && SAMPLE.length ? '<button class="btn sec small" data-act="reset">Ripristina le partite iniziali</button>' : ''}
     </div>
     <div class="matches">${list || '<p class="empty">Nessuna partita.</p>'}</div>
   </section>`;
