@@ -161,8 +161,10 @@ main { padding-block: 8px 20px }
 .board .bh em { font-style: normal; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap }
 .board svg.bc { width: 100%; height: 200px; display: block; touch-action: none; user-select: none; -webkit-user-select: none }
 .board .alert { font-size: 11px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 6px; padding: 2px 6px; line-height: 1.25 }
-.glyph.warn { background: transparent !important; color: var(--accent); border: 3px dashed var(--accent) }
-.minisig .g.warn { background: transparent !important; color: var(--accent); border: 2px dashed var(--accent) }
+.glyph.warn { background: transparent !important; color: var(--muted); border: 3px dashed var(--line) }
+.sigc h5.warnh { color: var(--muted); font-size: 15px }
+.minisig .g.warn { background: transparent !important; color: var(--muted); border: 2px dashed var(--line) }
+.minisig .nm.warnh { color: var(--muted); font-weight: 500 }
 .board .tend { font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; gap: 4px }
 
 /* setup */
@@ -305,6 +307,8 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
 // ===== Setter Radar core: DVW parser + model =====
 const SR = (() => {
   const nextRot = r => (r === 1 ? 6 : r - 1); // DataVolley: P1 -> P6 -> P5 ...
+  // a setter is recognised by surname + shirt number (surname alone merged different players, e.g. Carraro)
+  const setterKey = (last, num) => normName(last) + ' #' + num;
   function normName(s) {
     return (s || '').toUpperCase().replace(/\(.*?\)/g, ' ').replace(/[^A-Z0-9 ]/g, ' ')
       .replace(/\b(VC|V C|WOMEN|W|FC|BC)\b/g, ' ').replace(/\s+/g, ' ').trim();
@@ -366,7 +370,7 @@ const SR = (() => {
         if (!(rot >= 1 && rot <= 6) || !sp) continue;
         const ez = parseInt(c[10], 10);
         pend = {
-          side, m: id, src: 'dvw', setter: normName(sp.last), sName: sp.last, sNum: sn,
+          side, m: id, src: 'dvw', setter: setterKey(sp.last, sn), sName: sp.last, sNum: sn,
           team: teams[side].key, rot, q: skill === 'F' ? 'F' : (c[5] || ''),
           rz: ez >= 1 && ez <= 9 ? ez : 0, rcv: skill === 'R' ? num : -1,
           call: '', sz: '', att: -1, g: '', az: 0, ez: 0, out: ''
@@ -445,7 +449,7 @@ const SR = (() => {
     });
     return Object.values(o).map(s => ({ ...s, matches: s.matches.size, teams: Object.keys(s.teams), nums: Object.keys(s.nums) })).sort((a, b) => b.n - a.n);
   }
-  return { parseDVW, analyze, setters, nextRot, normName, CALLS, callZone, groupOf, SIDE, GOOD, POOR };
+  return { parseDVW, analyze, setters, nextRot, normName, setterKey, CALLS, callZone, groupOf, SIDE, GOOD, POOR };
 })();
 
 
@@ -489,7 +493,7 @@ const T = {
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
-    rule: 'Regola segnale', covers: 'copre', sigRule: 'Ricezioni per il segnale in partita', sigRuleA: '# + e ! (se il centrale si muove)', sigRuleB: 'solo # e +', withExcl: 'con !', noExcl: 'senza !', warnSub: 'avviso: tendenza da valutare', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, diviso gli attacchi. Con meno di 10 casi il segnale usa un valore prudente, più vicino alla media.',
+    rule: 'Regola segnale', covers: 'copre', sigRule: 'Ricezioni per il segnale in partita', sigRuleA: '# + e ! (se il centrale si muove)', sigRuleB: 'solo # e +', withExcl: 'con !', noExcl: 'senza !', warnSub: 'avviso: tendenza da valutare', weak: 'Leggere · debole', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, diviso gli attacchi. Con meno di 10 casi il segnale usa un valore prudente, più vicino alla media.',
     dataT: 'Partite caricate', importDVW: 'Importa file DVW', imported: 'Importate', skipped: 'già presenti',
     date: 'Data', match: 'Partita', src: 'Fonte', del: 'Elimina', sure: 'Sicuro?',
     backup: 'Backup', copyB: 'Copia backup', dlB: 'Scarica backup', restB: 'Ripristina da file', restP: 'Ripristina dal testo', copied: 'Copiato',
@@ -531,7 +535,7 @@ const T = {
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
-    rule: 'Signal rule', covers: 'covers', sigRule: 'Passes used for the match signal', sigRuleA: '# + and ! (if the middle runs)', sigRuleB: '# and + only', withExcl: 'with !', noExcl: 'no !', warnSub: 'warning: tendency to judge', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, divided by attacks. With fewer than 10 cases the signal uses a cautious value closer to the average.',
+    rule: 'Signal rule', covers: 'covers', sigRule: 'Passes used for the match signal', sigRuleA: '# + and ! (if the middle runs)', sigRuleB: '# and + only', withExcl: 'with !', noExcl: 'no !', warnSub: 'warning: tendency to judge', weak: 'Read · weak', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, divided by attacks. With fewer than 10 cases the signal uses a cautious value closer to the average.',
     dataT: 'Loaded matches', importDVW: 'Import DVW files', imported: 'Imported', skipped: 'already loaded',
     date: 'Date', match: 'Match', src: 'Source', del: 'Delete', sure: 'Sure?',
     backup: 'Backup', copyB: 'Copy backup', dlB: 'Download backup', restB: 'Restore from file', restP: 'Restore from text', copied: 'Copied',
@@ -556,8 +560,8 @@ const BASE_X = { KF: .08, KB: .14, KL: .2, KT: .26, KM: .27, KE: .28, KG: .28, K
 const ALL_CALLS = Object.keys(BASE_X);
 
 // ===================== state =====================
-const STORE = 'setter-radar-v2';
-const DEF_SET = { lang: 'it', covMin: 55, lead: 20, minN: 8, minLive: 3, histK: 8, sv: 3, sigExcl: true };
+const STORE = 'setter-radar-v2'; // kept: data migrates in place
+const DEF_SET = { lang: 'it', covMin: 60, lead: 15, minN: 8, minLive: 3, histK: 8, sv: 4, sigExcl: true };
 let DB, UNDO = [];
 const UI = { tab: 'live', step: null, rally: null, sub: null, slot: null, setupSetter: null, delConfirm: null, toastT: 0, repSetter: null };
 const S = () => DB.settings;
@@ -565,10 +569,21 @@ const t = k => (T[S().lang] || T.it)[k] || k;
 function seedDB() {
   const K = SEED.K;
   const recs = SEED.recs.map(a => { const o = {}; K.forEach((k, i) => o[k] = a[i]); o.m = SEED.matches[o.m].id; return o; });
-  return { v: 2, matches: SEED.matches.map(m => ({ ...m, src: 'dvw' })), recs, rosters: SEED.rosters, settings: { ...DEF_SET }, live: null };
+  return migrate({ v: 2, matches: SEED.matches.map(m => ({ ...m, src: 'dvw' })), recs, rosters: SEED.rosters, settings: { ...DEF_SET }, live: null });
+}
+// v3: setter key = surname + number; defaults 60/15
+function migrate(d) {
+  if ((d.v || 0) < 3) {
+    d.recs.forEach(r => { if (r.sName != null && r.sNum != null) r.setter = SR.setterKey(r.sName, r.sNum); });
+    if (d.live && d.live.sName != null) d.live.setter = SR.setterKey(d.live.sName, d.live.sNum);
+    d.v = 3;
+  }
+  return d;
 }
 function load() {
-  try { const s = localStorage.getItem(STORE); if (s) { const d = JSON.parse(s); if (d && d.recs) { d.settings = { ...DEF_SET, ...(d.settings || {}) }; if ((d.settings.sv || 0) < 3) Object.assign(d.settings, { minN: 8, minLive: 3, sv: 3 }); return d; } } } catch (e) {}
+  try { const s = localStorage.getItem(STORE); if (s) { const d = JSON.parse(s); if (d && d.recs) { d.settings = { ...DEF_SET, ...(d.settings || {}) }; if ((d.settings.sv || 0) < 3) Object.assign(d.settings, { minN: 8, minLive: 3, sv: 3 });
+      if (d.settings.sv < 4) { if (d.settings.covMin === 55 && d.settings.lead === 20) Object.assign(d.settings, { covMin: 60, lead: 15 }); d.settings.sv = 4; }
+      return migrate(d); } } } catch (e) {}
   return seedDB();
 }
 let saveT = 0;
@@ -813,7 +828,7 @@ function sigRowHTML() {
     const s = laneSignal(lv.setter, lv.id, rot, l);
     const w = s.warn;
     return `<div class="sigc lane-${l}"><div class="glyph ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</div>
-      <div style="min-width:0"><h5>${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</h5>${w ? `<div class="sub" style="color:var(--accent);font-weight:600">${t('warnSub')}</div>` : ''}<div class="sub">${t('laneShort')} <b style="color:var(--ink)">${ZL[l]}</b> <span title="${t('hist')} + ${t('live')}">(${s.nh}+${s.nl})</span></div>
+      <div style="min-width:0"><h5 class="${w ? 'warnh' : ''}">${w ? t('weak') + ': ' + SIGNAME(w).toLowerCase() : SIGNAME(s.sig)}</h5><div class="sub">${t('laneShort')} <b style="color:var(--ink)">${ZL[l]}</b> <span title="${t('hist')} + ${t('live')}">(${s.nh}+${s.nl})</span></div>
       <div class="sub">${covInline(s.cov)}</div></div></div>`;
   }).join('');
   const ex = S().sigExcl !== false;
@@ -1022,7 +1037,7 @@ function renderReport() {
   for (const r of [1, 6, 5, 4, 3, 2]) {
     const g = mine.filter(x => x.rot === r && QF(x.q)), p = mine.filter(x => x.rot === r && x.q === '-');
     const gc = counts(g), pc = counts(p); const gd = {}, pd = {}; KEYS.forEach(k => { gd[k] = gc.n ? gc.c[k] / gc.n : 0; pd[k] = pc.n ? pc.c[k] / pc.n : 0; });
-    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l, QF), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm">${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
+    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l, QF), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm ${w ? 'warnh' : ''}">${w ? t('weak') + ': ' + SIGNAME(w).toLowerCase() : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
     const cf = {}; g.forEach(x => { if (x.call) cf[x.call] = (cf[x.call] || 0) + 1; });
     const who = { L: {}, C: {}, R: {} }; g.forEach(x => { const s = SIDE(x.g); if (who[s]) who[s][x.att] = (who[s][x.att] || 0) + 1; });
     const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `#${n}<small class="muted">·${c}</small>`).join(' ') || '—';
@@ -1151,7 +1166,7 @@ document.addEventListener('click', e => {
     newSetter() {
       const name = ($('#nsName').value || '').trim(), team = ($('#nsTeam').value || '').trim(), num = parseInt($('#nsNum').value, 10);
       if (!name || !team || isNaN(num)) return;
-      const key = SR.normName(name); initLiveFor(key, { team: SR.normName(team), teamName: team, sNum: num, sName: name.toUpperCase() }); UI.setupSetter = key; save(); render();
+      const key = SR.setterKey(name, num); initLiveFor(key, { team: SR.normName(team), teamName: team, sNum: num, sName: name.toUpperCase() }); UI.setupSetter = key; save(); render();
     },
     addNum() { const n = parseInt($('#addNum').value, 10); if (isNaN(n) || !lv) return; lv.roster[n] = lv.roster[n] || { last: '', role: 0 }; save(); render(); },
     startSet() {
@@ -1217,7 +1232,7 @@ let wl = null;
 function wake() { try { if (navigator.wakeLock && !wl) navigator.wakeLock.request('screen').then(w => { wl = w; w.addEventListener('release', () => wl = null); }).catch(() => {}); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && L() && L().started) wake(); });
 
-if (!DB.live) { const s = settersList().find(x => x.key === 'MATSUMOTO') || settersList()[0]; if (s) { initLiveFor(s.key); UI.setupSetter = s.key; } }
+if (!DB.live) { const s = settersList().find(x => /^MATSUMOTO/.test(x.key)) || settersList()[0]; if (s) { initLiveFor(s.key); UI.setupSetter = s.key; } }
 render(); fit();
 </script>
 <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
