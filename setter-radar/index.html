@@ -273,6 +273,17 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .board { grid-template-rows: auto minmax(0, 1fr) auto auto; min-height: 0 }
   .board svg.bc { height: 100%; min-height: 0; width: auto; max-width: 100%; aspect-ratio: 1 / 1; justify-self: center }
 }
+.summary { margin-top: 18px; border: 2px solid var(--ink) }
+.summary h3 { margin: 0 0 10px }
+.summary h4 { margin: 0 0 6px; font-family: var(--f-display); font-size: 17px; text-transform: uppercase; letter-spacing: .03em; color: var(--accent) }
+.summary p { margin: 0 0 6px; font-size: 14px }
+.summary ol, .summary ul { margin: 0; padding-left: 20px; font-size: 14px; display: grid; gap: 4px }
+.sgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px }
+.sgrid .wide { grid-column: 1 / -1 }
+@media (max-width: 760px) { .sgrid { grid-template-columns: minmax(0, 1fr) } }
+.plan { font-size: 14px } .plan td { padding: 5px 6px } .plan td:first-child { width: 40px; font-family: var(--f-display); font-size: 18px }
+.rel { display: inline-block; padding: 1px 10px; border-radius: 999px; font-weight: 700; color: #fff }
+.rel-high { background: #17936a } .rel-mid { background: #c8a21a } .rel-low { background: var(--bad) }
 .printonly { display: none }
 @media print {
   @page { size: A4 portrait; margin: 10mm }
@@ -298,6 +309,8 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   table { font-size: 11px }
   th, td { padding: 3px 5px }
   .tbl { overflow: visible }
+  .summary { break-before: page; break-inside: avoid }
+  .summary p, .summary ol, .summary ul, .plan { font-size: 11.5px }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
 </style>
@@ -516,7 +529,7 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', printPdf: 'Esporta PDF / Stampa', printApp: 'La stampa funziona nell\'app installata dal tablet (Chrome → Salva come PDF).', printed: 'stampato il', changeSetter: 'Cambia palleggiatrice', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
+    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', sumT: 'Riassunto', sum1: 'Identikit', sum2: 'Le tendenze più forti', sum3: 'Piano di battuta per rotazione', sum4: 'Fuori sistema', sum5: 'Affidabilità', sumId1: '{m} partite, {n} attacchi con ricezione {q}', sumMost: 'Più cercata: {p} ({s}, {n} attacchi).', sumEff: 'Più efficiente: {p} ({s}, efficienza {e} su {n}).', sumNone: 'Nessuna tendenza supera la soglia del {p}% con casi sufficienti.', from: 'da', withRec: 'Con ricezione', serveIn: 'Batti in', noClear: 'nessun segnale netto; più vicino', watch: 'Attenzione a', highBalls: 'Palle alte soprattutto a', rel_high: 'Alta', rel_mid: 'Media', rel_low: 'Bassa', sumRel: '— {m} partite, minimo {min} casi per rotazione.', sumWeak: 'Pochi dati in {r}: usare con cautela.', sumRule: 'Soglie dalle Impostazioni: segnale e tendenze ≥ {c}% con {l} punti di distacco; almeno {n} casi.', printPdf: 'Esporta PDF / Stampa', printApp: 'La stampa funziona nell\'app installata dal tablet (Chrome → Salva come PDF).', printed: 'stampato il', changeSetter: 'Cambia palleggiatrice', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
@@ -558,7 +571,7 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', printPdf: 'Export PDF / Print', printApp: 'Printing works in the installed app (Chrome → Save as PDF).', printed: 'printed on', changeSetter: 'Change setter', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
+    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', sumT: 'Summary', sum1: 'Profile', sum2: 'Strongest tendencies', sum3: 'Serve plan by rotation', sum4: 'Out of system', sum5: 'Reliability', sumId1: '{m} matches, {n} attacks with {q} pass', sumMost: 'Most used: {p} ({s}, {n} attacks).', sumEff: 'Most efficient: {p} ({s}, efficiency {e} on {n}).', sumNone: 'No tendency above the {p}% threshold with enough cases.', from: 'from', withRec: 'With pass', serveIn: 'Serve to', noClear: 'no clear signal; closest', watch: 'Watch', highBalls: 'High balls mostly to', rel_high: 'High', rel_mid: 'Medium', rel_low: 'Low', sumRel: '— {m} matches, at least {min} cases per rotation.', sumWeak: 'Little data in {r}: use with care.', sumRule: 'Thresholds from Settings: signal and tendencies ≥ {c}% with {l} points lead; at least {n} cases.', printPdf: 'Export PDF / Print', printApp: 'Printing works in the installed app (Chrome → Save as PDF).', printed: 'printed on', changeSetter: 'Change setter', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
@@ -1100,7 +1113,63 @@ function renderReport() {
     <div class="qsel" style="margin:0 0 8px"><span class="lbl">${t('zoneWord')}</span>${['all', 'a', 'b', 'c'].map(k => `<button class="chip" data-replane="${k}" aria-pressed="${k === rl}">${k === 'all' ? t('allW') : `<i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(k)};margin-right:5px"></i>` + ZL[k]}</button>`).join('')}</div>
     <div class="card tbl"><table>${head(t('call'))}<tbody>${readRows}</tbody></table></div>
     <div class="rothead"><h3>${t('rotT')}</h3><div class="biglegend">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}</div></div>
-    <div class="rgrid">${cards}</div></div>`;
+    <div class="rgrid">${cards}</div>${summaryHTML(key, info, mine, QF, qk)}</div>`;
+}
+
+// ===================== summary (rule-based, thresholds from Settings) =====================
+function summaryHTML(key, info, mine, QF, qk) {
+  const st = S(), thr = st.covMin / 100, minN = st.minN;
+  const dname = k => t('s' + k).toLowerCase();
+  const distOf = arr => { const cn = counts(arr); const d = {}; KEYS.forEach(k => d[k] = cn.n ? cn.c[k] / cn.n : 0); const top = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L'); return { d, n: cn.n, top, share: d[top] }; };
+  const f = mine.filter(r => QF(r.q));
+  const all = distOf(f);
+  // 1. identikit
+  const att = {}; f.forEach(r => { if (r.att < 0) return; const o = att[r.att] = att[r.att] || { n: 0, v: 0, s: {} }; o.n++; if (r.out === '#') o.v++; else if (r.out === '=' || r.out === '/') o.v--; const k = SIDE(r.g); o.s[k] = (o.s[k] || 0) + 1; });
+  const mainSide = o => { const k = Object.entries(o.s).sort((a, b) => b[1] - a[1])[0]; return k ? dname(k[0]) : ''; };
+  const most = Object.entries(att).sort((a, b) => b[1].n - a[1].n)[0];
+  const eff = Object.entries(att).filter(([, o]) => o.n >= 10).sort((a, b) => b[1].v / b[1].n - a[1].v / a[1].n)[0];
+  const distTxt = VIEW.filter(k => all.d[k] >= .05).sort((a, b) => all.d[b] - all.d[a]).map(k => `${dname(k)} ${pct(all.d[k])}`).join(', ');
+  const b1 = `<p>${t('sumId1').replace('{m}', info.matches || 0).replace('{n}', all.n).replace('{q}', t('q_' + qk))}: ${distTxt || '—'}.</p>
+    <p>${most ? t('sumMost').replace('{p}', '#' + most[0]).replace('{s}', mainSide(most[1])).replace('{n}', most[1].n) : ''}${eff ? ' ' + t('sumEff').replace('{p}', '#' + eff[0]).replace('{s}', mainSide(eff[1])).replace('{e}', Math.round(eff[1].v / eff[1].n * 100) + '%').replace('{n}', eff[1].n) : ''}</p>`;
+  // 2. strongest tendencies
+  const items = [];
+  [...new Set(f.map(r => r.call).filter(Boolean))].forEach(c => { const x = distOf(f.filter(r => r.call === c)); if (x.n >= minN && x.share >= thr) items.push({ v: x.share, n: x.n, txt: `<b>${c}</b> → ${dname(x.top)} <b>${pct(x.share)}</b> <span class="muted">(${x.n} ${t('cases')})</span>` }); });
+  [1, 6, 5, 4, 3, 2].forEach(r => LANES.forEach(l => { const s = laneSignal(key, '__none__', r, l, QF); if (s.sig !== 'read') items.push({ v: s.cov[s.sig], n: s.nh, txt: `<b>P${r}</b> ${t('from')} <b>${ZL[l]}</b> → ${SIGNAME(s.sig).toLowerCase()} <span class="muted">(${t('covers')} ${pct(s.cov[s.sig])}, ${s.nh} ${t('cases')})</span>` }); }));
+  ['#', '+', '!', '-'].forEach(q => { const x = distOf(mine.filter(r => r.q === q)); if (x.n >= minN && x.share >= thr) items.push({ v: x.share, n: x.n, txt: `${t('withRec')} <b>${q === '-' ? '−' : q}</b> → ${dname(x.top)} <b>${pct(x.share)}</b> <span class="muted">(${x.n} ${t('cases')})</span>` }); });
+  items.sort((a, b) => b.v - a.v || b.n - a.n);
+  const b2 = items.length ? `<ol>${items.slice(0, 5).map(i => `<li>${i.txt}</li>`).join('')}</ol>` : `<p class="muted">${t('sumNone').replace('{p}', st.covMin)}</p>`;
+  // 3. serve plan per rotation
+  const b3 = `<table class="plan"><tbody>${[1, 6, 5, 4, 3, 2].map(r => {
+    const sg = LANES.map(l => ({ l, s: laneSignal(key, '__none__', r, l, QF) }));
+    const strong = sg.filter(x => x.s.sig !== 'read').sort((a, b) => b.s.cov[b.s.sig] - a.s.cov[a.s.sig])[0];
+    let plan;
+    if (strong) plan = `${t('serveIn')} <b>${ZL[strong.l]}</b> → <span class="sig-${strong.s.sig}" style="color:#fff;font-weight:700;font-size:13px;padding:2px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em">${SIGNAME(strong.s.sig)}</span> <span class="muted">(${pct(strong.s.cov[strong.s.sig])})</span>`;
+    else { const best = sg.map(x => { const k = ['fist', '4', '2'].reduce((a, q) => x.s.cov[q] > x.s.cov[a] ? q : a, 'fist'); return { l: x.l, k, v: x.s.cov[k] }; }).sort((a, b) => b.v - a.v)[0]; plan = `<span class="muted">${t('noClear')}: ${ZL[best.l]} → ${SIGNAME(best.k).toLowerCase()} ${pct(best.v)}</span>`; }
+    const rr = f.filter(x => x.rot === r);
+    const key2 = [...new Set(rr.map(x => x.call).filter(Boolean))].map(c => ({ c, x: distOf(rr.filter(x => x.call === c)) })).filter(o => o.x.n >= 4).sort((a, b) => b.x.share * Math.min(1, b.x.n / 8) - a.x.share * Math.min(1, a.x.n / 8) || b.x.n - a.x.n)[0];
+    return `<tr><td><b>P${r}</b></td><td>${plan}</td><td>${key2 ? `${t('watch')} <b>${key2.c}</b>: ${dname(key2.x.top)} ${pct(key2.x.share)} <span class="muted">(${key2.x.n})</span>` : '—'}</td></tr>`;
+  }).join('')}</tbody></table>`;
+  // 4. out of system
+  const line = (lab, arr) => { const x = distOf(arr); if (!x.n) return ''; const two = VIEW.filter(k => x.d[k] > 0).sort((a, b) => x.d[b] - x.d[a]).slice(0, 2).map(k => `${dname(k)} ${pct(x.d[k])}`).join(', '); return `<li>${lab}: ${two} <span class="muted">(${x.n} ${t('cases')})</span></li>`; };
+  const hb = {}; mine.filter(r => (r.sz === 'FS' || r.call === 'KO') && r.att >= 0).forEach(r => hb[r.att] = (hb[r.att] || 0) + 1);
+  const hbTop = Object.entries(hb).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([p, n]) => `#${p} (${n})`).join(', ');
+  const b4 = `<ul>${line(t('withRec') + ' !', mine.filter(r => r.q === '!'))}${line(t('withRec') + ' −', mine.filter(r => r.q === '-'))}${line(t('fs'), mine.filter(r => r.sz === 'FS' || r.call === 'KO'))}${hbTop ? `<li>${t('highBalls')}: ${hbTop}</li>` : ''}</ul>`;
+  // 5. reliability
+  const per = [1, 6, 5, 4, 3, 2].map(r => ({ r, n: f.filter(x => x.rot === r).length }));
+  const minRot = Math.min(...per.map(x => x.n)), m = info.matches || 0;
+  const lvl = m >= 6 && minRot >= 20 ? 'high' : m >= 3 && minRot >= 10 ? 'mid' : 'low';
+  const weak = per.filter(x => x.n < 15).map(x => 'P' + x.r);
+  const b5 = `<p><span class="rel rel-${lvl}">${t('rel_' + lvl)}</span> ${t('sumRel').replace('{m}', m).replace('{min}', minRot)}${weak.length ? ' ' + t('sumWeak').replace('{r}', weak.join(', ')) : ''}</p>
+    <p class="muted" style="font-size:12px">${t('sumRule').replace('{c}', st.covMin).replace('{l}', st.lead).replace('{n}', minN)}</p>`;
+  return `<section class="summary card">
+    <h3>${t('sumT')} — ${esc(info.name || '')}</h3>
+    <div class="sgrid">
+      <div><h4>1 · ${t('sum1')}</h4>${b1}</div>
+      <div><h4>2 · ${t('sum2')}</h4>${b2}</div>
+      <div class="wide"><h4>3 · ${t('sum3')}</h4>${b3}</div>
+      <div><h4>4 · ${t('sum4')}</h4>${b4}</div>
+      <div><h4>5 · ${t('sum5')}</h4>${b5}</div>
+    </div></section>`;
 }
 
 // ===================== data =====================
