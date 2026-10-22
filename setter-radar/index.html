@@ -130,7 +130,9 @@ main { padding-block: 8px 20px }
 .rots button { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--f-display); font-weight: 700; font-size: 19px }
 .rots button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink) }
 .sigrow { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch }
-.sigrow .rlab { display: grid; place-items: center; padding: 0 8px; font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.exbtn { margin-top: 4px; font-family: var(--f-body); font-size: 11px; font-weight: 700; border: 1px dashed var(--line); background: var(--sunk); color: var(--muted); border-radius: 7px; padding: 3px 6px; white-space: nowrap }
+.exbtn.on { border-style: solid; border-color: var(--accent); color: var(--ink); background: var(--surface) }
+.sigrow .rlab { display: grid; place-items: center; align-content: center; padding: 0 8px; font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
 .sigrow .rlab small { font-size: 10px; letter-spacing: .08em; color: var(--muted); font-family: var(--f-body); text-transform: uppercase }
 .sigc { display: grid; grid-template-columns: 54px 1fr; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-left: 6px solid; border-radius: 12px; padding: 6px 8px; min-width: 0 }
 .sigc.lane-a { border-left-color: var(--lane-a) } .sigc.lane-b { border-left-color: var(--lane-b) } .sigc.lane-c { border-left-color: var(--lane-c) }
@@ -466,7 +468,7 @@ const T = {
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
-    rule: 'Regola segnale', covers: 'copre', warnSub: 'avviso: tendenza da valutare', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, sugli attacchi dopo ricezione # + !.',
+    rule: 'Regola segnale', covers: 'copre', sigRule: 'Ricezioni per il segnale in partita', sigRuleA: '# + e ! (se il centrale si muove)', sigRuleB: 'solo # e +', withExcl: 'con !', noExcl: 'senza !', warnSub: 'avviso: tendenza da valutare', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, sugli attacchi dopo ricezione # + !.',
     dataT: 'Partite caricate', importDVW: 'Importa file DVW', imported: 'Importate', skipped: 'già presenti',
     date: 'Data', match: 'Partita', src: 'Fonte', del: 'Elimina', sure: 'Sicuro?',
     backup: 'Backup', copyB: 'Copia backup', dlB: 'Scarica backup', restB: 'Ripristina da file', restP: 'Ripristina dal testo', copied: 'Copiato',
@@ -508,7 +510,7 @@ const T = {
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
-    rule: 'Signal rule', covers: 'covers', warnSub: 'warning: tendency to judge', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, on attacks after # + ! passes.',
+    rule: 'Signal rule', covers: 'covers', sigRule: 'Passes used for the match signal', sigRuleA: '# + and ! (if the middle runs)', sigRuleB: '# and + only', withExcl: 'with !', noExcl: 'no !', warnSub: 'warning: tendency to judge', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, on attacks after # + ! passes.',
     dataT: 'Loaded matches', importDVW: 'Import DVW files', imported: 'Imported', skipped: 'already loaded',
     date: 'Date', match: 'Match', src: 'Source', del: 'Delete', sure: 'Sure?',
     backup: 'Backup', copyB: 'Copy backup', dlB: 'Download backup', restB: 'Restore from file', restP: 'Restore from text', copied: 'Copied',
@@ -533,7 +535,7 @@ const ALL_CALLS = Object.keys(BASE_X);
 
 // ===================== state =====================
 const STORE = 'setter-radar-v2';
-const DEF_SET = { lang: 'it', covMin: 55, lead: 20, minN: 8, minLive: 3, histK: 8, sv: 3 };
+const DEF_SET = { lang: 'it', covMin: 55, lead: 20, minN: 8, minLive: 3, histK: 8, sv: 3, sigExcl: true };
 let DB, UNDO = [];
 const UI = { tab: 'live', step: null, rally: null, sub: null, slot: null, setupSetter: null, delConfirm: null, toastT: 0, repSetter: null };
 const S = () => DB.settings;
@@ -641,7 +643,8 @@ function decide(b) {
   return { sig: 'read', why: enough ? 'bal' : 'few' };
 }
 // passes that count for the signal: # and +, plus ! when the middle still ran a base (a call was made)
-const SIGQ = r => GOOD(r.q) || (r.q === '!' && !!r.call && r.call !== 'KO' && r.sz !== 'FS');
+// rule chosen by the coach: # and + only, or also ! when the middle still ran a base
+const SIGQ = r => GOOD(r.q) || (S().sigExcl !== false && r.q === '!' && !!r.call && r.call !== 'KO' && r.sz !== 'FS');
 // signal for rotation + reception lane (we choose the lane with our serve)
 function laneSignal(setter, liveId, rot, lane, qf) {
   const ok = qf ? (r => qf(r.q)) : SIGQ;
@@ -790,7 +793,8 @@ function sigRowHTML() {
       <div style="min-width:0"><h5>${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</h5>${w ? `<div class="sub" style="color:var(--accent);font-weight:600">${t('warnSub')}</div>` : ''}<div class="sub">${t('laneShort')} <b style="color:var(--ink)">${ZL[l]}</b> <span title="${t('hist')} + ${t('live')}">(${s.nh}+${s.nl})</span></div>
       <div class="sub">${covInline(s.cov)}</div></div></div>`;
   }).join('');
-  return `<div class="sigrow"><div class="rlab">P${rot}</div>${cards}</div>`;
+  const ex = S().sigExcl !== false;
+  return `<div class="sigrow"><div class="rlab">P${rot}<button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button></div>${cards}</div>`;
 }
 function boardHTML(call) {
   const lv = L(), rot = lv.rot, li = S().lang === 'it' ? 0 : 1;
@@ -1035,6 +1039,7 @@ function renderData() {
       </tbody></table></div></div>
     <div style="display:grid;gap:12px">
       <div class="card"><h2 class="h">${t('settingsT')}</h2>
+        <div class="field"><label class="lbl" for="set-sigq">${t('sigRule')}</label><select id="set-sigq"><option value="1" ${s.sigExcl !== false ? 'selected' : ''}>${t('sigRuleA')}</option><option value="0" ${s.sigExcl === false ? 'selected' : ''}>${t('sigRuleB')}</option></select></div>
         <div class="settings">${['covMin', 'lead', 'minN', 'minLive', 'histK'].map(k => `<div class="field"><label class="lbl" for="set-${k}">${t(k)}</label><input id="set-${k}" data-set="${k}" type="number" inputmode="decimal" value="${s[k]}"></div>`).join('')}
         <div class="field"><label class="lbl" for="set-theme">Tema / Theme</label><select id="set-theme"><option value="">Auto</option><option value="light" ${s.theme === 'light' ? 'selected' : ''}>Light</option><option value="dark" ${s.theme === 'dark' ? 'selected' : ''}>Dark</option></select></div></div>
       </div>
@@ -1120,6 +1125,7 @@ document.addEventListener('click', e => {
       UI.step = null; UNDO = []; save(); render(); wake();
     },
     fs() { try { const d = document.documentElement; if (!document.fullscreenElement) (d.requestFullscreen ? d.requestFullscreen() : Promise.reject()).catch(() => {}); else document.exitFullscreen(); } catch (e) {} setTimeout(fit, 300); },
+    togExcl() { S().sigExcl = S().sigExcl === false; save(); render(); toast(S().sigExcl ? t('sigRuleA') : t('sigRuleB')); },
     toggleSrv() { snapshot(); lv.serving = lv.serving === 'us' ? 'them' : 'us'; save(); render(); },
     undo() { doUndo(); },
     sub() { UI.sub = { out: null }; render(); },
@@ -1164,6 +1170,7 @@ document.addEventListener('change', e => {
   if (el.id === 'dvwIn' && el.files.length) importDVWFiles(el.files);
   if (el.id === 'jsonIn' && el.files[0]) { const fr = new FileReader(); fr.onload = () => restore(fr.result); fr.readAsText(el.files[0]); }
   if (el.dataset.set) { const v = parseFloat(el.value); if (!isNaN(v)) { S()[el.dataset.set] = v; save(); } }
+  if (el.id === 'set-sigq') { S().sigExcl = el.value === '1'; save(); }
   if (el.id === 'set-theme') { S().theme = el.value || undefined; if (el.value) document.documentElement.dataset.theme = el.value; else delete document.documentElement.dataset.theme; save(); }
 });
 // live screen must fit the tablet without scrolling: size it to the real visible height
