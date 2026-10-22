@@ -197,6 +197,12 @@ td.hl { font-weight: 700 }
 .rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
 @media (max-width: 1100px) { .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 @media (max-width: 640px) { .rgrid { grid-template-columns: minmax(0, 1fr) } }
+.qsel { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 10px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.qsel .lbl { margin-right: 4px }
+.rothead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 18px 0 8px }
+.rothead h3 { margin: 0 }
+.biglegend { display: flex; flex-wrap: wrap; gap: 6px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-weight: 600; font-size: 14px }
+.biglegend i { display: inline-block; width: 16px; height: 16px; border-radius: 4px; margin-right: 6px; vertical-align: -3px }
 .rcard .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px }
 .rcard .hd b { font-family: var(--f-display); font-size: 28px; line-height: 1 }
 .minisig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px }
@@ -456,7 +462,7 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale', readH: 'Ricezione # + !. Per ogni chiamata, dove va la palla.',
+    readT: 'Lettura del centrale', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
@@ -498,7 +504,7 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle', readH: 'Pass # + !. For each call, where the ball goes.',
+    readT: 'Reading the middle', readH: 'For each call, where the ball goes.', recType: 'Pass type', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
@@ -637,12 +643,14 @@ function decide(b) {
 // passes that count for the signal: # and +, plus ! when the middle still ran a base (a call was made)
 const SIGQ = r => GOOD(r.q) || (r.q === '!' && !!r.call && r.call !== 'KO' && r.sz !== 'FS');
 // signal for rotation + reception lane (we choose the lane with our serve)
-function laneSignal(setter, liveId, rot, lane) {
-  const hf = [r => SIGQ(r), r => SIGQ(r) && r.rot === rot, r => SIGQ(r) && r.rot === rot && laneOf(r.rz) === lane];
-  const lf = r => SIGQ(r) && r.rot === rot && laneOf(r.rz) === lane;
+function laneSignal(setter, liveId, rot, lane, qf) {
+  const ok = qf ? (r => qf(r.q)) : SIGQ;
+  const hf = [r => ok(r), r => ok(r) && r.rot === rot, r => ok(r) && r.rot === rot && laneOf(r.rz) === lane];
+  const lf = r => ok(r) && r.rot === rot && laneOf(r.rz) === lane;
   const cb = coverBlend(setter, liveId, hf, lf), b = blend(setter, liveId, hf, lf);
   return { ...b, cov: cb.cov, ...decide(cb) };
 }
+const QFILT = { all: q => q === '#' || q === '+' || q === '!', good: q => q === '#' || q === '+', hash: q => q === '#', plus: q => q === '+', excl: q => q === '!' };
 const covTxt = c => `✊ ${pct(c.fist)} · 4 ${pct(c['4'])} · 2 ${pct(c['2'])}`;
 const ZL = { a: 'Z1-9-2', b: 'Z6-8-3', c: 'Z5-7-4' };
 // graphic labels: 4 = dot on the left, arrow to the right; 2 = arrow to the left, dot on the right
@@ -971,28 +979,29 @@ function renderReport() {
   const key = UI.repSetter, li = S().lang === 'it' ? 0 : 1, info = list.find(s => s.key === key) || { matches: 0, n: 0 };
   const liveId = L() && L().started ? L().id : null;
   const mine = DB.recs.filter(r => r.setter === key && r.g && r.m !== liveId);
+  const qk = QFILT[S().repQ] ? S().repQ : 'all', QF = QFILT[qk];
   const row = (label, arr, extra = '') => { const cn = counts(arr); if (!cn.n) return ''; const d = {}; KEYS.forEach(k => d[k] = cn.c[k] / cn.n); const mx = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L');
     return `<tr><td>${label}</td>${extra}<td class="n">${cn.n}</td><td class="bar-c">${barHTML(d)}</td>${['R', 'C', 'P', 'L'].map(k => `<td class="n ${k === mx && cn.n >= 5 ? 'hl' : ''}">${pct(d[k])}</td>`).join('')}</tr>`; };
   const head = (first, extra = '') => `<thead><tr><th>${first}</th>${extra}<th class="n">${t('n')}</th><th></th>${['R', 'C', 'P', 'L'].map(k => `<th class="n">${t('s' + k)}</th>`).join('')}</tr></thead>`;
   // reading the middle
-  const fq = {}; mine.forEach(r => { if (INSYS(r.q) && r.call) fq[r.call] = (fq[r.call] || 0) + 1; });
+  const fq = {}; mine.forEach(r => { if (QF(r.q) && r.call) fq[r.call] = (fq[r.call] || 0) + 1; });
   const calls = Object.entries(fq).filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1]).map(x => x[0]);
-  const readRows = calls.map(c => row(`<b>${c}</b> <small class="muted">${esc((CALL_NAMES[c] || [c, c])[li])}</small>`, mine.filter(r => INSYS(r.q) && r.call === c))).join('')
-    + row(`<b>⤴</b> <small class="muted">${t('fs')}</small>`, mine.filter(r => r.sz === 'FS' || r.call === 'KO'));
-  const laneRows = calls.slice(0, 4).map(c => LANES.map(l => row(`<b>${c}</b>`, mine.filter(r => INSYS(r.q) && r.call === c && laneOf(r.rz) === l), `<td><i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(l)};margin-right:4px"></i>${t('lane' + l.toUpperCase())}</td>`)).join('')).join('');
+  const readRows = calls.map(c => row(`<b>${c}</b> <small class="muted">${esc((CALL_NAMES[c] || [c, c])[li])}</small>`, mine.filter(r => QF(r.q) && r.call === c))).join('')
+    + row(`<b>⤴</b> <small class="muted">${t('fs')}</small>`, mine.filter(r => QF(r.q) && (r.sz === 'FS' || r.call === 'KO')));
+  const laneRows = calls.slice(0, 4).map(c => LANES.map(l => row(`<b>${c}</b>`, mine.filter(r => QF(r.q) && r.call === c && laneOf(r.rz) === l), `<td><i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(l)};margin-right:4px"></i>${t('lane' + l.toUpperCase())}</td>`)).join('')).join('');
   let cards = '';
   for (const r of [1, 6, 5, 4, 3, 2]) {
-    const g = mine.filter(x => x.rot === r && GOOD(x.q)), p = mine.filter(x => x.rot === r && POOR(x.q));
+    const g = mine.filter(x => x.rot === r && QF(x.q)), p = mine.filter(x => x.rot === r && x.q === '-');
     const gc = counts(g), pc = counts(p); const gd = {}, pd = {}; KEYS.forEach(k => { gd[k] = gc.n ? gc.c[k] / gc.n : 0; pd[k] = pc.n ? pc.c[k] / pc.n : 0; });
-    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm">${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
+    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l, QF), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm">${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
     const cf = {}; g.forEach(x => { if (x.call) cf[x.call] = (cf[x.call] || 0) + 1; });
     const who = { L: {}, C: {}, R: {} }; g.forEach(x => { const s = SIDE(x.g); if (who[s]) who[s][x.att] = (who[s][x.att] || 0) + 1; });
     const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `#${n}<small class="muted">·${c}</small>`).join(' ') || '—';
-    cards += `<article class="card rcard"><div class="hd"><b>P${r}</b><span class="badge">${gc.n + pc.n} ${t('cases')}</span></div>
+    cards += `<article class="card rcard"><div class="hd"><b>P${r}</b><span class="badge">${gc.n} ${t('cases')} · ${t('q_' + qk)}</span></div>
       <div class="minisig">${sigs}</div>
-      <div class="barlbl"><span>${t('goodRec')}</span><span>${gc.n}</span></div>${barHTML(gd)}
+      <div class="barlbl"><span>${t('recWord')} ${t('q_' + qk)}</span><span>${gc.n}</span></div>${barHTML(gd)}
       <div class="legend" style="margin-top:3px">${['R', 'C', 'P', 'L'].map(k => `<span><i class="k-${k}"></i>${pct(gd[k])}</span>`).join('')}</div>
-      <div class="barlbl"><span>${t('poorRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}
+      <div class="barlbl"><span>${t('negRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}
       <dl class="kv"><dt>${t('calls')}</dt><dd>${Object.entries(cf).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, n]) => `${c}<small class="muted">·${n}</small>`).join(' ') || '—'}</dd>
       <dt>${t('sL')}</dt><dd>${top(who.L)}</dd><dt>${t('sC')}</dt><dd>${top(who.C)}</dd><dt>${t('sR')}</dt><dd>${top(who.R)}</dd></dl></article>`;
   }
@@ -1001,14 +1010,15 @@ function renderReport() {
       <div style="min-width:0"><h2 class="h" style="margin:0">${t('repT')}</h2><p class="muted" style="margin:2px 0 0;max-width:72ch;font-size:14px">${t('repH')}</p></div>
       <div class="field" style="min-width:260px;margin:0"><label class="lbl" for="repSel">${t('pickSetter')}</label><select id="repSel">${list.map(s => `<option value="${esc(s.key)}" ${s.key === key ? 'selected' : ''}>${esc(s.name)} — ${esc(s.teams.join(', '))} (${s.matches})</option>`).join('')}</select></div>
     </div>
+    <div class="qsel" role="group" aria-label="${t('recType')}"><span class="lbl">${t('recType')}</span>${Object.keys(QFILT).map(k => `<button class="chip" data-repq="${k}" aria-pressed="${k === qk}">${t('q_' + k)}</button>`).join('')}</div>
     <div class="legend" style="margin-top:8px">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}<span>· ${t('rule')}: ${t('ruleTxt').replace('{c}', S().covMin).replace('{l}', S().lead)} · ≥ ${S().minN} ${t('cases')} ${t('hist')} / ≥ ${S().minLive} ${t('live')}</span></div>
     <h3>${t('effT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('effH')}</p>
     <div class="card"><div class="row" style="gap:18px">${(() => { const E = effMap(key); return VIEW.map(k => `<span><i class="k-${k}" style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px"></i>${t('s' + k)} <b class="disp" style="font-size:20px">${Math.round(E[k] * 100)}%</b> <small class="muted">n${E['n' + k]}</small></span>`).join(''); })()}</div></div>
-    <h3>${t('readT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('readH')}</p>
+    <h3>${t('readT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('readH')}</p>
     <div class="card tbl"><table>${head(t('call'))}<tbody>${readRows}</tbody></table></div>
     <h3>${t('callLaneT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('callLaneH')}</p>
     <div class="card tbl"><table>${head(t('call'), '<th></th>')}<tbody>${laneRows}</tbody></table></div>
-    <h3>${t('rotT')}</h3>
+    <div class="rothead"><h3>${t('rotT')}</h3><div class="biglegend">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}</div></div>
     <div class="rgrid">${cards}</div></div>`;
 }
 
@@ -1060,6 +1070,7 @@ document.addEventListener('click', e => {
   const d = b.dataset, lv = L();
   if (d.tab) { UI.tab = d.tab; UI.delConfirm = null; render(); return; }
   if (b.id === 'lang') { S().lang = S().lang === 'it' ? 'en' : 'it'; save(); render(); return; }
+  if (d.repq) { S().repQ = d.repq; save(); render(); return; }
   if (d.setter != null) { UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
   if (d.slot != null) { UI.slot = +d.slot; render(); return; }
   if (d.pick != null && lv) {
