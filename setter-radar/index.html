@@ -143,7 +143,7 @@ main { padding-block: 8px 20px }
 .sigc .sub { font-size: 11px; color: var(--muted); line-height: 1.2 }
 .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunk); margin-top: 4px }
 .bar span { display: block; height: 100% }
-.k-L { background: var(--sig-4) } .k-C { background: var(--sig-fist) } .k-R { background: var(--sig-2) } .k-P { background: var(--k-p) } .k-D { background: var(--muted) }
+.k-L { background: var(--sig-4) } .k-L5 { background: color-mix(in srgb, var(--sig-4) 45%, var(--surface)) } .k-R1 { background: color-mix(in srgb, var(--sig-2) 45%, var(--surface)) } .k-C { background: var(--sig-fist) } .k-R { background: var(--sig-2) } .k-P { background: var(--k-p) } .k-D { background: var(--muted) }
 .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted) }
 .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px }
 
@@ -402,7 +402,8 @@ const SR = (() => {
   }
 
   // ---------- model ----------
-  const SIDE = g => (g === '4' || g === '5') ? 'L' : (g === '2' || g === '1') ? 'R' : g === '3' ? 'C' : g === 'P' ? 'P' : g === 'D' ? 'D' : '';
+  // destinations: L = front 4, L5 = back row from 5, R = front 2, R1 = back row from 1 (opposite), C = middle, P = pipe, D = setter
+  const SIDE = g => g === '4' ? 'L' : g === '5' ? 'L5' : g === '2' ? 'R' : g === '1' ? 'R1' : g === '3' ? 'C' : g === 'P' ? 'P' : g === 'D' ? 'D' : '';
   const GOOD = q => q === '#' || q === '+';
   const POOR = q => q === '!' || q === '-';
   const KEYS = ['L', 'C', 'R', 'P', 'D'];
@@ -467,7 +468,7 @@ const T = {
     sig4: 'Anticipo 4', sig2: 'Anticipo 2', sigfist: 'Segui centrale', sigread: 'Leggere',
     laneA: 'corsia 1-9-2', laneB: 'corsia 6-8-3', laneC: 'corsia 5-7-4', laneShort: 'Battuta in',
     hist: 'storico', live: 'live', cases: 'casi',
-    sL: 'Lato 4', sC: 'Centrale', sR: 'Lato 2', sP: 'Pipe', sD: '2° tocco',
+    sL: 'Lato 4', sL5: 'Zona 5 (2ª linea)', sC: 'Centrale', sR: 'Lato 2', sR1: 'Zona 1 (2ª linea)', sP: 'Pipe', sD: '2° tocco',
     idleUs: 'Ricezione', idleUsH: 'Tocca zona e qualità sulla loro metà campo.',
     idleThem: 'Battono loro', idleThemH: 'Registra chi vince lo scambio. Free ball se mandiamo una palla facile.',
     srvErr: 'Errore battuta', free: 'Free ball', ptUs: 'Punto noi', ptThem: 'Punto loro',
@@ -509,7 +510,7 @@ const T = {
     sig4: 'Shift to 4', sig2: 'Shift to 2', sigfist: 'Follow middle', sigread: 'Read',
     laneA: 'lane 1-9-2', laneB: 'lane 6-8-3', laneC: 'lane 5-7-4', laneShort: 'Serve to',
     hist: 'history', live: 'live', cases: 'cases',
-    sL: 'Side 4', sC: 'Middle', sR: 'Side 2', sP: 'Pipe', sD: '2nd ball',
+    sL: 'Side 4', sL5: 'Zone 5 (back row)', sC: 'Middle', sR: 'Side 2', sR1: 'Zone 1 (back row)', sP: 'Pipe', sD: '2nd ball',
     idleUs: 'Reception', idleUsH: 'Tap zone and quality on their half.',
     idleThem: 'They serve', idleThemH: 'Record who wins the rally. Free ball when we send an easy ball.',
     srvErr: 'Serve error', free: 'Free ball', ptUs: 'Our point', ptThem: 'Their point',
@@ -603,8 +604,9 @@ const SIGNAME = s => t('sig' + s);
 const LANES = ['a', 'b', 'c'];
 const laneOf = z => [1, 9, 2].includes(z) ? 'a' : [6, 8, 3].includes(z) ? 'b' : [5, 7, 4].includes(z) ? 'c' : '';
 const laneVar = l => l ? `var(--lane-${l})` : 'var(--lane-f)';
-const KEYS = ['L', 'C', 'R', 'P', 'D'];
-const VIEW = ['R', 'D', 'C', 'P', 'L']; // as seen from our bench: their 2 on the left, 4 on the right
+const KEYS = ['L', 'L5', 'C', 'R', 'R1', 'P', 'D'];
+const BASE = k => k === 'L5' ? 'L' : k === 'R1' ? 'R' : k; // block side of a back-row attack
+const VIEW = ['R', 'R1', 'D', 'C', 'P', 'L5', 'L']; // as seen from our bench: their 2 on the left, 4 on the right
 const OUTS = [['#', 'o_hash'], ['-', 'o_minus'], ['+', 'o_plus'], ['=', 'o_eq'], ['/', 'o_slash'], ['!', 'o_excl']];
 // outcome marker at landing point (Lino's notation): ● kill, ○ dug & countered, ⊘ dug no counter, ○ with 2 bars error, ■ blocked, □ blocked & covered
 function marker(o, x, y, r, col, sw) {
@@ -625,8 +627,8 @@ function rosterOf(team) { const r = DB.rosters[team]; return r ? r.players : {};
 
 // ===================== model: history + live blend =====================
 const SIDE = SR.SIDE, GOOD = q => q === '#' || q === '+', INSYS = q => q === '#' || q === '+' || q === '!', POOR = q => q === '!' || q === '-';
-function counts(arr) { const c = { L: 0, C: 0, R: 0, P: 0, D: 0 }; let n = 0; arr.forEach(r => { const s = SIDE(r.g); if (s) { c[s]++; n++; } }); return { c, n }; }
-const FLAT = { L: .2, C: .2, R: .2, P: .2, D: .2 };
+function counts(arr) { const c = { L: 0, L5: 0, C: 0, R: 0, R1: 0, P: 0, D: 0 }; let n = 0; arr.forEach(r => { const s = SIDE(r.g); if (s) { c[s]++; n++; } }); return { c, n }; }
+const FLAT = { L: .2, L5: .07, C: .2, R: .2, R1: .13, P: .1, D: .1 };
 function shrink(cn, prior, K) { const d = {}; KEYS.forEach(k => d[k] = (cn.c[k] + K * prior[k]) / (cn.n + K)); return d; }
 // chain of history filters (general -> specific) then live on top with weight histK
 function blend(setter, liveId, histFilters, liveFilter) {
@@ -655,7 +657,7 @@ const OPTS = ['fist', '4', '2'];
 function coverOf(recs, E) {
   const c = { fist: 0, '4': 0, '2': 0 }; let w = 0, n = 0;
   recs.forEach(r => { const k = SIDE(r.g); if (!k) return; const wt = Math.max(.05, E[k]); w += wt; n++;
-    if (k === 'C' || RUN[r.call] === k) c.fist += wt; if (k === 'L') c['4'] += wt; if (k === 'R') c['2'] += wt; });
+    const b = BASE(k); if (k === 'C' || RUN[r.call] === b) c.fist += wt; if (b === 'L') c['4'] += wt; if (b === 'R') c['2'] += wt; });
   return { c, w, n };
 }
 function coverBlend(setter, liveId, histFilters, liveFilter, qf) {
@@ -861,10 +863,10 @@ function boardHTML(call) {
   return `<div class="board ${cls}" data-board="${call}">
     <div class="bh"><b>${call === 'FS' ? '⤴' : call}</b><span>${esc(call === 'FS' ? t('fs') : name)}</span><em>${recs.length || ''}</em></div>
     <svg class="bc" viewBox="0 0 ${W} ${H}" data-bc="${call}">${s}</svg>
-    ${boardAlert(call)}${barHTML(tend.d)}<div class="tend"><span><b style="color:var(--sig-2)">2</b> ${pct(tend.d.R)} · <b style="color:var(--sig-fist)">C</b> ${pct(tend.d.C)} · <b style="color:var(--sig-4)">4</b> ${pct(tend.d.L)}</span><span title="${t('hist')} + ${t('live')}">${tend.nh}+${tend.nl}</span></div>
+    ${boardAlert(call)}${barHTML(tend.d)}<div class="tend"><span><b style="color:var(--sig-2)">2</b> ${pct(tend.d.R + tend.d.R1)} · <b style="color:var(--sig-fist)">C</b> ${pct(tend.d.C)} · <b style="color:var(--sig-4)">4</b> ${pct(tend.d.L + tend.d.L5)}</span><span title="${t('hist')} + ${t('live')}">${tend.nh}+${tend.nl}</span></div>
   </div>`;
 }
-const SHORT = { L: '4', R: '2', C: 'centrale', P: 'pipe', D: '2° tocco' };
+const SHORT = { L: '4', L5: 'z5', R: '2', R1: 'z1', C: 'centrale', P: 'pipe', D: '2° tocco' };
 // warn when today's use of a call contradicts the history (all rotations, passes # + !)
 function boardAlert(call) {
   const lv = L(); if (call === 'FS') return fsSplit();
@@ -1023,8 +1025,8 @@ function renderReport() {
   const mine = DB.recs.filter(r => r.setter === key && r.g && r.m !== liveId);
   const qk = QFILT[S().repQ] ? S().repQ : 'all', QF = QFILT[qk];
   const row = (label, arr, extra = '') => { const cn = counts(arr); if (!cn.n) return ''; const d = {}; KEYS.forEach(k => d[k] = cn.c[k] / cn.n); const mx = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L');
-    return `<tr><td>${label}</td>${extra}<td class="n">${cn.n}</td><td class="bar-c">${barHTML(d)}</td>${['R', 'C', 'P', 'L'].map(k => `<td class="n ${k === mx && cn.n >= 5 ? 'hl' : ''}">${pct(d[k])}</td>`).join('')}</tr>`; };
-  const head = (first, extra = '') => `<thead><tr><th>${first}</th>${extra}<th class="n">${t('n')}</th><th></th>${['R', 'C', 'P', 'L'].map(k => `<th class="n">${t('s' + k)}</th>`).join('')}</tr></thead>`;
+    return `<tr><td>${label}</td>${extra}<td class="n">${cn.n}</td><td class="bar-c">${barHTML(d)}</td>${['R', 'R1', 'C', 'P', 'L'].map(k => `<td class="n ${k === mx && cn.n >= 5 ? 'hl' : ''}">${pct(d[k])}</td>`).join('')}</tr>`; };
+  const head = (first, extra = '') => `<thead><tr><th>${first}</th>${extra}<th class="n">${t('n')}</th><th></th>${['R', 'R1', 'C', 'P', 'L'].map(k => `<th class="n">${t('s' + k)}</th>`).join('')}</tr></thead>`;
   // reading the middle
   const rr = S().repRot || 'all', rl = S().repLane || 'all';
   const inScope = r => QF(r.q) && (rr === 'all' || r.rot === +rr) && (rl === 'all' || laneOf(r.rz) === rl);
@@ -1039,17 +1041,17 @@ function renderReport() {
     const gc = counts(g), pc = counts(p); const gd = {}, pd = {}; KEYS.forEach(k => { gd[k] = gc.n ? gc.c[k] / gc.n : 0; pd[k] = pc.n ? pc.c[k] / pc.n : 0; });
     const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l, QF), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm ${w ? 'warnh' : ''}">${w ? t('weak') + ': ' + SIGNAME(w).toLowerCase() : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
     const cf = {}; g.forEach(x => { if (x.call) cf[x.call] = (cf[x.call] || 0) + 1; });
-    const who = { L: {}, C: {}, R: {} }; g.forEach(x => { const s = SIDE(x.g); if (who[s]) who[s][x.att] = (who[s][x.att] || 0) + 1; });
+    const who = { L: {}, C: {}, R: {}, R1: {} }; g.forEach(x => { const s = SIDE(x.g); const s2 = s === 'L5' ? 'L' : s; if (who[s2]) who[s2][x.att] = (who[s2][x.att] || 0) + 1; });
     const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `#${n}<small class="muted">·${c}</small>`).join(' ') || '—';
     cards += `<article class="card rcard"><div class="hd"><b>P${r}</b><span class="badge">${gc.n} ${t('cases')} · ${t('q_' + qk)}</span></div>
       <div class="minisig">${sigs}</div>
       <div class="barlbl"><span>${t('recWord')} ${t('q_' + qk)}</span><span>${gc.n}</span></div>${barHTML(gd)}
-      <div class="legend" style="margin-top:3px">${['R', 'C', 'P', 'L'].map(k => `<span><i class="k-${k}"></i>${pct(gd[k])}</span>`).join('')}</div>
+      <div class="legend" style="margin-top:3px">${['R', 'R1', 'C', 'P', 'L'].map(k => `<span><i class="k-${k}"></i>${pct(gd[k])}</span>`).join('')}</div>
       ${qk === 'neg' ? '' : `<div class="barlbl"><span>${t('negRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}`}
       <div class="barlbl"><span>${t('callsBy')}</span><button class="linkbtn" data-goread="${r}">${t('detail')} →</button></div>
       <div class="ctab">${Object.entries(cf).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, n]) => { const cn = counts(g.filter(x => x.call === c)); const d = {}; KEYS.forEach(k => d[k] = cn.n ? cn.c[k] / cn.n : 0); const mx = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L');
         return `<div class="crow"><b>${c}</b><span class="n">${n}</span>${barHTML(d)}<span class="dm"><i class="k-${mx}"></i>${SHORT[mx]} ${pct(d[mx])}</span></div>`; }).join('') || '<span class="muted">—</span>'}</div>
-      <dl class="kv"><dt>${t('sL')}</dt><dd>${top(who.L)}</dd><dt>${t('sC')}</dt><dd>${top(who.C)}</dd><dt>${t('sR')}</dt><dd>${top(who.R)}</dd></dl></article>`;
+      <dl class="kv"><dt>${t('sL')}</dt><dd>${top(who.L)}</dd><dt>${t('sC')}</dt><dd>${top(who.C)}</dd><dt>${t('sR')}</dt><dd>${top(who.R)}</dd><dt>${t('sR1')}</dt><dd>${top(who.R1)}</dd></dl></article>`;
   }
   $('#v-study').innerHTML = `<div class="rep">
     <div class="rephead">
