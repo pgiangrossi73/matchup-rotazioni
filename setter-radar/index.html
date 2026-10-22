@@ -531,7 +531,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v21';
+const APP_VER = 'v22';
 </script>
 <script>
 // ===================== i18n =====================
@@ -555,7 +555,7 @@ const T = {
     out: 'Esito dell\'attacco', who: 'Chi ha vinto lo scambio?',
     o_hash: 'punto', o_minus: 'difeso e rigiocato', o_plus: 'difeso, non rigiocato', o_eq: 'errore', o_slash: 'murato', o_excl: 'murato e coperto',
     skip: 'Salta', back: 'Indietro', cancel: 'Annulla azione',
-    full: 'Schermo intero', subOut: 'Cambio: chi esce?', subIn: 'Chi entra?', addNum: 'Numero', confirm: 'Conferma',
+    full: 'Schermo intero', subOut: 'Cambio: chi esce?', subIn: 'Chi entra?', subDouble: 'Doppio cambio', subOut2: 'Secondo cambio: chi esce?', setterQ: 'Chi fa la palleggiatrice adesso?', setterQH: 'Le sue azioni vengono salvate a parte, sotto il suo nome.', keepSetter: 'Nessun cambio di palleggiatrice', setterNow: 'Palleggiatrice in campo', addNum: 'Numero', confirm: 'Conferma',
     endQ: 'Chiudere il set', yes: 'Sì, chiudi', no: 'No', discard: 'Scarta la rilevazione di questa partita', discardQ: 'Cancellare tutta la rilevazione live di questa partita ({n} azioni)? Lo storico DVW non viene toccato.', discardYes: 'Sì, cancella tutto', discarded: 'Rilevazione cancellata: si riparte dal set 1',
     fs: 'Fuori sistema', fsName: 'palla alta / alzata non della palleggiatrice', none: 'nessuna',
     actions: 'azioni', libero: 'libero',
@@ -597,7 +597,7 @@ const T = {
     out: 'Attack result', who: 'Who won the rally?',
     o_hash: 'kill', o_minus: 'dug & countered', o_plus: 'dug, no counter', o_eq: 'error', o_slash: 'blocked', o_excl: 'blocked & covered',
     skip: 'Skip', back: 'Back', cancel: 'Cancel rally',
-    full: 'Full screen', subOut: 'Sub: who goes out?', subIn: 'Who comes in?', addNum: 'Number', confirm: 'Confirm',
+    full: 'Full screen', subOut: 'Sub: who goes out?', subIn: 'Who comes in?', subDouble: 'Double sub', subOut2: 'Second sub: who goes out?', setterQ: 'Who is setting now?', setterQH: 'Her actions are saved separately, under her own name.', keepSetter: 'No setter change', setterNow: 'Setter on court', addNum: 'Number', confirm: 'Confirm',
     endQ: 'Close set', yes: 'Yes, close', no: 'No', discard: 'Discard this match\'s scouting', discardQ: 'Delete all live scouting of this match ({n} actions)? DVW history is not touched.', discardYes: 'Yes, delete all', discarded: 'Scouting deleted: back to set 1',
     fs: 'Out of system', fsName: 'high ball / set not by the setter', none: 'none',
     actions: 'actions', libero: 'libero',
@@ -1048,9 +1048,16 @@ function stepHTML() {
 }
 function subHTML() {
   const lv = L(), sb = UI.sub;
-  if (sb.out == null) return `<h4>${t('subOut')}</h4><div class="nums" style="grid-template-columns:repeat(3,1fr)">${[3, 2, 1, 4, 5, 0].map(i => numBtn(lv.lineup[i], '', 'Z' + (i + 1))).join('')}</div><div class="foot"><button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
+  if (sb.ask) {
+    const keep = lv.lineup.includes(lv.sNum);
+    return `<h4>${t('setterQ')}</h4><p class="hint">${t('setterQH')}</p><div class="nums" style="grid-template-columns:repeat(3,1fr)">${[3, 2, 1, 4, 5, 0].map(i => numBtn(lv.lineup[i], lv.lineup[i] === sb.ask ? 'hot' : '', 'Z' + (i + 1) + (lv.lineup[i] === lv.sNum ? ' · P' : ''))).join('')}</div>
+      ${keep ? `<div class="foot"><button class="btn" data-act="keepSetter">${t('keepSetter')}</button></div>` : ''}`;
+  }
+  const n2 = (sb.done || []).length;
+  if (sb.out == null) return `<h4>${n2 ? t('subOut2') : t('subOut')}</h4>${n2 ? `<div class="crumbs">${sb.done.map(p => `<span>↓ #${p.out} ↑ #${p.in}</span>`).join('')}</div>` : ''}<div class="nums" style="grid-template-columns:repeat(3,1fr)">${[3, 2, 1, 4, 5, 0].map(i => numBtn(lv.lineup[i], '', 'Z' + (i + 1))).join('')}</div>
+    <div class="foot">${n2 ? '' : `<button class="btn ${sb.double ? 'pri' : ''}" data-act="subDouble" aria-pressed="${!!sb.double}">⇄⇄ ${t('subDouble')}</button>`}<button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
   const bench = Object.keys(lv.roster || {}).map(Number).filter(n => !lv.lineup.includes(n) && !(lv.liberos || []).includes(n));
-  return `<h4>${t('subIn')}</h4><div class="crumbs"><span>↓ #${sb.out}</span></div><div class="nums">${bench.map(n => numBtn(n)).join('')}</div>
+  return `<h4>${t('subIn')}</h4><div class="crumbs">${(sb.done || []).map(p => `<span>↓ #${p.out} ↑ #${p.in}</span>`).join('')}<span>↓ #${sb.out}</span></div><div class="nums">${bench.map(n => numBtn(n, (lv.roster[n] || {}).role === 5 ? 'hot' : '')).join('')}</div>
     <div class="row" style="margin-top:8px"><input id="subNum" type="number" inputmode="numeric" placeholder="${t('addNum')}" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100px;min-height:44px"><button class="btn" data-act="subTyped">${t('confirm')}</button></div>
     <div class="foot"><button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
 }
@@ -1304,7 +1311,7 @@ document.addEventListener('click', e => {
   if (d.q) { if (!lv || UI.step || lv.serving !== 'us') return; startRally(d.q, +d.z); return; }
   if (d.num != null) {
     const n = +d.num;
-    if (UI.sub) { if (UI.sub.out == null) { UI.sub.out = n; render(); } else doSub(n); return; }
+    if (UI.sub) { if (UI.sub.ask != null) { setActiveSetter(n); UI.sub = null; save(); render(); toast(t('setterNow') + ': ' + L().sName + ' #' + n + ' · P' + L().rot); return; } if (UI.sub.out == null) { UI.sub.out = n; render(); } else doSub(n); return; }
     if (UI.step === 'rcv') { UI.rally.rcv = n; UI.step = 'board'; render(); return; }
     if (UI.step === 'att') { UI.rally.att = n; UI.step = 'out'; render(); return; }
     return;
@@ -1346,8 +1353,9 @@ document.addEventListener('click', e => {
     addNum() { const n = parseInt($('#addNum').value, 10); if (isNaN(n) || !lv) return; lv.roster[n] = lv.roster[n] || { last: '', role: 0 }; save(); render(); },
     startSet() {
       if (lv.lineup.some(x => x == null)) { toast(t('needSix')); return; }
+      if (!lv.lineup.includes(lv.sNum)) { const c = lv.lineup.find(n => (lv.roster[n] || {}).role === 5); if (c != null) setActiveSetter(c); }
       const si = lv.lineup.indexOf(lv.sNum); if (si < 0) { toast(t('needSetter')); return; }
-      lv.rot = si + 1; lv.started = true; lv.startLineup = lv.lineup.slice();
+      lv.rot = si + 1; lv.started = true; lv.startLineup = lv.lineup.slice(); lv.startSetter = { setter: lv.setter, sName: lv.sName, sNum: lv.sNum };
       if (!DB.matches.some(m => m.id === lv.id)) DB.matches.push({ id: lv.id, date: new Date().toISOString().slice(0, 10), teams: ['AEL', lv.teamName], src: 'live' });
       UI.step = null; UNDO = []; save(); render(); wake();
     },
@@ -1361,6 +1369,8 @@ document.addEventListener('click', e => {
     undo() { doUndo(); },
     sub() { UI.sub = { out: null }; render(); },
     subCancel() { UI.sub = null; render(); },
+    subDouble() { UI.sub.double = !UI.sub.double; render(); },
+    keepSetter() { UI.sub = null; save(); render(); },
     subTyped() { const n = parseInt($('#subNum').value, 10); if (!isNaN(n)) doSub(n); },
     endset() { UI.step = 'endset'; render(); },
     endsetNo() { UI.step = null; render(); },
@@ -1368,10 +1378,10 @@ document.addEventListener('click', e => {
     discardAsk() { UI.step = 'discard'; render(); },
     discardYes() {
       const id = lv.id; DB.recs = DB.recs.filter(r => r.m !== id); DB.matches = DB.matches.filter(m => m.id !== id);
-      Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, lineup: (lv.startLineup || lv.lineup).slice() });
+      Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, lineup: (lv.startLineup || lv.lineup).slice(), ...(lv.startSetter || {}) });
       UI.step = null; UI.rally = null; UI.sub = null; UI.slot = 3; UNDO = []; save(); render(); toast(t('discarded'));
     },
-    endsetYes() { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
+    endsetYes() { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); if (lv.startSetter) Object.assign(lv, lv.startSetter); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
     srvErr() { snapshot(); lv.serr = (lv.serr || 0) + 1; pointThem(); save(); render(); },
     free() { startRally('F', 0); },
     ptUs() { snapshot(); pointUs(); save(); render(); },
@@ -1396,11 +1406,24 @@ document.addEventListener('click', e => {
   if (d.act && acts[d.act]) acts[d.act]();
 });
 function doSub(n) {
-  const lv = L(); snapshot();
-  const i = lv.lineup.indexOf(UI.sub.out); if (i >= 0) lv.lineup[i] = n;
+  const lv = L(), sb = UI.sub, done = sb.done || [];
+  if (!done.length) snapshot();
+  const i = lv.lineup.indexOf(sb.out); if (i >= 0) lv.lineup[i] = n;
   if (!lv.roster[n]) lv.roster[n] = { last: '', role: 0 };
-  (lv.subs = lv.subs || []).push({ set: lv.set, score: lv.score.slice(), out: UI.sub.out, in: n });
+  (lv.subs = lv.subs || []).push({ set: lv.set, score: lv.score.slice(), out: sb.out, in: n });
+  const pairs = [...done, { out: sb.out, in: n }];
+  if (sb.double && pairs.length < 2) { UI.sub = { out: null, double: true, done: pairs }; save(); render(); return; }
+  // did the setter change? an incoming setter, or the setter on court went out
+  const inSetter = pairs.map(p => p.in).find(x => (lv.roster[x] || {}).role === 5 && x !== lv.sNum);
+  const outSetter = pairs.some(p => p.out === lv.sNum);
+  if (inSetter != null || outSetter) { UI.sub = { ask: inSetter != null ? inSetter : (pairs.find(p => p.out === lv.sNum) || {}).in }; save(); render(); return; }
   UI.sub = null; save(); render();
+}
+function setActiveSetter(n) {
+  const lv = L(), p = lv.roster[n] = lv.roster[n] || { last: '', role: 0 };
+  const name = (p.last || '').trim() || lv.teamName;
+  p.role = 5; lv.sNum = n; lv.sName = name.toUpperCase(); lv.setter = SR.setterKey(name, n);
+  const i = lv.lineup.indexOf(n); if (i >= 0) lv.rot = i + 1;
 }
 document.addEventListener('change', e => {
   const el = e.target;
