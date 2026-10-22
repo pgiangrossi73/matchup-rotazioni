@@ -273,6 +273,32 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .board { grid-template-rows: auto minmax(0, 1fr) auto auto; min-height: 0 }
   .board svg.bc { height: 100%; min-height: 0; width: auto; max-width: 100%; aspect-ratio: 1 / 1; justify-self: center }
 }
+.printonly { display: none }
+@media print {
+  @page { size: A4 portrait; margin: 10mm }
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    --bg: #ffffff; --surface: #ffffff; --sunk: #eef1f6; --ink: #13203a; --muted: #4a5672; --line: #c9d1df;
+    --sig-4: #ef6a2a; --sig-2: #7a4ce0; --sig-fist: #c23a33; --sig-read: #4b5876; --k-p: #c8a21a;
+    --lane-a: #2c6bd9; --lane-b: #d6433b; --lane-c: #17936a; --accent: #ef6a2a; color-scheme: light }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important }
+  html, body { height: auto; background: #fff }
+  body::before, header.top, .toast, .noprint, .qsel, .repside label, .repside select, .linkbtn { display: none !important }
+  main { padding: 0 }
+  .wrap { padding-left: 0; padding-right: 0 }
+  .printonly { display: block; font-size: 11px; margin: 6px 0 4px; color: var(--muted) }
+  .rephead { grid-template-columns: 1fr 1.4fr }
+  .sbox { border-width: 1.5px }
+  .sname { font-size: 30px }
+  .rep h3, .rothead { break-after: avoid }
+  .card, .rcard, tr { break-inside: avoid }
+  .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+  .rcard { padding: 8px }
+  .biglegend { font-size: 11px; padding: 4px 8px }
+  .biglegend i { width: 11px; height: 11px }
+  table { font-size: 11px }
+  th, td { padding: 3px 5px }
+  .tbl { overflow: visible }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
 </style>
 
@@ -490,7 +516,7 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', changeSetter: 'Cambia palleggiatrice', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
+    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', printPdf: 'Esporta PDF / Stampa', printApp: 'La stampa funziona nell\'app installata dal tablet (Chrome → Salva come PDF).', printed: 'stampato il', changeSetter: 'Cambia palleggiatrice', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
@@ -532,7 +558,7 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', changeSetter: 'Change setter', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
+    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', printPdf: 'Export PDF / Print', printApp: 'Printing works in the installed app (Chrome → Save as PDF).', printed: 'printed on', changeSetter: 'Change setter', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
@@ -1061,8 +1087,10 @@ function renderReport() {
       </div>
       <div class="repside"><h2 class="h" style="margin:0">${t('repT')}</h2><p class="muted" style="margin:2px 0 0;max-width:60ch;font-size:14px">${t('repH')}</p>
         <label class="lbl" for="repSel" style="margin-top:8px">${t('changeSetter')}</label>
-        <select id="repSel">${list.map(s => `<option value="${esc(s.key)}" ${s.key === key ? 'selected' : ''}>${esc(s.name)} — ${esc(s.teams.join(', '))} (${s.matches})</option>`).join('')}</select></div>
+        <select id="repSel">${list.map(s => `<option value="${esc(s.key)}" ${s.key === key ? 'selected' : ''}>${esc(s.name)} — ${esc(s.teams.join(', '))} (${s.matches})</option>`).join('')}</select>
+        <button class="btn pri noprint" data-act="print" style="margin-top:8px">⎙ ${t('printPdf')}</button></div>
     </div>
+    <div class="printonly">${t('recType')}: <b>${t('q_' + qk)}</b> · ${t('readT')}: <b>${rr === 'all' ? t('allW') : 'P' + rr}</b> / <b>${rl === 'all' ? t('allW') : ZL[rl]}</b> · ${t('printed')} ${new Date().toLocaleDateString(S().lang === 'it' ? 'it-IT' : 'en-GB')} · Setter Radar</div>
     <div class="qsel qbig" role="group" aria-label="${t('recType')}"><span class="lbl big">${t('recType')}</span>${Object.keys(QFILT).map(k => `<button class="chip" data-repq="${k}" aria-pressed="${k === qk}">${t('q_' + k)}</button>`).join('')}</div>
     <div class="legend" style="margin-top:8px">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}<span>· ${t('rule')}: ${t('ruleTxt').replace('{c}', S().covMin).replace('{l}', S().lead)} · ≥ ${S().minN} ${t('cases')} ${t('hist')} / ≥ ${S().minLive} ${t('live')}</span></div>
     <h3>${t('effT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('effH')}</p>
@@ -1179,6 +1207,10 @@ document.addEventListener('click', e => {
       UI.step = null; UNDO = []; save(); render(); wake();
     },
     fs() { try { const d = document.documentElement; if (!document.fullscreenElement) (d.requestFullscreen ? d.requestFullscreen() : Promise.reject()).catch(() => {}); else document.exitFullscreen(); } catch (e) {} setTimeout(fit, 300); },
+    print() {
+      if (window.self !== window.top) { toast(t('printApp')); return; }
+      try { window.print(); } catch (e) { toast(t('printApp')); }
+    },
     togExcl() { S().sigExcl = S().sigExcl === false; save(); render(); toast(S().sigExcl ? t('sigRuleA') : t('sigRuleB')); },
     toggleSrv() { snapshot(); lv.serving = lv.serving === 'us' ? 'them' : 'us'; save(); render(); },
     undo() { doUndo(); },
