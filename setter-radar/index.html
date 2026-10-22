@@ -199,7 +199,9 @@ td.hl { font-weight: 700 }
 .rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
 @media (max-width: 1100px) { .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 @media (max-width: 640px) { .rgrid { grid-template-columns: minmax(0, 1fr) } }
-.rephead { display: grid; grid-template-columns: minmax(280px, 520px) minmax(0, 1fr); gap: 12px 20px; align-items: center }
+.rephead { display: grid; grid-template-columns: minmax(280px, 520px) minmax(0, 1fr); gap: 12px 20px; align-items: start }
+.repside { display: grid; gap: 2px; min-width: 0; max-width: 520px }
+.repside select { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-height: 44px; width: 100% }
 @media (max-width: 760px) { .rephead { grid-template-columns: minmax(0, 1fr) } }
 .sbox { display: grid; gap: 2px; min-width: 0; background: var(--surface); border: 2px solid var(--ink); border-radius: 14px; padding: 10px 14px }
 .lbl.big { font-size: 14px; letter-spacing: .1em; color: var(--ink) }
@@ -483,7 +485,7 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
+    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', changeSetter: 'Cambia palleggiatrice', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
@@ -525,7 +527,7 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
+    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', changeSetter: 'Change setter', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
@@ -1039,8 +1041,10 @@ function renderReport() {
       <div class="sbox"><label class="lbl big" for="repSel">${t('pickSetter')}</label>
         <div class="sname">${esc(info.name || '—')} ${info.nums ? `<small>#${info.nums.join('/#')}</small>` : ''}</div>
         <div class="steam">${esc((info.teams || []).join(', '))}${info.matches ? ` · ${info.matches} ${t('matchesN')}` : ''}</div>
+      </div>
+      <div class="repside"><h2 class="h" style="margin:0">${t('repT')}</h2><p class="muted" style="margin:2px 0 0;max-width:60ch;font-size:14px">${t('repH')}</p>
+        <label class="lbl" for="repSel" style="margin-top:8px">${t('changeSetter')}</label>
         <select id="repSel">${list.map(s => `<option value="${esc(s.key)}" ${s.key === key ? 'selected' : ''}>${esc(s.name)} — ${esc(s.teams.join(', '))} (${s.matches})</option>`).join('')}</select></div>
-      <div style="min-width:0"><h2 class="h" style="margin:0">${t('repT')}</h2><p class="muted" style="margin:2px 0 0;max-width:60ch;font-size:14px">${t('repH')}</p></div>
     </div>
     <div class="qsel qbig" role="group" aria-label="${t('recType')}"><span class="lbl big">${t('recType')}</span>${Object.keys(QFILT).map(k => `<button class="chip" data-repq="${k}" aria-pressed="${k === qk}">${t('q_' + k)}</button>`).join('')}</div>
     <div class="legend" style="margin-top:8px">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}<span>· ${t('rule')}: ${t('ruleTxt').replace('{c}', S().covMin).replace('{l}', S().lead)} · ≥ ${S().minN} ${t('cases')} ${t('hist')} / ≥ ${S().minLive} ${t('live')}</span></div>
