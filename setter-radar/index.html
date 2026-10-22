@@ -200,7 +200,21 @@ td.hl { font-weight: 700 }
 .rcard .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px }
 .rcard .hd b { font-family: var(--f-display); font-size: 28px; line-height: 1 }
 .minisig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px }
-.minisig div { border-left: 5px solid; border-radius: 8px; background: var(--sunk); padding: 4px 6px; font-size: 12px; display: flex; gap: 6px; align-items: center }
+.minisig > div { border-left: 5px solid; border-radius: 8px; background: var(--sunk); padding: 6px 8px; font-size: 12px; display: grid; gap: 4px; align-content: start; min-width: 0 }
+.minisig .msh { display: flex; gap: 6px; align-items: center; min-width: 0 }
+.minisig .nm { font-weight: 600; line-height: 1.1 }
+.minisig .zl { font-family: var(--f-display); font-weight: 700; font-size: 15px; letter-spacing: .02em }
+.cov { display: grid; gap: 2px; font-variant-numeric: tabular-nums }
+.cov span { display: grid; grid-template-columns: 28px 12px auto; align-items: center; gap: 3px; color: var(--muted) }
+.cov span.top { color: var(--ink) }
+.cov span.top b { font-weight: 800 }
+.cov i { font-style: normal; font-weight: 700; font-size: 11px }
+.cov b { font-weight: 600 }
+.cov .ci { width: 26px; height: 13px }
+.cov span:first-child .ci { width: 16px; height: 16px; justify-self: center }
+.covi { display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap; font-variant-numeric: tabular-nums; color: var(--ink) }
+.covi .ci { width: 20px; height: 10px; margin-left: 4px }
+.covi .ci:first-child { width: 13px; height: 13px; margin-left: 0 }
 .minisig .g { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; color: #fff; font-family: var(--f-display); font-weight: 700; font-size: 17px; flex: none }
 .minisig .g svg { width: 70%; height: 70%; fill: currentColor }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 13px; margin-top: 6px }
@@ -630,6 +644,17 @@ function laneSignal(setter, liveId, rot, lane) {
   return { ...b, cov: cb.cov, ...decide(cb) };
 }
 const covTxt = c => `✊ ${pct(c.fist)} · 4 ${pct(c['4'])} · 2 ${pct(c['2'])}`;
+const ZL = { a: 'Z1-9-2', b: 'Z6-8-3', c: 'Z5-7-4' };
+// graphic labels: 4 = dot on the left, arrow to the right; 2 = arrow to the left, dot on the right
+const IC4 = '<svg class="ci" viewBox="0 0 26 12" aria-label="4"><circle cx="4" cy="6" r="3.2" fill="var(--sig-4)"/><path d="M8 6H22M17.5 2 22 6l-4.5 4" fill="none" stroke="var(--sig-4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const IC2 = '<svg class="ci" viewBox="0 0 26 12" aria-label="2"><circle cx="22" cy="6" r="3.2" fill="var(--sig-2)"/><path d="M18 6H4M8.5 2 4 6l4.5 4" fill="none" stroke="var(--sig-2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICF = '<svg class="ci" viewBox="0 0 24 24" aria-label="pugno" style="fill:var(--sig-fist)"><path d="M6 9.5a2 2 0 0 1 2-2h.5V7a2 2 0 0 1 3.6-1.2A2 2 0 0 1 15.5 6a2 2 0 0 1 3 1.7V14a7 7 0 0 1-7 7h-.5A5.5 5.5 0 0 1 5.5 15.5V12a2 2 0 0 1 .5-1.3zm2.5 0V12h0V9.5a.5.5 0 0 0-.5 0zm2-2.5v4h2V7a1 1 0 0 0-2 0zm4 0.5V11h2V7.5a1 1 0 0 0-2 0z"/></svg>';
+function covRows(c) {
+  const best = ['fist', '4', '2'].reduce((a, k) => c[k] > c[a] ? k : a, 'fist');
+  const row = (k, ic, lab) => `<span class="${k === best ? 'top' : ''}">${ic}<i>${lab}</i><b>${pct(c[k])}</b></span>`;
+  return `<div class="cov">${row('fist', ICF, '')}${row('4', IC4, '4')}${row('2', IC2, '2')}</div>`;
+}
+function covInline(c) { return `<span class="covi">${ICF}${pct(c.fist)} ${IC4}${pct(c['4'])} ${IC2}${pct(c['2'])}</span>`; }
 function callTend(setter, liveId, rot, call) {
   const m = call === 'FS' ? (r => r.sz === 'FS' || r.call === 'KO') : (r => r.call === call);
   return blend(setter, liveId, [r => INSYS(r.q), r => m(r), r => m(r) && r.rot === rot], r => m(r) && r.rot === rot);
@@ -754,8 +779,8 @@ function sigRowHTML() {
     const s = laneSignal(lv.setter, lv.id, rot, l);
     const w = s.warn;
     return `<div class="sigc lane-${l}"><div class="glyph ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</div>
-      <div style="min-width:0"><h5>${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</h5>${w ? `<div class="sub" style="color:var(--accent);font-weight:600">${t('warnSub')}</div>` : ''}<div class="sub">${t('laneShort')} ${t('lane' + l.toUpperCase())}</div>
-      <div class="sub" style="font-variant-numeric:tabular-nums">${t('covers')}: ${covTxt(s.cov)}</div><div class="sub">${s.nh} ${t('hist')} · ${s.nl} ${t('live')}</div></div></div>`;
+      <div style="min-width:0"><h5>${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</h5>${w ? `<div class="sub" style="color:var(--accent);font-weight:600">${t('warnSub')}</div>` : ''}<div class="sub">${t('laneShort')} <b style="color:var(--ink)">${ZL[l]}</b> <span title="${t('hist')} + ${t('live')}">(${s.nh}+${s.nl})</span></div>
+      <div class="sub">${covInline(s.cov)}</div></div></div>`;
   }).join('');
   return `<div class="sigrow"><div class="rlab">P${rot}</div>${cards}</div>`;
 }
@@ -959,7 +984,7 @@ function renderReport() {
   for (const r of [1, 6, 5, 4, 3, 2]) {
     const g = mine.filter(x => x.rot === r && GOOD(x.q)), p = mine.filter(x => x.rot === r && POOR(x.q));
     const gc = counts(g), pc = counts(p); const gd = {}, pd = {}; KEYS.forEach(k => { gd[k] = gc.n ? gc.c[k] / gc.n : 0; pd[k] = pc.n ? pc.c[k] / pc.n : 0; });
-    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span>${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}<br><small class="muted">${t('lane' + l.toUpperCase()).replace(/^\S+ /, '')} · ${s.nh}</small><br><small class="muted" style="font-size:10px">${covTxt(s.cov)}</small></span></div>`; }).join('');
+    const sigs = LANES.map(l => { const s = laneSignal(key, '__none__', r, l), w = s.warn; return `<div style="border-left-color:${laneVar(l)}"><div class="msh"><span class="g ${w ? 'warn sig-' + w : 'sig-' + s.sig}">${SIGTXT(w || s.sig)}</span><span class="nm">${w ? '⚠ ' + SIGNAME(w) + '?' : SIGNAME(s.sig)}</span></div><div class="zl">${ZL[l]} <span class="muted">(${s.nh})</span></div>${covRows(s.cov)}</div>`; }).join('');
     const cf = {}; g.forEach(x => { if (x.call) cf[x.call] = (cf[x.call] || 0) + 1; });
     const who = { L: {}, C: {}, R: {} }; g.forEach(x => { const s = SIDE(x.g); if (who[s]) who[s][x.att] = (who[s][x.att] || 0) + 1; });
     const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `#${n}<small class="muted">·${c}</small>`).join(' ') || '—';
