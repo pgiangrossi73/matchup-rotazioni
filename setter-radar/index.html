@@ -205,6 +205,15 @@ td.hl { font-weight: 700 }
 .rothead h3 { margin: 0 }
 .biglegend { display: flex; flex-wrap: wrap; gap: 6px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-weight: 600; font-size: 14px }
 .biglegend i { display: inline-block; width: 16px; height: 16px; border-radius: 4px; margin-right: 6px; vertical-align: -3px }
+.ctab { display: grid; gap: 3px; margin-top: 3px }
+.crow { display: grid; grid-template-columns: 34px 22px minmax(0, 1fr) 96px; align-items: center; gap: 6px; font-size: 12.5px }
+.crow b { font-family: var(--f-display); font-size: 16px }
+.crow .n { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right }
+.crow .bar { margin: 0; height: 10px }
+.crow .dm { font-variant-numeric: tabular-nums; white-space: nowrap }
+.crow .dm i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px }
+#readT { scroll-margin-top: 70px }
+.linkbtn { border: 0; background: none; color: var(--accent); font-weight: 600; font-size: 12px; padding: 0; min-height: 0 }
 .rcard .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px }
 .rcard .hd b { font-family: var(--f-display); font-size: 28px; line-height: 1 }
 .minisig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px }
@@ -464,7 +473,7 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', negRec: 'Ricezione negativa (−): si legge',
+    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
@@ -506,7 +515,7 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle', readH: 'For each call, where the ball goes.', recType: 'Pass type', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', negRec: 'Negative pass (−): read',
+    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
@@ -988,10 +997,12 @@ function renderReport() {
     return `<tr><td>${label}</td>${extra}<td class="n">${cn.n}</td><td class="bar-c">${barHTML(d)}</td>${['R', 'C', 'P', 'L'].map(k => `<td class="n ${k === mx && cn.n >= 5 ? 'hl' : ''}">${pct(d[k])}</td>`).join('')}</tr>`; };
   const head = (first, extra = '') => `<thead><tr><th>${first}</th>${extra}<th class="n">${t('n')}</th><th></th>${['R', 'C', 'P', 'L'].map(k => `<th class="n">${t('s' + k)}</th>`).join('')}</tr></thead>`;
   // reading the middle
-  const fq = {}; mine.forEach(r => { if (QF(r.q) && r.call) fq[r.call] = (fq[r.call] || 0) + 1; });
-  const calls = Object.entries(fq).filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1]).map(x => x[0]);
-  const readRows = calls.map(c => row(`<b>${c}</b> <small class="muted">${esc((CALL_NAMES[c] || [c, c])[li])}</small>`, mine.filter(r => QF(r.q) && r.call === c))).join('')
-    + row(`<b>⤴</b> <small class="muted">${t('fs')}</small>`, mine.filter(r => QF(r.q) && (r.sz === 'FS' || r.call === 'KO')));
+  const rr = S().repRot || 'all', rl = S().repLane || 'all';
+  const inScope = r => QF(r.q) && (rr === 'all' || r.rot === +rr) && (rl === 'all' || laneOf(r.rz) === rl);
+  const fq = {}; mine.forEach(r => { if (inScope(r) && r.call) fq[r.call] = (fq[r.call] || 0) + 1; });
+  const calls = Object.entries(fq).filter(([, n]) => n >= (rr === 'all' && rl === 'all' ? 3 : 1)).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  const readRows = calls.map(c => row(`<b>${c}</b> <small class="muted">${esc((CALL_NAMES[c] || [c, c])[li])}</small>`, mine.filter(r => inScope(r) && r.call === c))).join('')
+    + row(`<b>⤴</b> <small class="muted">${t('fs')}</small>`, mine.filter(r => inScope(r) && (r.sz === 'FS' || r.call === 'KO')));
   const laneRows = calls.slice(0, 4).map(c => LANES.map(l => row(`<b>${c}</b>`, mine.filter(r => QF(r.q) && r.call === c && laneOf(r.rz) === l), `<td><i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(l)};margin-right:4px"></i>${t('lane' + l.toUpperCase())}</td>`)).join('')).join('');
   let cards = '';
   for (const r of [1, 6, 5, 4, 3, 2]) {
@@ -1006,8 +1017,10 @@ function renderReport() {
       <div class="barlbl"><span>${t('recWord')} ${t('q_' + qk)}</span><span>${gc.n}</span></div>${barHTML(gd)}
       <div class="legend" style="margin-top:3px">${['R', 'C', 'P', 'L'].map(k => `<span><i class="k-${k}"></i>${pct(gd[k])}</span>`).join('')}</div>
       <div class="barlbl"><span>${t('negRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}
-      <dl class="kv"><dt>${t('calls')}</dt><dd>${Object.entries(cf).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, n]) => `${c}<small class="muted">·${n}</small>`).join(' ') || '—'}</dd>
-      <dt>${t('sL')}</dt><dd>${top(who.L)}</dd><dt>${t('sC')}</dt><dd>${top(who.C)}</dd><dt>${t('sR')}</dt><dd>${top(who.R)}</dd></dl></article>`;
+      <div class="barlbl"><span>${t('callsBy')}</span><button class="linkbtn" data-goread="${r}">${t('detail')} →</button></div>
+      <div class="ctab">${Object.entries(cf).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, n]) => { const cn = counts(g.filter(x => x.call === c)); const d = {}; KEYS.forEach(k => d[k] = cn.n ? cn.c[k] / cn.n : 0); const mx = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L');
+        return `<div class="crow"><b>${c}</b><span class="n">${n}</span>${barHTML(d)}<span class="dm"><i class="k-${mx}"></i>${SHORT[mx]} ${pct(d[mx])}</span></div>`; }).join('') || '<span class="muted">—</span>'}</div>
+      <dl class="kv"><dt>${t('sL')}</dt><dd>${top(who.L)}</dd><dt>${t('sC')}</dt><dd>${top(who.C)}</dd><dt>${t('sR')}</dt><dd>${top(who.R)}</dd></dl></article>`;
   }
   $('#v-study').innerHTML = `<div class="rep">
     <div class="row" style="justify-content:space-between;align-items:end">
@@ -1018,10 +1031,10 @@ function renderReport() {
     <div class="legend" style="margin-top:8px">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}<span>· ${t('rule')}: ${t('ruleTxt').replace('{c}', S().covMin).replace('{l}', S().lead)} · ≥ ${S().minN} ${t('cases')} ${t('hist')} / ≥ ${S().minLive} ${t('live')}</span></div>
     <h3>${t('effT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('effH')}</p>
     <div class="card"><div class="row" style="gap:18px">${(() => { const E = effMap(key); return VIEW.map(k => `<span><i class="k-${k}" style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px"></i>${t('s' + k)} <b class="disp" style="font-size:20px">${Math.round(E[k] * 100)}%</b> <small class="muted">n${E['n' + k]}</small></span>`).join(''); })()}</div></div>
-    <h3>${t('readT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('readH')}</p>
+    <h3 id="readT">${t('readT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('readH')}</p>
+    <div class="qsel" style="margin:0 0 6px"><span class="lbl">${t('rotWord')}</span>${['all', 1, 6, 5, 4, 3, 2].map(k => `<button class="chip" data-reprot="${k}" aria-pressed="${String(k) === String(rr)}">${k === 'all' ? t('allW') : 'P' + k}</button>`).join('')}</div>
+    <div class="qsel" style="margin:0 0 8px"><span class="lbl">${t('zoneWord')}</span>${['all', 'a', 'b', 'c'].map(k => `<button class="chip" data-replane="${k}" aria-pressed="${k === rl}">${k === 'all' ? t('allW') : `<i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(k)};margin-right:5px"></i>` + ZL[k]}</button>`).join('')}</div>
     <div class="card tbl"><table>${head(t('call'))}<tbody>${readRows}</tbody></table></div>
-    <h3>${t('callLaneT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('callLaneH')}</p>
-    <div class="card tbl"><table>${head(t('call'), '<th></th>')}<tbody>${laneRows}</tbody></table></div>
     <div class="rothead"><h3>${t('rotT')}</h3><div class="biglegend">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}</div></div>
     <div class="rgrid">${cards}</div></div>`;
 }
@@ -1075,6 +1088,9 @@ document.addEventListener('click', e => {
   const d = b.dataset, lv = L();
   if (d.tab) { UI.tab = d.tab; UI.delConfirm = null; render(); return; }
   if (b.id === 'lang') { S().lang = S().lang === 'it' ? 'en' : 'it'; save(); render(); return; }
+  if (d.reprot) { S().repRot = d.reprot; save(); render(); return; }
+  if (d.replane) { S().repLane = d.replane; save(); render(); return; }
+  if (d.goread) { S().repRot = d.goread; S().repLane = 'all'; save(); render(); const h = document.getElementById('readT'); if (h) h.scrollIntoView({ block: 'start' }); return; }
   if (d.repq) { S().repQ = d.repq; save(); render(); return; }
   if (d.setter != null) { UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
   if (d.slot != null) { UI.slot = +d.slot; render(); return; }
