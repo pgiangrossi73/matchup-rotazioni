@@ -520,7 +520,7 @@ const T = {
     o_hash: 'punto', o_minus: 'difeso e rigiocato', o_plus: 'difeso, non rigiocato', o_eq: 'errore', o_slash: 'murato', o_excl: 'murato e coperto',
     skip: 'Salta', back: 'Indietro', cancel: 'Annulla azione',
     full: 'Schermo intero', subOut: 'Cambio: chi esce?', subIn: 'Chi entra?', addNum: 'Numero', confirm: 'Conferma',
-    endQ: 'Chiudere il set', yes: 'Sì, chiudi', no: 'No',
+    endQ: 'Chiudere il set', yes: 'Sì, chiudi', no: 'No', discard: 'Scarta la rilevazione di questa partita', discardQ: 'Cancellare tutta la rilevazione live di questa partita ({n} azioni)? Lo storico DVW non viene toccato.', discardYes: 'Sì, cancella tutto', discarded: 'Rilevazione cancellata: si riparte dal set 1',
     fs: 'Fuori sistema', fsName: 'palla alta / alzata non della palleggiatrice', none: 'nessuna',
     actions: 'azioni', libero: 'libero',
     setupT: 'Preparazione', pickSetter: 'Palleggiatrice avversaria', newSetter: 'Nuova palleggiatrice',
@@ -562,7 +562,7 @@ const T = {
     o_hash: 'kill', o_minus: 'dug & countered', o_plus: 'dug, no counter', o_eq: 'error', o_slash: 'blocked', o_excl: 'blocked & covered',
     skip: 'Skip', back: 'Back', cancel: 'Cancel rally',
     full: 'Full screen', subOut: 'Sub: who goes out?', subIn: 'Who comes in?', addNum: 'Number', confirm: 'Confirm',
-    endQ: 'Close set', yes: 'Yes, close', no: 'No',
+    endQ: 'Close set', yes: 'Yes, close', no: 'No', discard: 'Discard this match\'s scouting', discardQ: 'Delete all live scouting of this match ({n} actions)? DVW history is not touched.', discardYes: 'Yes, delete all', discarded: 'Scouting deleted: back to set 1',
     fs: 'Out of system', fsName: 'high ball / set not by the setter', none: 'none',
     actions: 'actions', libero: 'libero',
     setupT: 'Setup', pickSetter: 'Opponent setter', newSetter: 'New setter',
@@ -970,7 +970,9 @@ function numBtn(num, extra = '', label = '') {
 function stepHTML() {
   const lv = L(), r = UI.rally, st = UI.step, li = S().lang === 'it' ? 0 : 1;
   if (UI.sub) return subHTML();
-  if (st === 'endset') return `<h4>${t('endQ')} ${lv.set} (${lv.score[0]}–${lv.score[1]})?</h4><div class="grid2" style="margin-top:8px"><button class="btn big pri" data-act="endsetYes">${t('yes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>`;
+  if (st === 'endset') return `<h4>${t('endQ')} ${lv.set} (${lv.score[0]}–${lv.score[1]})?</h4><div class="grid2" style="margin-top:8px"><button class="btn big pri" data-act="endsetYes">${t('yes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>
+    <button class="btn" style="width:100%;margin-top:18px;color:var(--bad);border-color:var(--bad)" data-act="discardAsk">🗑 ${t('discard')}</button>`;
+  if (st === 'discard') return `<h4 style="color:var(--bad)">${t('discardQ').replace('{n}', DB.recs.filter(r => r.m === lv.id).length)}</h4><div class="grid2" style="margin-top:8px"><button class="btn big" style="background:var(--bad);color:#fff;border-color:var(--bad)" data-act="discardYes">${t('discardYes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>`;
   if (!st) {
     if (lv.serving === 'us') return `<h4>${t('idleUs')}</h4><p class="hint">${t('idleUsH')}</p>
       <div class="grid2"><button class="btn" data-act="srvErr">${t('srvErr')}</button><button class="btn" data-act="free">${t('free')}</button>
@@ -1036,7 +1038,8 @@ function setupHTML() {
       <div class="chips">${nums.map(n => `<button class="chip" data-mid="${n}" aria-pressed="${(lv.middles || []).includes(n)}">${n}</button>`).join('')}</div>
       <div class="lbl" style="margin:12px 0 6px">${t('firstServe')}</div>
       <div class="chips"><button class="chip" data-first="us" aria-pressed="${lv.serving === 'us'}">${t('us')}</button><button class="chip" data-first="them" aria-pressed="${lv.serving === 'them'}">${esc(lv.teamName)}</button></div>
-      <button class="btn big pri" style="width:100%;margin-top:14px" data-act="startSet">${t('start')}</button>` : `<p class="muted">← ${t('pickSetter')}</p>`}
+      <button class="btn big pri" style="width:100%;margin-top:14px" data-act="startSet">${t('start')}</button>
+      ${DB.recs.some(r => r.m === lv.id) ? `<button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
     </div></div>`;
 }
 function initLiveFor(key, custom) {
@@ -1288,6 +1291,13 @@ document.addEventListener('click', e => {
     subTyped() { const n = parseInt($('#subNum').value, 10); if (!isNaN(n)) doSub(n); },
     endset() { UI.step = 'endset'; render(); },
     endsetNo() { UI.step = null; render(); },
+    discardSetup() { if (UI.delConfirm !== '__live') { UI.delConfirm = '__live'; render(); return; } UI.delConfirm = null; acts.discardYes(); },
+    discardAsk() { UI.step = 'discard'; render(); },
+    discardYes() {
+      const id = lv.id; DB.recs = DB.recs.filter(r => r.m !== id); DB.matches = DB.matches.filter(m => m.id !== id);
+      Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, lineup: (lv.startLineup || lv.lineup).slice() });
+      UI.step = null; UI.rally = null; UI.sub = null; UI.slot = 3; UNDO = []; save(); render(); toast(t('discarded'));
+    },
     endsetYes() { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
     srvErr() { snapshot(); lv.serr = (lv.serr || 0) + 1; pointThem(); save(); render(); },
     free() { startRally('F', 0); },
