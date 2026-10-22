@@ -473,11 +473,11 @@ const T = {
     lineupT: 'Formazione set', start: 'Inizia set', needSix: 'Inserisci 6 giocatrici', needSetter: 'La palleggiatrice deve essere in campo',
     matchesN: 'partite', recsW: 'azioni',
     repT: 'Report palleggiatrice', repH: 'Generato dalle partite caricate (DVW e rilevazioni precedenti). In partita fa da base: il live pesa sempre di più man mano che si accumulano casi.',
-    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', negRec: 'Ricezione negativa (−): si legge',
+    readT: 'Lettura del centrale per rotazione e zona', readH: 'Per ogni chiamata, dove va la palla.', recType: 'Tipo di ricezione', rotWord: 'Rotazione', zoneWord: 'Zona di ricezione', allW: 'Tutte', callsBy: 'Chiamate: dove va la palla', detail: 'dettaglio', recWord: 'Ricezione', q_all: 'tutte (# + !)', q_good: '# e +', q_hash: 'solo #', q_plus: 'solo +', q_excl: 'solo !', q_neg: 'solo −', fewW: 'pochi casi', negRec: 'Ricezione negativa (−): si legge',
     callLaneT: 'Chiamata e zona di ricezione', callLaneH: 'Le 4 chiamate più usate, per corsia di ricezione.',
     rotT: 'Rotazioni per zona di ricezione', goodRec: 'Ricezione buona (# +)', poorRec: 'Ricezione scarsa (! −): si legge',
     calls: 'Chiamate', attackers: 'Attaccanti', call: 'Chiamata', n: 'n',
-    rule: 'Regola segnale', covers: 'copre', sigRule: 'Ricezioni per il segnale in partita', sigRuleA: '# + e ! (se il centrale si muove)', sigRuleB: 'solo # e +', withExcl: 'con !', noExcl: 'senza !', warnSub: 'avviso: tendenza da valutare', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, sugli attacchi dopo ricezione # + !.',
+    rule: 'Regola segnale', covers: 'copre', sigRule: 'Ricezioni per il segnale in partita', sigRuleA: '# + e ! (se il centrale si muove)', sigRuleB: 'solo # e +', withExcl: 'con !', noExcl: 'senza !', warnSub: 'avviso: tendenza da valutare', today: 'oggi', ruleTxt: 'vince il segnale che copre più pericolo (attacchi pesati per efficienza; il pugno copre anche il lato verso cui corre il centrale) se ≥ {c}% e con {l} punti di distacco', effT: 'Efficienza per destinazione', effH: 'Punti meno errori e murate, diviso gli attacchi. Con meno di 10 casi il segnale usa un valore prudente, più vicino alla media.',
     dataT: 'Partite caricate', importDVW: 'Importa file DVW', imported: 'Importate', skipped: 'già presenti',
     date: 'Data', match: 'Partita', src: 'Fonte', del: 'Elimina', sure: 'Sicuro?',
     backup: 'Backup', copyB: 'Copia backup', dlB: 'Scarica backup', restB: 'Ripristina da file', restP: 'Ripristina dal testo', copied: 'Copiato',
@@ -515,11 +515,11 @@ const T = {
     lineupT: 'Set lineup', start: 'Start set', needSix: 'Enter 6 players', needSetter: 'The setter must be on court',
     matchesN: 'matches', recsW: 'actions',
     repT: 'Setter report', repH: 'Built from loaded matches (DVW and earlier scouting). In the match it is the starting point: live data weighs more as cases add up.',
-    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', negRec: 'Negative pass (−): read',
+    readT: 'Reading the middle by rotation and zone', readH: 'For each call, where the ball goes.', recType: 'Pass type', rotWord: 'Rotation', zoneWord: 'Pass zone', allW: 'All', callsBy: 'Calls: where the ball goes', detail: 'detail', recWord: 'Pass', q_all: 'all (# + !)', q_good: '# and +', q_hash: '# only', q_plus: '+ only', q_excl: '! only', q_neg: '− only', fewW: 'few cases', negRec: 'Negative pass (−): read',
     callLaneT: 'Call and pass zone', callLaneH: 'The 4 most used calls, by pass lane.',
     rotT: 'Rotations by reception zone', goodRec: 'Good pass (# +)', poorRec: 'Poor pass (! −): read',
     calls: 'Calls', attackers: 'Attackers', call: 'Call', n: 'n',
-    rule: 'Signal rule', covers: 'covers', sigRule: 'Passes used for the match signal', sigRuleA: '# + and ! (if the middle runs)', sigRuleB: '# and + only', withExcl: 'with !', noExcl: 'no !', warnSub: 'warning: tendency to judge', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, on attacks after # + ! passes.',
+    rule: 'Signal rule', covers: 'covers', sigRule: 'Passes used for the match signal', sigRuleA: '# + and ! (if the middle runs)', sigRuleB: '# and + only', withExcl: 'with !', noExcl: 'no !', warnSub: 'warning: tendency to judge', today: 'today', ruleTxt: 'the signal covering the most danger wins (attacks weighted by efficiency; the fist also covers the side the middle runs to) if ≥ {c}% and {l} points ahead', effT: 'Efficiency by destination', effH: 'Kills minus errors and blocks, divided by attacks. With fewer than 10 cases the signal uses a cautious value closer to the average.',
     dataT: 'Loaded matches', importDVW: 'Import DVW files', imported: 'Imported', skipped: 'already loaded',
     date: 'Date', match: 'Match', src: 'Source', del: 'Delete', sure: 'Sure?',
     backup: 'Backup', copyB: 'Copy backup', dlB: 'Download backup', restB: 'Restore from file', restP: 'Restore from text', copied: 'Copied',
@@ -613,11 +613,12 @@ function blend(setter, liveId, histFilters, liveFilter) {
   return { d: shrink(lc, prior, K), nh, nl: lc.n, K };
 }
 // ---- efficiency of each destination for this setter's team (kills − errors − blocked) / attacks, shrunk to 0.25
-function effMap(setter) {
+function effMap(setter, qf) {
+  const qok = qf || INSYS;
   const e = {}; let K = 10, base = .25;
-  DB.recs.forEach(r => { if (r.setter !== setter || !r.g || !r.out || !INSYS(r.q)) return; const k = SIDE(r.g); if (!k) return;
+  DB.recs.forEach(r => { if (r.setter !== setter || !r.g || !r.out || !qok(r.q)) return; const k = SIDE(r.g); if (!k) return;
     const o = e[k] = e[k] || { n: 0, v: 0 }; o.n++; if (r.out === '#') o.v++; else if (r.out === '=' || r.out === '/') o.v--; });
-  const out = {}; KEYS.forEach(k => { const o = e[k] || { n: 0, v: 0 }; out[k] = (o.v + K * base) / (o.n + K); out['n' + k] = o.n; });
+  const out = {}; KEYS.forEach(k => { const o = e[k] || { n: 0, v: 0 }; out[k] = (o.v + K * base) / (o.n + K); out['n' + k] = o.n; out['r' + k] = o.n ? o.v / o.n : null; });
   return out;
 }
 // side the middle runs toward with each call: following her also covers attacks on that side
@@ -629,8 +630,8 @@ function coverOf(recs, E) {
     if (k === 'C' || RUN[r.call] === k) c.fist += wt; if (k === 'L') c['4'] += wt; if (k === 'R') c['2'] += wt; });
   return { c, w, n };
 }
-function coverBlend(setter, liveId, histFilters, liveFilter) {
-  const E = effMap(setter);
+function coverBlend(setter, liveId, histFilters, liveFilter, qf) {
+  const E = effMap(setter, qf);
   const mine = DB.recs.filter(r => r.setter === setter && r.g);
   const hist = mine.filter(r => r.m !== liveId), live = mine.filter(r => r.m === liveId);
   let prior = { fist: .4, '4': .35, '2': .25 }, nh = 0, nRot = 0;
@@ -659,10 +660,10 @@ function laneSignal(setter, liveId, rot, lane, qf) {
   const ok = qf ? (r => qf(r.q)) : SIGQ;
   const hf = [r => ok(r), r => ok(r) && r.rot === rot, r => ok(r) && r.rot === rot && laneOf(r.rz) === lane];
   const lf = r => ok(r) && r.rot === rot && laneOf(r.rz) === lane;
-  const cb = coverBlend(setter, liveId, hf, lf), b = blend(setter, liveId, hf, lf);
+  const cb = coverBlend(setter, liveId, hf, lf, qf), b = blend(setter, liveId, hf, lf);
   return { ...b, cov: cb.cov, ...decide(cb) };
 }
-const QFILT = { all: q => q === '#' || q === '+' || q === '!', good: q => q === '#' || q === '+', hash: q => q === '#', plus: q => q === '+', excl: q => q === '!' };
+const QFILT = { all: q => q === '#' || q === '+' || q === '!', good: q => q === '#' || q === '+', hash: q => q === '#', plus: q => q === '+', excl: q => q === '!', neg: q => q === '-' };
 const covTxt = c => `✊ ${pct(c.fist)} · 4 ${pct(c['4'])} · 2 ${pct(c['2'])}`;
 const ZL = { a: 'Z1-9-2', b: 'Z6-8-3', c: 'Z5-7-4' };
 // graphic labels: 4 = dot on the left, arrow to the right; 2 = arrow to the left, dot on the right
@@ -1016,7 +1017,7 @@ function renderReport() {
       <div class="minisig">${sigs}</div>
       <div class="barlbl"><span>${t('recWord')} ${t('q_' + qk)}</span><span>${gc.n}</span></div>${barHTML(gd)}
       <div class="legend" style="margin-top:3px">${['R', 'C', 'P', 'L'].map(k => `<span><i class="k-${k}"></i>${pct(gd[k])}</span>`).join('')}</div>
-      <div class="barlbl"><span>${t('negRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}
+      ${qk === 'neg' ? '' : `<div class="barlbl"><span>${t('negRec')}</span><span>${pc.n}</span></div>${barHTML(pd)}`}
       <div class="barlbl"><span>${t('callsBy')}</span><button class="linkbtn" data-goread="${r}">${t('detail')} →</button></div>
       <div class="ctab">${Object.entries(cf).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([c, n]) => { const cn = counts(g.filter(x => x.call === c)); const d = {}; KEYS.forEach(k => d[k] = cn.n ? cn.c[k] / cn.n : 0); const mx = KEYS.reduce((a, k) => d[k] > d[a] ? k : a, 'L');
         return `<div class="crow"><b>${c}</b><span class="n">${n}</span>${barHTML(d)}<span class="dm"><i class="k-${mx}"></i>${SHORT[mx]} ${pct(d[mx])}</span></div>`; }).join('') || '<span class="muted">—</span>'}</div>
@@ -1029,8 +1030,8 @@ function renderReport() {
     </div>
     <div class="qsel" role="group" aria-label="${t('recType')}"><span class="lbl">${t('recType')}</span>${Object.keys(QFILT).map(k => `<button class="chip" data-repq="${k}" aria-pressed="${k === qk}">${t('q_' + k)}</button>`).join('')}</div>
     <div class="legend" style="margin-top:8px">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}<span>· ${t('rule')}: ${t('ruleTxt').replace('{c}', S().covMin).replace('{l}', S().lead)} · ≥ ${S().minN} ${t('cases')} ${t('hist')} / ≥ ${S().minLive} ${t('live')}</span></div>
-    <h3>${t('effT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('effH')}</p>
-    <div class="card"><div class="row" style="gap:18px">${(() => { const E = effMap(key); return VIEW.map(k => `<span><i class="k-${k}" style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px"></i>${t('s' + k)} <b class="disp" style="font-size:20px">${Math.round(E[k] * 100)}%</b> <small class="muted">n${E['n' + k]}</small></span>`).join(''); })()}</div></div>
+    <h3>${t('effT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('effH')}</p>
+    <div class="card"><div class="row" style="gap:18px">${(() => { const E = effMap(key, QF); return VIEW.map(k => `<span><i class="k-${k}" style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px"></i>${t('s' + k)} <b class="disp" style="font-size:20px">${E['r' + k] == null ? '—' : Math.round(E['r' + k] * 100) + '%'}</b> <small class="muted">n${E['n' + k]}${E['n' + k] && E['n' + k] < 10 ? ' · ' + t('fewW') : ''}</small></span>`).join(''); })()}</div></div>
     <h3 id="readT">${t('readT')}</h3><p class="muted" style="margin:-4px 0 6px;font-size:13px">${t('recWord')} ${t('q_' + qk)}. ${t('readH')}</p>
     <div class="qsel" style="margin:0 0 6px"><span class="lbl">${t('rotWord')}</span>${['all', 1, 6, 5, 4, 3, 2].map(k => `<button class="chip" data-reprot="${k}" aria-pressed="${String(k) === String(rr)}">${k === 'all' ? t('allW') : 'P' + k}</button>`).join('')}</div>
     <div class="qsel" style="margin:0 0 8px"><span class="lbl">${t('zoneWord')}</span>${['all', 'a', 'b', 'c'].map(k => `<button class="chip" data-replane="${k}" aria-pressed="${k === rl}">${k === 'all' ? t('allW') : `<i class="sw" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${laneVar(k)};margin-right:5px"></i>` + ZL[k]}</button>`).join('')}</div>
