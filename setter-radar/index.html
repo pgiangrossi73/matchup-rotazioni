@@ -316,7 +316,7 @@ const SR = (() => {
   }
   // call -> setting zone along the net
   const CALLS = {
-    C: ['KC', 'K7', 'KF', 'K1', 'K2', 'KN', 'KG', 'KW', 'KA'],
+    C: ['KC', 'K7', 'KF', 'K1', 'K2', 'KN', 'KG', 'KW', 'KA', 'K3', 'KK'],
     '2': ['KT', 'KM', 'KL', 'KB', 'KE'],
     '4': ['KP', 'KJ', 'KD', 'KS'],
     FS: ['KO']
@@ -546,10 +546,11 @@ const CALL_NAMES = {
   KT: ['Shoot zona 2', 'Shoot zone 2'], KM: ['Primo tempo 2', 'First tempo 2'], KL: ['Spostato verso 2', 'Shifted to 2'],
   KB: ['Primo tempo dietro 2', 'Back quick 2'], KE: ['! zona 2', '! zone 2'],
   KP: ['Primo tempo 4', 'First tempo 4'], KJ: ['Spostato verso 4', 'Shifted to 4'], KD: ['Primo tempo dietro 4', 'Back quick 4'], KS: ['! zona 4', '! zone 4'],
+  K3: ['Punto rete 3 (centro)', 'Net point 3 (middle)'], KK: ['Primo tempo in 3', 'First tempo in 3'],
   KO: ['Palla alta', 'High ball'], FS: ['Fuori sistema', 'Out of system']
 };
 // where the middle goes along the net (screen x: 0 = their zone 2 on the left, 1 = their zone 4 on the right)
-const BASE_X = { KF: .08, KB: .14, KL: .2, KT: .26, KM: .27, KE: .28, KG: .28, K2: .33, KC: .45, K1: .47, KN: .5, KA: .5, K7: .62, KD: .7, KJ: .74, KS: .8, KP: .82, KW: .88 };
+const BASE_X = { KF: .08, KB: .14, KL: .2, KT: .26, KM: .27, KE: .28, KG: .28, K2: .33, KC: .45, K1: .47, KN: .5, KA: .5, K7: .62, KD: .7, KJ: .74, KS: .8, KP: .82, KW: .88, K3: .5, KK: .48 };
 const ALL_CALLS = Object.keys(BASE_X);
 
 // ===================== state =====================
