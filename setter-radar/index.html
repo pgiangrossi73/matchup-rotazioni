@@ -288,6 +288,26 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .boards { grid-template-columns: repeat(3, minmax(0, 1fr)) }
 }
 @media (min-width: 700px) and (max-width: 1150px) and (orientation: portrait) { .live { grid-template-columns: minmax(300px, 46%) minmax(0, 1fr) } .srvtog { font-size: 11px; padding: 4px 6px } .score .who { max-width: 90px } }
+/* small square screens (Honor Magic V5 inner ~724x725): compact everything, boards get the room */
+@media (min-width: 700px) and (max-width: 860px) {
+  .live, .live { grid-template-columns: 286px minmax(0, 1fr) !important; gap: 6px }
+  main:has(.live) { padding-left: 6px; padding-right: 6px }
+  .score { padding: 2px 8px; gap: 6px } .score .n { font-size: 26px } .score .who { font-size: 9px; max-width: 80px } .srvtog { font-size: 11px; padding: 3px 6px; min-height: 34px }
+  .rots { gap: 3px } .rots button { width: 36px; height: 36px; font-size: 15px; border-radius: 8px }
+  .topbar { gap: 4px } .topbar .row { gap: 4px } .topbar .btn { padding: 4px 7px; font-size: 12px; min-height: 36px }
+  .sigrow { gap: 5px } .sigrow .rlab { font-size: 22px; padding: 0 5px }
+  .sigc { grid-template-columns: 38px 1fr; gap: 6px; padding: 4px 6px; border-left-width: 5px }
+  .glyph { width: 38px; height: 38px; font-size: 25px; border-radius: 9px }
+  .sigc h5 { font-size: 13px } .sigc h5.warnh { font-size: 11.5px } .sigc .sub { font-size: 10px }
+  .boards { gap: 5px } .board { padding: 3px 5px 5px; gap: 2px; border-radius: 9px }
+  .board .bh b { font-size: 17px } .board .bh span { display: none } .board .bh em { font-size: 10px } .board .tend { font-size: 8.5px } .board .bar { height: 6px; margin-top: 2px }
+  .legend { font-size: 9px; gap: 2px 6px }
+  .idlebar { gap: 4px } .idlebar .btn { min-height: 40px; font-size: 12px; padding: 2px 4px }
+  .zone { padding: 14px 3px 3px; gap: 2px } .zone .zn { font-size: 12px }
+  .nums { gap: 4px } .num { min-height: 42px } .num b { font-size: 20px }
+  .outs button { min-height: 48px; padding: 3px 5px } .outs b { font-size: 16px } .outs small { font-size: 9.5px }
+  .step h4 { font-size: 16px } .step .hint { font-size: 11.5px }
+}
 .summary { margin-top: 18px; border: 2px solid var(--ink) }
 .summary h3 { margin: 0 0 10px }
 .summary h4 { margin: 0 0 6px; font-family: var(--f-display); font-size: 17px; text-transform: uppercase; letter-spacing: .03em; color: var(--accent) }
@@ -511,7 +531,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v20';
+const APP_VER = 'v21';
 </script>
 <script>
 // ===================== i18n =====================
