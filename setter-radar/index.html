@@ -186,6 +186,8 @@ h2.h { margin: 0 0 10px; font-family: var(--f-display); font-size: 23px; text-tr
 .slot[aria-pressed="true"] { border-color: var(--accent); background: rgba(255,255,255,.25) }
 .slot.setter b { color: #ffd38a }
 .field { display: grid; gap: 4px; margin-bottom: 10px }
+.tgrid { display: grid; grid-template-columns: minmax(0, 9em) 70px minmax(0, 1fr); gap: 6px 8px; align-items: center }
+.trole { font-size: 14px }
 .field input, .field select { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-height: 44px; width: 100% }
 
 /* report */
@@ -540,7 +542,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -582,7 +584,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -661,8 +663,17 @@ function marker(o, x, y, r, col, sw) {
 }
 function markerIcon(o) { return `<svg viewBox="0 0 20 20" aria-hidden="true">${marker(o, 10, 10, 6.5, 'var(--ink)', 2)}</svg>`; }
 
-function settersList() { const own = s => s.teams.every(x => /AEL LIMAS/.test(x)); return SR.setters(DB.recs).sort((a, b) => own(a) - own(b) || b.n - a.n); }
+function settersList() {
+  const own = s => s.teams.every(x => /AEL LIMAS/.test(x)), list = SR.setters(DB.recs);
+  customSetters().forEach(c => { if (!list.some(s => s.key === c.key)) list.push({ key: c.key, name: c.sName, nums: [c.sNum], teams: [c.team], matches: 0, n: 0 }); });
+  return list.sort((a, b) => own(a) - own(b) || b.n - a.n);
+}
 function rosterOf(team) { const r = DB.rosters[team]; return r ? r.players : {}; }
+function customSetters() { return DB.customSetters || (DB.customSetters = []); }
+const TEAM_ROWS = [['P', 5], ['O', 3], ['S1', 2], ['S2', 2], ['C1', 4], ['C2', 4], ['L1', 1], ['L2', 1]];
+const ROT_ORDER = ['P', 'S1', 'C2', 'O', 'S2', 'C1']; // 5-1 order following the setter around the court
+const BENCH_N = 6, BENCH_ROLES = [['2', 'rlS'], ['3', 'rlO'], ['4', 'rlC'], ['5', 'rlP'], ['1', 'rlL']];
+function slotNum(ro, slot) { const e = Object.entries(ro).find(([, p]) => p.slot === slot); return e ? +e[0] : null; }
 
 // ===================== model: history + live blend =====================
 const SIDE = SR.SIDE, GOOD = q => q === '#' || q === '+', INSYS = q => q === '#' || q === '+' || q === '!', POOR = q => q === '!' || q === '-';
@@ -1011,6 +1022,20 @@ function subHTML() {
 }
 
 // ===================== setup =====================
+function teamFormHTML() {
+  const lv = DB.live, cs = lv && customSetters().find(c => c.key === lv.setter), ro = cs ? rosterOf(cs.team) : {};
+  const pre = slot => { const n = slotNum(ro, slot); return n == null ? ['', ''] : [n, ro[n].last || '']; };
+  const bench = cs ? Object.entries(ro).filter(([, p]) => !p.slot).slice(0, BENCH_N) : [];
+  const inp = (id, v, ph, w, num) => `<input id="${id}" ${num ? 'type="number" inputmode="numeric"' : ''} value="${esc(String(v))}" placeholder="${ph}" style="font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px;width:${w}">`;
+  return `<div class="tform">
+    <div class="field"><label class="lbl" for="tfTeam">${t('teamName')}</label><input id="tfTeam" value="${esc(cs ? cs.teamName : '')}"></div>
+    <div class="tgrid"><span class="lbl">${t('roleW')}</span><span class="lbl">#</span><span class="lbl">${t('lastW')}</span>
+    ${TEAM_ROWS.map(([slot]) => { const [n, l] = pre(slot); return `<b class="trole">${t('r' + slot)}</b>${inp('tfN_' + slot, n, '#', '70px', 1)}${inp('tfL_' + slot, l, t('lastW'), '100%')}`; }).join('')}</div>
+    <div class="lbl" style="margin:12px 0 6px">${t('bench')}</div>
+    <div class="tgrid">${Array.from({ length: BENCH_N }, (_, i) => { const b = bench[i]; return `<select id="tfR_${i}" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px">${BENCH_ROLES.map(([r, k]) => `<option value="${r}" ${b && String(b[1].role) === r ? 'selected' : ''}>${t(k)}</option>`).join('')}</select>${inp('tfBN_' + i, b ? b[0] : '', '#', '70px', 1)}${inp('tfBL_' + i, b ? b[1].last || '' : '', t('lastW'), '100%')}`; }).join('')}</div>
+    <button class="btn pri" style="width:100%;margin-top:12px" data-act="saveTeam">${cs ? t('editTeam') : t('createTeam')}</button>
+  </div>`;
+}
 function setupHTML() {
   const lv = DB.live, list = settersList(), sel = lv ? lv.setter : UI.setupSetter;
   const roster = lv ? lv.roster : {}, lineup = lv ? lv.lineup : [];
@@ -1019,16 +1044,12 @@ function setupHTML() {
   return `<div class="setup">
     <div class="card"><h2 class="h">${t('pickSetter')}</h2>
       ${list.length ? '' : `<p class="muted" style="margin:0 0 10px">${t('noSetters')}</p>`}<div class="setterlist">${list.map(s => `<button class="setterbtn" data-setter="${esc(s.key)}" aria-pressed="${s.key === sel}"><span><b>${esc(s.name)}</b> <small>#${s.nums.join('/#')}</small><br><small>${esc(s.teams.join(', '))}</small></span><small>${s.matches} ${t('matchesN')}<br>${s.n} ${t('recsW')}</small></button>`).join('')}</div>
-      <details style="margin-top:10px" ${list.length ? '' : 'open'}><summary class="lbl" style="cursor:pointer;padding:8px 0">+ ${t('newSetter')}</summary>
-        <div class="field"><label class="lbl" for="nsName">${t('sName')}</label><input id="nsName"></div>
-        <div class="row" style="align-items:end"><div class="field" style="flex:2"><label class="lbl" for="nsTeam">${t('sTeam')}</label><input id="nsTeam"></div>
-        <div class="field" style="flex:1"><label class="lbl" for="nsNum">${t('sNum')}</label><input id="nsNum" type="number" inputmode="numeric"></div></div>
-        <button class="btn" data-act="newSetter">${t('add')}</button>
-      </details>
+      <details id="teamForm" style="margin-top:10px" ${list.length && !UI.teamOpen ? '' : 'open'}><summary class="lbl" style="cursor:pointer;padding:8px 0">+ ${t('newTeam')}</summary>${teamFormHTML()}</details>
     </div>
     <div class="card"><h2 class="h">${t('lineupT')} ${lv ? lv.set : 1}</h2>
       ${lv ? `<p class="muted" style="margin:0 0 8px;font-size:13px">${esc(lv.sName)} #${lv.sNum} · ${esc(lv.teamName)} — ${t('rosterH')}</p>
       <div class="lineup">${pos.map(([z, i, c], k) => `<button class="slot ${lineup[i] === lv.sNum && lineup[i] != null ? 'setter' : ''}" style="grid-column:${c};grid-row:${k < 3 ? 1 : 2}" data-slot="${i}" aria-pressed="${UI.slot === i}"><b>${lineup[i] ?? '·'}</b><small>Z${z}</small></button>`).join('')}</div>
+      ${ROT_ORDER.every(sl => slotNum(roster, sl) != null) ? `<div class="lbl" style="margin:12px 0 6px">${t('autoLine')}</div><div class="chips">${[1, 6, 5, 4, 3, 2].map(z => `<button class="chip" data-autoz="${z}" aria-pressed="${lineup[z - 1] === lv.sNum && ROT_ORDER.every((sl, k) => lineup[(z - 1 + k) % 6] === slotNum(roster, sl))}">Z${z}</button>`).join('')}</div>` : ''}
       <div class="lbl" style="margin:12px 0 6px">${t('roster')}</div>
       <div class="chips">${nums.map(n => `<button class="chip" data-pick="${n}" aria-pressed="${lineup.includes(n)}">${n} <small>${esc(roster[n].last || '')}</small></button>`).join('')}
         <span class="row"><input id="addNum" type="number" inputmode="numeric" placeholder="#" style="font:inherit;width:70px;padding:8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:42px"><button class="chip" data-act="addNum">+</button></span></div>
@@ -1044,6 +1065,8 @@ function setupHTML() {
 }
 function initLiveFor(key, custom) {
   let team, teamName, sNum, sName;
+  const cs = customSetters().find(c => c.key === key);
+  if (!custom && cs && !DB.recs.some(r => r.setter === key)) custom = cs;
   if (custom) ({ team, teamName, sNum, sName } = custom);
   else {
     const mine = DB.recs.filter(r => r.setter === key); const tc = {}; mine.forEach(r => tc[r.team] = (tc[r.team] || 0) + 1);
@@ -1232,6 +1255,7 @@ document.addEventListener('click', e => {
   if (d.repq) { S().repQ = d.repq; save(); render(); return; }
   if (d.setter != null) { UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
   if (d.slot != null) { UI.slot = +d.slot; render(); return; }
+  if (d.autoz != null && lv) { const z = +d.autoz; ROT_ORDER.forEach((sl, k) => { lv.lineup[(z - 1 + k) % 6] = slotNum(lv.roster, sl); }); UI.slot = null; save(); render(); return; }
   if (d.pick != null && lv) {
     const n = +d.pick, i = lv.lineup.indexOf(n);
     if (i >= 0) lv.lineup[i] = null;
@@ -1269,6 +1293,20 @@ document.addEventListener('click', e => {
       const name = ($('#nsName').value || '').trim(), team = ($('#nsTeam').value || '').trim(), num = parseInt($('#nsNum').value, 10);
       if (!name || !team || isNaN(num)) return;
       const key = SR.setterKey(name, num); initLiveFor(key, { team: SR.normName(team), teamName: team, sNum: num, sName: name.toUpperCase() }); UI.setupSetter = key; save(); render();
+    },
+    saveTeam() {
+      const v = id => ($('#' + id) || {}).value || '', teamName = v('tfTeam').trim();
+      const sNum = parseInt(v('tfN_P'), 10);
+      if (!teamName || isNaN(sNum)) { toast(t('needSetterRow')); return; }
+      const team = SR.normName(teamName), players = {}, prev = rosterOf(team);
+      Object.entries(prev).forEach(([n, p]) => { const q = { ...p }; delete q.slot; players[n] = q; });
+      TEAM_ROWS.forEach(([slot, role]) => { const n = parseInt(v('tfN_' + slot), 10); if (!isNaN(n)) players[n] = { last: v('tfL_' + slot).trim().toUpperCase(), first: '', role, slot }; });
+      for (let i = 0; i < BENCH_N; i++) { const n = parseInt(v('tfBN_' + i), 10); if (!isNaN(n) && !(players[n] && players[n].slot)) players[n] = { last: v('tfBL_' + i).trim().toUpperCase(), first: '', role: +v('tfR_' + i) }; }
+      const sName = players[sNum].last || ('#' + sNum), key = SR.setterKey(sName, sNum);
+      DB.rosters[team] = { team, name: teamName, date: new Date().toISOString().slice(0, 10), players, custom: true };
+      const cs = customSetters(), i = cs.findIndex(c => c.team === team || c.key === key), entry = { key, team, teamName, sNum, sName };
+      if (i >= 0) cs[i] = entry; else cs.push(entry);
+      initLiveFor(key, entry); UI.setupSetter = key; UI.teamOpen = false; UI.slot = null; save(); render(); toast(t('teamSaved'));
     },
     addNum() { const n = parseInt($('#addNum').value, 10); if (isNaN(n) || !lv) return; lv.roster[n] = lv.roster[n] || { last: '', role: 0 }; save(); render(); },
     startSet() {
