@@ -493,7 +493,7 @@ const T = {
     backup: 'Backup', copyB: 'Copia backup', dlB: 'Scarica backup', restB: 'Ripristina da file', restP: 'Ripristina dal testo', copied: 'Copiato',
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
-    seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
+    seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
     noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
@@ -535,7 +535,7 @@ const T = {
     backup: 'Backup', copyB: 'Copy backup', dlB: 'Download backup', restB: 'Restore from file', restP: 'Restore from text', copied: 'Copied',
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
-    seedNote: 'Preloaded with the 13 DVW matches you shared.', localNote: 'Files stay on this device only: nothing is sent or published.',
+    seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
     noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
@@ -1058,7 +1058,8 @@ function renderData() {
   const ms = DB.matches.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')), s = S();
   $('#v-data').innerHTML = `<div class="data">
     <div class="card"><div class="row" style="justify-content:space-between"><h2 class="h">${t('dataT')}</h2>
-      <label class="btn pri" style="display:inline-flex;align-items:center">${t('importDVW')}<input id="dvwIn" type="file" accept=".dvw" multiple hidden></label></div>
+      <label class="btn pri" style="display:inline-flex;align-items:center">${t('importDVW')}<input id="dvwIn" type="file" multiple hidden></label></div>
+      <p class="muted" style="margin:6px 0 8px;font-size:13px">${t('driveHint')}</p>
       <p class="muted" style="margin:0 0 8px;font-size:13px">${SEED.recs.length ? t('seedNote') : t('localNote')}</p>
       <div class="tbl"><table><thead><tr><th>${t('date')}</th><th>${t('match')}</th><th>${t('src')}</th><th class="n">${t('recsW')}</th><th></th></tr></thead><tbody>
       ${ms.map(m => `<tr><td>${esc(m.date)}</td><td>${esc((m.teams || []).join(' – '))}</td><td><span class="badge">${m.src}</span></td><td class="n">${DB.recs.filter(r => r.m === m.id).length}</td>
@@ -1079,11 +1080,12 @@ function renderData() {
       </div></div></div>`;
 }
 function importDVWFiles(files) {
-  let add = 0, skip = 0, nr = 0;
+  let add = 0, skip = 0, nr = 0, bad = 0;
   Promise.all([...files].map(f => new Promise(res => {
     const fr = new FileReader();
     fr.onload = () => {
       try {
+        if (!/\[3SCOUT\]/i.test(fr.result)) { bad++; return res(); } // not a DataVolley file: skip quietly
         const p = SR.parseDVW(fr.result, f.name);
         if (DB.matches.some(m => m.id === p.match.id)) { skip++; return res(); }
         DB.matches.push({ ...p.match, src: 'dvw' }); DB.recs.push(...p.recs); nr += p.recs.length; add++;
@@ -1092,7 +1094,7 @@ function importDVWFiles(files) {
       res();
     };
     fr.onerror = () => res(); fr.readAsText(f, 'ISO-8859-1');
-  }))).then(() => { UNDO = []; save(); render(); toast(`${t('imported')}: ${add} · ${nr} ${t('recsW')}${skip ? ' · ' + skip + ' ' + t('skipped') : ''}`); });
+  }))).then(() => { UNDO = []; save(); render(); toast(`${t('imported')}: ${add} · ${nr} ${t('recsW')}${skip ? ' · ' + skip + ' ' + t('skipped') : ''}${bad ? ' · ' + bad + ' ' + t('notDvw') : ''}`); });
 }
 function restore(txt) { try { const d = JSON.parse(txt); if (!d.recs || !d.matches) throw 0; d.settings = { ...DEF_SET, ...(d.settings || {}) }; DB = d; UNDO = []; save(); render(); toast(t('done')); } catch (e) { toast(t('err')); } }
 
