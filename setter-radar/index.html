@@ -99,6 +99,17 @@ main { padding-block: 8px 20px }
 .zone button.q:active { filter: brightness(1.25) }
 .lane-a button.q { background: var(--lane-a) } .lane-b button.q { background: var(--lane-b) } .lane-c button.q { background: var(--lane-c) }
 .rcourt.off button.q { opacity: .2; pointer-events: none }
+.photo-ov { position: fixed; inset: 0; z-index: 60; background: rgba(8,14,28,.55); display: grid; place-items: center; padding: 12px }
+.photo { width: min(980px, 100%); max-height: calc(100dvh - 24px); overflow: auto; box-shadow: 0 20px 50px rgba(0,0,0,.4) }
+.pgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px }
+@media (max-width: 760px) { .pgrid { grid-template-columns: minmax(0, 1fr) } }
+.plan6 { display: grid; gap: 6px }
+.prow { display: grid; grid-template-columns: 58px 34px 1fr; gap: 8px; align-items: center; font-size: 13.5px; padding: 4px 6px; border-radius: 8px }
+.prow.now { background: var(--sunk); outline: 2px solid var(--accent) }
+.prow small { display: block; font-size: 9.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .04em }
+.prow .g { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #fff; font-family: var(--f-display); font-weight: 700; font-size: 20px }
+.prow .g svg { width: 62%; height: 62%; fill: currentColor }
+.prow .g.warn { background: transparent !important; color: var(--muted); border: 2px dashed var(--line) }
 .rcourt .zsel { outline: 3px solid #fff; outline-offset: -3px; z-index: 1 }
 .rcourt .zsel button.q { opacity: .55 }
 .rpop { position: absolute; left: 3%; right: 3%; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.45); padding: 10px }
@@ -556,7 +567,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v28';
+const APP_VER = 'v29';
 </script>
 <script>
 // ===================== i18n =====================
@@ -601,7 +612,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -643,7 +654,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -723,7 +734,7 @@ function marker(o, x, y, r, col, sw) {
 function markerIcon(o) { return `<svg viewBox="0 0 20 20" aria-hidden="true">${marker(o, 10, 10, 6.5, 'var(--ink)', 2)}</svg>`; }
 
 function settersList() {
-  const own = s => s.teams.every(x => /AEL LIMAS/.test(x)), list = SR.setters(DB.recs);
+  const my = SR.normName(S().myTeam || ''), own = s => !!my && s.teams.every(x => x === my), list = SR.setters(DB.recs);
   customSetters().forEach(c => { if (!list.some(s => s.key === c.key)) list.push({ key: c.key, name: c.sName, nums: [c.sNum], teams: [c.team], matches: 0, n: 0 }); });
   return list.sort((a, b) => own(a) - own(b) || b.n - a.n);
 }
@@ -915,13 +926,17 @@ function renderLive() {
   const el = $('#v-live');
   if (!L() || !L().started) { el.innerHTML = setupHTML(); return; }
   const lv = L(), rot = lv.rot;
-  el.innerHTML = `<div class="live">
+  if (!UI.step && !UI.sub && !UI.photo && setOver(lv) && lv.endAck !== lv.set + ':' + lv.score.join('-')) {
+    const w = (lv.won || [0, 0]).slice(); w[lv.score[0] > lv.score[1] ? 0 : 1]++;
+    UI.photo = { mode: (w[0] >= 3 || w[1] >= 3) ? 'match' : 'set' };
+  }
+  el.innerHTML = `${UI.photo ? photoHTML(UI.photo.mode) : ''}<div class="live">
     <div class="left">
       <div class="score">
         <div><div class="who">${t('us')}${lv.serving === 'us' ? '<span class="serve"></span>' : ''}</div><div class="n">${lv.score[0]}</div></div>
         <div class="disp muted">–</div>
         <div><div class="who">${esc(lv.teamName)}${lv.serving === 'them' ? '<span class="serve"></span>' : ''}</div><div class="n">${lv.score[1]}</div></div>
-        <div class="who">${t('set')}<br><b class="disp" style="font-size:18px;color:var(--ink)">${lv.set}</b></div>
+        <div class="who">${t('set')}<br><b class="disp" style="font-size:18px;color:var(--ink)">${lv.set}</b>${(lv.won || [0, 0]).some(x => x) ? `<br><small>${(lv.won || [0, 0]).join('–')}</small>` : ''}</div>
         <button class="srvtog" data-act="toggleSrv">${lv.serving === 'us' ? t('srvUs') : t('srvThem')} ⇄</button>
       </div>
       ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
@@ -932,7 +947,8 @@ function renderLive() {
         <div class="row" style="margin-left:auto">
           <button class="btn" data-act="sub">${t('sub')}</button>
           <button class="btn" data-act="undo" ${UNDO.length ? '' : 'disabled'}>↶ ${t('undo')}</button>
-          <button class="btn" data-act="endset">${t('endSet')}</button>
+          <button class="btn" data-act="timeout">⏱ ${t('timeout')}</button>
+          <button class="btn" data-act="endset">${t('matchMenu')}</button>
           <button class="btn" data-act="fs" aria-label="${t('full')}" title="${t('full')}">⛶</button>
         </div>
       </div>
@@ -944,6 +960,36 @@ function renderLive() {
     </div>
   </div>`;
   bindBoards();
+}
+function photoHTML(mode) {
+  const lv = L(), mine = DB.recs.filter(r => r.m === lv.id && r.g), inS = r => INSYS(r.q) || r.q === 'F';
+  const setR = mine.filter(r => r.set === lv.set);
+  const dist = (title, arr) => {
+    const c = counts(arr.filter(inS)), d = {}; KEYS.forEach(k => d[k] = c.n ? c.c[k] / c.n : 0);
+    const top = KEYS.filter(k => c.c[k]).sort((a, b) => c.c[b] - c.c[a]).slice(0, 3).map(k => `<b>${t('s' + k)}</b> ${pct(d[k])}`).join(' · ');
+    return `<div class="lbl" style="margin:8px 0 4px">${title} <span style="text-transform:none;letter-spacing:0">(${c.n})</span></div>${c.n ? barHTML(d) + `<div style="font-size:13px;margin-top:4px">${top}</div>` : `<div class="muted" style="font-size:13px">${t('noData')}</div>`}`;
+  };
+  const src = setR.length >= 3 ? setR : mine;
+  const cl = {}; src.filter(r => r.call && inS(r)).forEach(r => { const o = cl[r.call] = cl[r.call] || { n: 0, c: {} }; o.n++; const k = SIDE(r.g); if (k) o.c[k] = (o.c[k] || 0) + 1; });
+  const calls = Object.entries(cl).sort((a, b) => b[1].n - a[1].n).slice(0, 4).map(([k, o]) => { const top = Object.entries(o.c).sort((a, b) => b[1] - a[1])[0]; return `<div><b>${k}</b> ${o.n} → ${top ? t('s' + top[0]).toLowerCase() + ' ' + pct(top[1] / o.n) : '—'}</div>`; }).join('') || `<div class="muted">${t('noData')}</div>`;
+  const at = {}; src.filter(r => r.att >= 0).forEach(r => { const o = at[r.att] = at[r.att] || { n: 0, k: 0 }; o.n++; if (r.out === '#') o.k++; });
+  const atts = Object.entries(at).sort((a, b) => b[1].n - a[1].n).slice(0, 4).map(([n, o]) => `<div><b>#${n}</b> ${esc(pName(+n))} · ${o.n} att · ${o.k} #</div>`).join('') || `<div class="muted">${t('noData')}</div>`;
+  const rots = []; let r = lv.rot; for (let i = 0; i < 6; i++) { rots.push(r); r = SR.nextRot(r); }
+  const plan = rots.map((rt, i) => {
+    const sg = LANES.map(l => ({ l, s: laneSignal(lv.setter, lv.id, rt, l) }));
+    const strong = sg.filter(x => x.s.sig !== 'read').sort((a, b) => b.s.cov[b.s.sig] - a.s.cov[a.s.sig])[0], weak = sg.filter(x => x.s.warn).sort((a, b) => b.s.cov[b.s.warn] - a.s.cov[a.s.warn])[0];
+    const x = strong || weak, k = x ? (strong ? x.s.sig : x.s.warn) : 'read';
+    return `<div class="prow ${i === 0 ? 'now' : ''}"><span><b>P${rt}</b>${i === 0 ? `<small>${t('nextW')}</small>` : ''}</span><span class="g ${strong ? 'sig-' + k : x ? 'warn sig-' + k : 'sig-read'}">${SIGTXT(k)}</span><span>${x ? `${t('serveIn')} <b>${ZL[x.l]}</b> → ${SIGNAME(k).toLowerCase()} ${pct(x.s.cov[k])}${strong ? '' : ' · ' + t('weak').toLowerCase()}` : SIGNAME('read')}</span></div>`;
+  }).join('');
+  const title = mode === 'timeout' ? `⏱ ${t('timeout')} · ${t('set')} ${lv.set} · ${lv.score[0]}–${lv.score[1]}` : mode === 'match' ? `${t('matchOverT')} · ${lv.score[0]}–${lv.score[1]}` : `${t('setOverT')} ${lv.set} · ${lv.score[0]}–${lv.score[1]}`;
+  const btns = mode === 'timeout' ? `<button class="btn big pri" data-act="photoClose">${t('closeW')}</button>`
+    : `<button class="btn big pri" data-act="${mode === 'match' ? 'closeMYes' : 'photoNext'}">${mode === 'match' ? '✓ ' + t('closeM') : t('toNext') + ' ' + (lv.set + 1)}</button><button class="btn" data-act="photoUndo">↶ ${t('undoPt')}</button><button class="btn ghost" data-act="photoCont">${t('notOver')}</button>`;
+  return `<div class="photo-ov"><div class="card photo"><h3 class="h" style="margin:0 0 6px">${title}</h3>
+    <div class="pgrid"><div>${dist(t('thisSet'), setR)}${dist(t('wholeM'), mine)}
+      <div class="lbl" style="margin:10px 0 4px">${t('callsT')}</div><div style="font-size:13px;display:grid;gap:2px">${calls}</div>
+      <div class="lbl" style="margin:10px 0 4px">${t('attT')}</div><div style="font-size:13px;display:grid;gap:2px">${atts}</div></div>
+    <div><div class="lbl" style="margin:8px 0 4px">${t('planT')}</div><div class="plan6">${plan}</div></div></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">${btns}</div></div></div>`;
 }
 function idleBarHTML() {
   const lv = L();
@@ -1073,8 +1119,14 @@ function numBtn(num, extra = '', label = '') {
 function stepHTML() {
   const lv = L(), r = UI.rally, st = UI.step, li = S().lang === 'it' ? 0 : 1;
   if (UI.sub) return subHTML();
-  if (st === 'endset') return `<h4>${t('endQ')} ${lv.set} (${lv.score[0]}–${lv.score[1]})?</h4><div class="grid2" style="margin-top:8px"><button class="btn big pri" data-act="endsetYes">${t('yes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>
-    <button class="btn" style="width:100%;margin-top:18px;color:var(--bad);border-color:var(--bad)" data-act="discardAsk">🗑 ${t('discard')}</button>`;
+  if (st === 'endset') return `<h4>${t('matchMenu').replace(' ▾', '')} · ${t('set')} ${lv.set} (${lv.score[0]}–${lv.score[1]})</h4>
+    <div style="display:grid;gap:8px;margin-top:8px">
+      <button class="btn big pri" data-act="endsetYes">${t('closeSet')} ${lv.set}</button>
+      <button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button>
+      <button class="btn" data-act="closeMAsk">✓ ${t('closeM')}</button>
+      <button class="btn" style="color:var(--bad);border-color:var(--bad)" data-act="discardAsk">🗑 ${t('discard')}</button>
+      <button class="btn ghost" data-act="endsetNo">✕ ${t('no')}</button></div>`;
+  if (st === 'closeq') return `<h4>${t('closeMQ')}</h4><div class="grid2" style="margin-top:8px"><button class="btn big pri" data-act="closeMYes">${t('yes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>`;
   if (st === 'discard') return `<h4 style="color:var(--bad)">${t('discardQ').replace('{n}', DB.recs.filter(r => r.m === lv.id).length)}</h4><div class="grid2" style="margin-top:8px"><button class="btn big" style="background:var(--bad);color:#fff;border-color:var(--bad)" data-act="discardYes">${t('discardYes')}</button><button class="btn big" data-act="endsetNo">${t('no')}</button></div>`;
   if (!st) {
     if (lv.serving === 'us') return `<h4>${t('idleUs')}</h4><p class="hint">${t('idleUsH')}</p>
@@ -1097,8 +1149,16 @@ function stepHTML() {
   }
   if (st === 'traj') return `<h4>${t('traj')}</h4><p class="hint">${t('trajH')}</p>${crumbs()}<button class="btn" style="width:100%" data-act="skipTraj">${t('skip')}</button>${foot()}`;
   if (st === 'att') {
-    const order = [3, 2, 1, 4, 5, 0];
-    return `<h4>${t('att')}</h4><p class="hint">${t('attH')}</p>${crumbs()}<div class="nums">${order.map(i => numBtn(lv.lineup[i], '', (pName(lv.lineup[i]) ? pName(lv.lineup[i]) + ' · ' : '') + 'Z' + (i + 1))).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
+    const order = [3, 2, 1, 4, 5, 0], g = r.a0 ? groupFromStart(r.a0, -2) : '', ro = lv.roster || {}, mids = lv.middles || [];
+    const role = n => (ro[n] || {}).role, isMid = n => mids.includes(n) || role(n) === 4;
+    const front = [3, 2, 1].map(i => lv.lineup[i]), back = [4, 5, 0].map(i => lv.lineup[i]).filter(n => n !== lv.sNum && !isMid(n));
+    let cands = g === '' || UI.attAll ? order.map(i => lv.lineup[i]) : ['2', '3', '4'].includes(g) ? front : back;
+    const want = { '3': isMid, '4': n => role(n) === 2 && !isMid(n), '2': n => role(n) === 3 || n === lv.sNum, '1': n => role(n) === 3, 'P': n => role(n) === 2, '5': n => role(n) === 2 }[g];
+    const best = want ? cands.find(want) : null;
+    if (best != null) cands = [best, ...cands.filter(n => n !== best)];
+    const zoneOf = n => 'Z' + (lv.lineup.indexOf(n) + 1);
+    return `<h4>${t('att')}</h4>${crumbs()}<div class="nums">${cands.map(n => numBtn(n, n === best ? 'hot' : '', (pName(n) ? pName(n) + ' · ' : '') + zoneOf(n))).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>
+      ${g !== '' && !UI.attAll ? `<button class="btn ghost" style="width:100%;margin-top:6px" data-act="attAll">+ ${t('otherAtt')}</button>` : ''}${foot()}`;
   }
   if (st === 'out') return `<h4>${t('out')}</h4>${crumbs()}<div class="outs">${OUTS.map(([o, k]) => `<button data-out="${o}">${markerIcon(o)}<span><b>A${o === '-' ? '−' : o}</b><small>${t(k)}</small></span></button>`).join('')}</div>${foot()}`;
   if (st === 'who') return `<h4>${t('who')}</h4>${crumbs()}<div class="grid2"><button class="btn big pri" data-act="whoUs">${t('ptUs')}</button><button class="btn big" data-act="whoThem">${t('ptThem')}</button></div>`;
@@ -1136,13 +1196,27 @@ function teamFormHTML() {
     ${cs ? `<button class="btn" style="width:100%;margin-top:8px;color:var(--bad);border-color:var(--bad)" data-delteam="${esc(cs.team)}">🗑 ${UI.delConfirm === 'team:' + cs.team ? t('sure') : t('delTeam')}</button>` : ''}
   </div>`;
 }
+function pausedHTML() {
+  const ps = DB.paused || []; if (!ps.length) return '';
+  return `<div class="card" style="border:2px solid var(--accent);grid-column:1 / -1"><h2 class="h">${t('paused')}</h2>${ps.map((p, i) => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span><b>${esc(S().myTeam || t('us'))} – ${esc(p.teamName)}</b><br><small class="muted">${esc(p.sName)} #${p.sNum} · ${t('set')} ${p.set} · ${p.score[0]}–${p.score[1]} · ${t('setsW')} ${(p.won || [0, 0]).join('–')} · ${DB.recs.filter(r => r.m === p.id).length} ${t('actions')}</small></span><button class="btn pri" data-resume="${i}">▶ ${t('resume')}</button></div>`).join('')}</div>`;
+}
+function liveHasData(lv) { return !!lv && !lv.closed && DB.recs.some(r => r.m === lv.id); }
+function pauseLive() { const lv = DB.live; if (!liveHasData(lv)) return false; (DB.paused = DB.paused || []).push(lv); DB.live = null; return true; }
+function resumeLive(i) { const ps = DB.paused || [], p = ps[i]; if (!p) return; ps.splice(i, 1); pauseLive(); DB.live = p; UI.step = null; UI.photo = null; UI.rally = null; UI.sub = null; UNDO = []; save(); render(); }
+function closeMatch() {
+  const lv = DB.live; if (!lv) return; const m = DB.matches.find(x => x.id === lv.id);
+  if (m) { m.res = (lv.won || [0, 0]).join('-'); m.teams = [S().myTeam || m.teams[0], lv.teamName]; }
+  lv.closed = true; DB.live = null; UI.step = null; UI.photo = null; UI.rally = null; UI.sub = null; UNDO = []; save(); render(); toast(t('closedT'));
+}
+const setTarget = lv => lv.set >= 5 ? 15 : 25;
+function setOver(lv) { const [a, b] = lv.score, tg = setTarget(lv); return Math.max(a, b) >= tg && Math.abs(a - b) >= 2; }
 function setupHTML() {
   const lv = DB.live, list = settersList(), sel = lv ? lv.setter : UI.setupSetter;
   const roster = lv ? lv.roster : {}, lineup = lv ? lv.lineup : [];
   const nums = Object.keys(roster).map(Number).sort((a, b) => a - b);
   const pos = [[1, 0, 1], [6, 5, 2], [5, 4, 3], [2, 1, 1], [3, 2, 2], [4, 3, 3]]; // [zone, index, column]; first 3 back row (top), then front row
   return `<div class="setup">
-    <div class="card"><h2 class="h">${t('pickSetter')}</h2>
+    ${pausedHTML()}<div class="card"><div class="field"><label class="lbl" for="myTeam">${t('myTeam')}</label><input id="myTeam" value="${esc(S().myTeam || '')}" placeholder="${t('myTeamPh')}"></div><h2 class="h">${t('pickSetter')}</h2>
       ${list.length ? '' : `<p class="muted" style="margin:0 0 10px">${t('noSetters')}</p>`}<div class="setterlist">${list.map(s => `<button class="setterbtn" data-setter="${esc(s.key)}" aria-pressed="${s.key === sel}"><span><b>${esc(s.name)}</b> <small>#${s.nums.join('/#')}</small><br><small>${esc(s.teams.join(', '))}</small></span><small>${s.matches} ${t('matchesN')}<br>${s.n} ${t('recsW')}</small></button>`).join('')}</div>
       <details id="teamForm" style="margin-top:10px" ${list.length && !UI.teamOpen ? '' : 'open'}><summary class="lbl" style="cursor:pointer;padding:8px 0">+ ${t('newTeam')}</summary>${teamFormHTML()}</details>
     </div>
@@ -1307,7 +1381,7 @@ function renderData() {
       <p class="muted" style="margin:6px 0 8px;font-size:13px">${t('driveHint')}</p>
       <p class="muted" style="margin:0 0 8px;font-size:13px">${SEED.recs.length ? t('seedNote') : t('localNote')}</p>
       <div class="tbl"><table><thead><tr><th>${t('date')}</th><th>${t('match')}</th><th>${t('src')}</th><th class="n">${t('recsW')}</th><th></th></tr></thead><tbody>
-      ${ms.map(m => `<tr><td>${esc(m.date)}</td><td>${esc((m.teams || []).join(' – '))}</td><td><span class="badge">${m.src}</span></td><td class="n">${DB.recs.filter(r => r.m === m.id).length}</td>
+      ${ms.map(m => `<tr><td>${esc(m.date)}</td><td>${esc((m.teams || []).join(' – '))}${m.res ? ' <b>(' + esc(m.res) + ')</b>' : ''}</td><td><span class="badge">${m.src}</span></td><td class="n">${DB.recs.filter(r => r.m === m.id).length}</td>
         <td><button class="btn ghost" style="min-height:38px;padding:4px 10px" data-del="${esc(m.id)}">${UI.delConfirm === m.id ? t('sure') : t('del')}</button></td></tr>`).join('')}
       </tbody></table></div></div>
     <div style="display:grid;gap:12px">
@@ -1356,7 +1430,8 @@ document.addEventListener('click', e => {
   if (d.replane) { S().repLane = d.replane; save(); render(); return; }
   if (d.goread) { S().repRot = d.goread; S().repLane = 'all'; save(); render(); const h = document.getElementById('readT'); if (h) h.scrollIntoView({ block: 'start' }); return; }
   if (d.repq) { S().repQ = d.repq; save(); render(); return; }
-  if (d.setter != null) { UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
+  if (d.setter != null) { if (DB.live && DB.live.setter !== d.setter && pauseLive()) toast(t('pausedT')); UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
+  if (d.resume != null) { resumeLive(+d.resume); return; }
   if (d.delteam != null) { const k = 'team:' + d.delteam; if (UI.delConfirm !== k) { UI.delConfirm = k; if (b.closest('#teamForm')) UI.teamOpen = true; render(); return; } UI.teamOpen = false; deleteTeam(d.delteam); return; }
   if (d.slot != null) { UI.slot = +d.slot; render(); return; }
   if (d.autoz != null && lv) { const z = +d.autoz, a = autoSeq(lv); if (!a) return; a.seq.forEach((n, k) => { lv.lineup[(z - 1 + k) % 6] = n; if (!lv.roster[n]) lv.roster[n] = { last: '', role: 0 }; }); UI.slot = null; save(); render(); return; }
@@ -1375,7 +1450,7 @@ document.addEventListener('click', e => {
     const n = +d.num;
     if (UI.sub) { if (UI.sub.ask != null) { setActiveSetter(n); UI.sub = null; save(); render(); toast(t('setterNow') + ': ' + L().sName + ' #' + n + ' · P' + L().rot); return; } if (UI.sub.out == null) { UI.sub.out = n; render(); } else doSub(n); return; }
     if (UI.step === 'rcv') { UI.rally.rcv = n; UI.step = 'board'; render(); return; }
-    if (UI.step === 'att') { UI.rally.att = n; UI.step = 'out'; render(); return; }
+    if (UI.step === 'att') { UI.rally.att = n; UI.attAll = false; UI.step = 'out'; render(); return; }
     return;
   }
   if (d.newcall) {
@@ -1418,7 +1493,7 @@ document.addEventListener('click', e => {
       if (!lv.lineup.includes(lv.sNum)) { const c = lv.lineup.find(n => (lv.roster[n] || {}).role === 5); if (c != null) setActiveSetter(c); }
       const si = lv.lineup.indexOf(lv.sNum); if (si < 0) { toast(t('needSetter')); return; }
       lv.rot = si + 1; lv.started = true; lv.startLineup = lv.lineup.slice(); lv.startSetter = { setter: lv.setter, sName: lv.sName, sNum: lv.sNum };
-      if (!DB.matches.some(m => m.id === lv.id)) DB.matches.push({ id: lv.id, date: new Date().toISOString().slice(0, 10), teams: ['AEL', lv.teamName], src: 'live' });
+      if (!DB.matches.some(m => m.id === lv.id)) DB.matches.push({ id: lv.id, date: new Date().toISOString().slice(0, 10), teams: [S().myTeam || t('us'), lv.teamName], src: 'live' });
       UI.step = null; UNDO = []; save(); render(); wake();
     },
     fs() { try { const d = document.documentElement; if (!document.fullscreenElement) (d.requestFullscreen ? d.requestFullscreen() : Promise.reject()).catch(() => {}); else document.exitFullscreen(); } catch (e) {} setTimeout(fit, 300); },
@@ -1436,6 +1511,14 @@ document.addEventListener('click', e => {
     subTyped() { const n = parseInt($('#subNum').value, 10); if (!isNaN(n)) doSub(n); },
     endset() { UI.step = 'endset'; render(); },
     endsetNo() { UI.step = null; render(); },
+    pauseM() { if (!pauseLive()) { DB.live = null; } UI.step = null; save(); render(); toast(t('pausedT')); },
+    closeMAsk() { UI.step = 'closeq'; render(); },
+    closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); } closeMatch(); },
+    timeout() { UI.photo = { mode: 'timeout' }; render(); },
+    photoClose() { UI.photo = null; render(); },
+    photoNext() { UI.photo = null; acts.endsetYes(); },
+    photoUndo() { UI.photo = null; doUndo(); },
+    photoCont() { lv.endAck = lv.set + ':' + lv.score.join('-'); UI.photo = null; save(); render(); },
     discardSetup() { if (UI.delConfirm !== '__live') { UI.delConfirm = '__live'; render(); return; } UI.delConfirm = null; acts.discardYes(); },
     discardAsk() { UI.step = 'discard'; render(); },
     discardYes() {
@@ -1443,7 +1526,7 @@ document.addEventListener('click', e => {
       Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, lineup: (lv.startLineup || lv.lineup).slice(), ...(lv.startSetter || {}) });
       UI.step = null; UI.rally = null; UI.sub = null; UI.slot = 3; UNDO = []; save(); render(); toast(t('discarded'));
     },
-    endsetYes() { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); if (lv.startSetter) Object.assign(lv, lv.startSetter); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
+    endsetYes() { const w = lv.won = lv.won || [0, 0]; if (lv.score[0] !== lv.score[1]) w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); if (w[0] >= 3 || w[1] >= 3) { closeMatch(); return; } lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); if (lv.startSetter) Object.assign(lv, lv.startSetter); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
     srvErr() { snapshot(); lv.serr = (lv.serr || 0) + 1; pointThem(); save(); render(); },
     free() { startRally('F', 0); },
     ptUs() { snapshot(); pointUs(); save(); render(); },
@@ -1452,6 +1535,7 @@ document.addEventListener('click', e => {
     whoThem() { pointThem(); endRally(); },
     moreCall() { UI.step = 'pickcall'; render(); },
     skipTraj() { UI.step = 'att'; render(); },
+    attAll() { UI.attAll = true; render(); },
     cancel() { UI.step = null; UI.rally = null; render(); },
     back() {
       const r = UI.rally, st = UI.step;
@@ -1492,6 +1576,7 @@ document.addEventListener('change', e => {
   if (el.id === 'repSel') { UI.repSetter = el.value; render(); }
   if (el.id === 'dvwIn' && el.files.length) importDVWFiles(el.files);
   if (el.id === 'jsonIn' && el.files[0]) { const fr = new FileReader(); fr.onload = () => restore(fr.result); fr.readAsText(el.files[0]); }
+  if (el.id === 'myTeam') { S().myTeam = el.value.trim(); save(); }
   if (el.dataset.set) { const v = parseFloat(el.value); if (!isNaN(v)) { S()[el.dataset.set] = v; save(); } }
   if (el.id === 'set-sigq') { S().sigExcl = el.value === '1'; save(); }
   if (el.id === 'set-theme') { S().theme = el.value || undefined; if (el.value) document.documentElement.dataset.theme = el.value; else delete document.documentElement.dataset.theme; save(); }
