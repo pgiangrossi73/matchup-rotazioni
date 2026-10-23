@@ -545,7 +545,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v23';
+const APP_VER = 'v24';
 </script>
 <script>
 // ===================== i18n =====================
@@ -590,7 +590,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -632,7 +632,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -717,6 +717,15 @@ function settersList() {
   return list.sort((a, b) => own(a) - own(b) || b.n - a.n);
 }
 function rosterOf(team) { const r = DB.rosters[team]; return r ? r.players : {}; }
+function deleteTeam(team) {
+  const lv = DB.live;
+  if (lv && lv.team === team && lv.started) { toast(t('teamInUse')); return; }
+  DB.customSetters = customSetters().filter(c => c.team !== team);
+  const ro = DB.rosters[team], hasDvw = DB.recs.some(r => r.team === team && r.src !== 'live');
+  if (ro) { if (hasDvw) { Object.values(ro.players).forEach(p => delete p.slot); delete ro.custom; } else delete DB.rosters[team]; }
+  if (lv && lv.team === team) { DB.live = null; const s = settersList()[0]; if (s) { try { initLiveFor(s.key); UI.setupSetter = s.key; } catch (e) { DB.live = null; } } }
+  UI.delConfirm = null; save(); render(); toast(t('teamDeleted'));
+}
 function customSetters() { return DB.customSetters || (DB.customSetters = []); }
 const TEAM_ROWS = [['P', 5], ['O', 3], ['S1', 2], ['S2', 2], ['C1', 4], ['C2', 4], ['L1', 1], ['L2', 1]];
 const ROT_ORDER = ['P', 'S1', 'C2', 'O', 'S2', 'C1']; // 5-1 order following the setter around the court
@@ -1089,6 +1098,7 @@ function teamFormHTML() {
     <div class="lbl" style="margin:12px 0 6px">${t('bench')}</div>
     <div class="tgrid">${Array.from({ length: BENCH_N }, (_, i) => { const b = bench[i]; return `<select id="tfR_${i}" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px">${BENCH_ROLES.map(([r, k]) => `<option value="${r}" ${b && String(b[1].role) === r ? 'selected' : ''}>${t(k)}</option>`).join('')}</select>${inp('tfBN_' + i, b ? b[0] : '', '#', '70px', 1)}${inp('tfBL_' + i, b ? b[1].last || '' : '', t('lastW'), '100%')}`; }).join('')}</div>
     <button class="btn pri" style="width:100%;margin-top:12px" data-act="saveTeam">${cs ? t('editTeam') : t('createTeam')}</button>
+    ${cs ? `<button class="btn" style="width:100%;margin-top:8px;color:var(--bad);border-color:var(--bad)" data-delteam="${esc(cs.team)}">🗑 ${UI.delConfirm === 'team:' + cs.team ? t('sure') : t('delTeam')}</button>` : ''}
   </div>`;
 }
 function setupHTML() {
@@ -1266,6 +1276,8 @@ function renderData() {
         <td><button class="btn ghost" style="min-height:38px;padding:4px 10px" data-del="${esc(m.id)}">${UI.delConfirm === m.id ? t('sure') : t('del')}</button></td></tr>`).join('')}
       </tbody></table></div></div>
     <div style="display:grid;gap:12px">
+      ${customSetters().length ? `<div class="card"><h2 class="h">${t('teamsT')}</h2><p class="muted" style="margin:4px 0 8px;font-size:13px">${t('teamsH')}</p>
+        ${customSetters().map(c => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span><b>${esc(c.teamName)}</b> <small class="muted">· ${esc(c.sName)} #${c.sNum}</small></span><button class="btn ghost" style="min-height:38px;padding:4px 10px;color:var(--bad)" data-delteam="${esc(c.team)}">${UI.delConfirm === 'team:' + c.team ? t('sure') : t('delTeam')}</button></div>`).join('')}</div>` : ''}
       <div class="card"><h2 class="h">${t('settingsT')}</h2>
         <div class="field"><label class="lbl" for="set-sigq">${t('sigRule')}</label><select id="set-sigq"><option value="1" ${s.sigExcl !== false ? 'selected' : ''}>${t('sigRuleA')}</option><option value="0" ${s.sigExcl === false ? 'selected' : ''}>${t('sigRuleB')}</option></select></div>
         <div class="settings">${['covMin', 'lead', 'minN', 'minLive', 'histK'].map(k => `<div class="field"><label class="lbl" for="set-${k}">${t(k)}</label><input id="set-${k}" data-set="${k}" type="number" inputmode="decimal" value="${s[k]}"></div>`).join('')}
@@ -1310,6 +1322,7 @@ document.addEventListener('click', e => {
   if (d.goread) { S().repRot = d.goread; S().repLane = 'all'; save(); render(); const h = document.getElementById('readT'); if (h) h.scrollIntoView({ block: 'start' }); return; }
   if (d.repq) { S().repQ = d.repq; save(); render(); return; }
   if (d.setter != null) { UI.setupSetter = d.setter; initLiveFor(d.setter); save(); render(); return; }
+  if (d.delteam != null) { const k = 'team:' + d.delteam; if (UI.delConfirm !== k) { UI.delConfirm = k; if (b.closest('#teamForm')) UI.teamOpen = true; render(); return; } UI.teamOpen = false; deleteTeam(d.delteam); return; }
   if (d.slot != null) { UI.slot = +d.slot; render(); return; }
   if (d.autoz != null && lv) { const z = +d.autoz; ROT_ORDER.forEach((sl, k) => { lv.lineup[(z - 1 + k) % 6] = slotNum(lv.roster, sl); }); UI.slot = null; save(); render(); return; }
   if (d.pick != null && lv) {
