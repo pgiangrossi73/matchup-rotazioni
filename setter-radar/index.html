@@ -545,7 +545,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v24';
+const APP_VER = 'v25';
 </script>
 <script>
 // ===================== i18n =====================
@@ -1131,7 +1131,7 @@ function setupHTML() {
 function initLiveFor(key, custom) {
   let team, teamName, sNum, sName;
   const cs = customSetters().find(c => c.key === key);
-  if (!custom && cs && !DB.recs.some(r => r.setter === key)) custom = cs;
+  if (!custom && cs) custom = cs; // a team entered by hand always wins: keeps its roles and the automatic lineup
   if (custom) ({ team, teamName, sNum, sName } = custom);
   else {
     const mine = DB.recs.filter(r => r.setter === key); const tc = {}; mine.forEach(r => tc[r.team] = (tc[r.team] || 0) + 1);
