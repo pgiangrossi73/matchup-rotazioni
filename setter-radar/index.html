@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" translate="no">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,6 +11,7 @@
 <title>Setter Radar</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0f1b33">
+<meta name="google" content="notranslate">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
@@ -276,7 +277,7 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .board svg.bc { height: 100%; min-height: 0; width: auto; max-width: 100%; aspect-ratio: 1 / 1; justify-self: center }
 }
 /* foldable / small tablet (e.g. Honor Magic V5 inner screen): signals across the top, court left, boards right */
-@media (min-width: 700px) and (max-width: 1150px) {
+@media (min-width: 700px) and (max-width: 1150px) and (max-aspect-ratio: 7/5) {
   .live { grid-template-columns: minmax(300px, 40%) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "score top" "sig sig" "court boards" "idle legend"; gap: 8px }
   .left, .right { display: contents }
   .score { grid-area: score } .topbar { grid-area: top; gap: 6px } .sigrow { grid-area: sig } .boards { grid-area: boards } .legend { grid-area: legend; font-size: 10.5px; gap: 4px 8px }
@@ -287,9 +288,22 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .board .tend { font-size: 9.5px; white-space: nowrap }
   .boards { grid-template-columns: repeat(3, minmax(0, 1fr)) }
 }
-@media (min-width: 700px) and (max-width: 1150px) and (orientation: portrait) { .live { grid-template-columns: minmax(300px, 46%) minmax(0, 1fr) } .srvtog { font-size: 11px; padding: 4px 6px } .score .who { max-width: 90px } }
+/* small landscape tablet / browser with toolbars (e.g. ~1100x650): signals across, court left, boards on 4 columns */
+@media (min-width: 900px) and (max-width: 1150px) and (min-aspect-ratio: 7/5) {
+  .live { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "score top" "sig sig" "court boards" "idle legend"; gap: 8px }
+  .left, .right { display: contents }
+  .score { grid-area: score } .topbar { grid-area: top; gap: 6px; flex-wrap: nowrap } .topbar .row { flex-wrap: nowrap } .sigrow { grid-area: sig } .boards { grid-area: boards; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px } .legend { grid-area: legend; font-size: 10.5px; gap: 2px 8px }
+  .rwrap { grid-area: court } .idlebar { grid-area: idle }
+  .stepfull { grid-area: court; grid-row: 3 / 5; overflow: auto; min-height: 0 }
+  .rots { gap: 3px } .rots button { width: 40px; height: 40px; font-size: 17px }
+  .topbar .btn { padding: 6px 9px; font-size: 13px; min-height: 40px }
+  .sigc { padding: 4px 8px } .glyph { width: 44px; height: 44px; font-size: 28px }
+  .calllist { max-height: 190px }
+  .board { padding: 4px 6px 6px; gap: 2px } .board .bh span { font-size: 10.5px } .board .tend { font-size: 9.5px; white-space: nowrap }
+}
+@media (min-width: 700px) and (max-width: 1150px) and (max-aspect-ratio: 7/5) and (orientation: portrait) { .live { grid-template-columns: minmax(300px, 46%) minmax(0, 1fr) } .srvtog { font-size: 11px; padding: 4px 6px } .score .who { max-width: 90px } }
 /* small square screens (Honor Magic V5 inner ~724x725): compact everything, boards get the room */
-@media (min-width: 700px) and (max-width: 860px) {
+@media (min-width: 700px) and (max-width: 860px) and (max-aspect-ratio: 7/5) {
   .live, .live { grid-template-columns: 286px minmax(0, 1fr) !important; gap: 6px }
   main:has(.live) { padding-left: 6px; padding-right: 6px }
   .score { padding: 2px 8px; gap: 6px } .score .n { font-size: 26px } .score .who { font-size: 9px; max-width: 80px } .srvtog { font-size: 11px; padding: 3px 6px; min-height: 34px }
@@ -531,7 +545,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v22';
+const APP_VER = 'v23';
 </script>
 <script>
 // ===================== i18n =====================
@@ -851,7 +865,7 @@ function endRally() { UI.step = null; UI.rally = null; save(); render(); }
 
 // ===================== render shell =====================
 function render() {
-  document.documentElement.lang = S().lang;
+  document.documentElement.lang = S().lang; document.documentElement.setAttribute('translate', 'no');
   $('#lang').textContent = S().lang === 'it' ? 'EN' : 'IT';
   $('#tabs').innerHTML = ['live', 'study', 'data'].map(k => `<button role="tab" data-tab="${k}" aria-selected="${UI.tab === k}">${t({ live: 'tLive', study: 'tStudy', data: 'tData' }[k])}</button>`).join('');
   ['live', 'study', 'data'].forEach(k => $('#v-' + k).hidden = UI.tab !== k);
