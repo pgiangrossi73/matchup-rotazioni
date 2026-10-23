@@ -398,6 +398,7 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   </div>
   <nav class="tabs" role="tablist" id="tabs"></nav>
   <button class="lang" id="lang" type="button">EN</button>
+  <button class="lang" id="fsBtn" type="button" data-act="fs" aria-label="Full screen" title="Full screen">⛶</button>
 </div></header>
 
 <main class="wrap">
@@ -567,7 +568,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v29';
+const APP_VER = 'v30';
 </script>
 <script>
 // ===================== i18n =====================
@@ -949,7 +950,6 @@ function renderLive() {
           <button class="btn" data-act="undo" ${UNDO.length ? '' : 'disabled'}>↶ ${t('undo')}</button>
           <button class="btn" data-act="timeout">⏱ ${t('timeout')}</button>
           <button class="btn" data-act="endset">${t('matchMenu')}</button>
-          <button class="btn" data-act="fs" aria-label="${t('full')}" title="${t('full')}">⛶</button>
         </div>
       </div>
       ${sigRowHTML()}
@@ -1205,7 +1205,7 @@ function pauseLive() { const lv = DB.live; if (!liveHasData(lv)) return false; (
 function resumeLive(i) { const ps = DB.paused || [], p = ps[i]; if (!p) return; ps.splice(i, 1); pauseLive(); DB.live = p; UI.step = null; UI.photo = null; UI.rally = null; UI.sub = null; UNDO = []; save(); render(); }
 function closeMatch() {
   const lv = DB.live; if (!lv) return; const m = DB.matches.find(x => x.id === lv.id);
-  if (m) { m.res = (lv.won || [0, 0]).join('-'); m.teams = [S().myTeam || m.teams[0], lv.teamName]; }
+  if (m) { if (lv.won && (lv.won[0] || lv.won[1])) m.res = lv.won.join('-'); m.teams = [S().myTeam || m.teams[0], lv.teamName]; }
   lv.closed = true; DB.live = null; UI.step = null; UI.photo = null; UI.rally = null; UI.sub = null; UNDO = []; save(); render(); toast(t('closedT'));
 }
 const setTarget = lv => lv.set >= 5 ? 15 : 25;
@@ -1234,7 +1234,7 @@ function setupHTML() {
       <div class="lbl" style="margin:12px 0 6px">${t('firstServe')}</div>
       <div class="chips"><button class="chip" data-first="us" aria-pressed="${lv.serving === 'us'}">${t('us')}</button><button class="chip" data-first="them" aria-pressed="${lv.serving === 'them'}">${esc(lv.teamName)}</button></div>
       <button class="btn big pri" style="width:100%;margin-top:14px" data-act="startSet">${t('start')}</button>
-      ${DB.recs.some(r => r.m === lv.id) ? `<button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
+      ${DB.recs.some(r => r.m === lv.id) ? `<div class="grid2" style="margin-top:10px"><button class="btn" data-act="closeMAsk2">${UI.delConfirm === '__close' ? t('sure') + ' ✓' : '✓ ' + t('closeM')}</button><button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button></div><button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
     </div></div>`;
 }
 function initLiveFor(key, custom) {
@@ -1513,6 +1513,7 @@ document.addEventListener('click', e => {
     endsetNo() { UI.step = null; render(); },
     pauseM() { if (!pauseLive()) { DB.live = null; } UI.step = null; save(); render(); toast(t('pausedT')); },
     closeMAsk() { UI.step = 'closeq'; render(); },
+    closeMAsk2() { if (UI.delConfirm !== '__close') { UI.delConfirm = '__close'; render(); return; } UI.delConfirm = null; closeMatch(); },
     closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); } closeMatch(); },
     timeout() { UI.photo = { mode: 'timeout' }; render(); },
     photoClose() { UI.photo = null; render(); },
