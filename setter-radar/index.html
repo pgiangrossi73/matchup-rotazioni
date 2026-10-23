@@ -99,6 +99,11 @@ main { padding-block: 8px 20px }
 .zone button.q:active { filter: brightness(1.25) }
 .lane-a button.q { background: var(--lane-a) } .lane-b button.q { background: var(--lane-b) } .lane-c button.q { background: var(--lane-c) }
 .rcourt.off button.q { opacity: .2; pointer-events: none }
+.rcourt .zsel { outline: 3px solid #fff; outline-offset: -3px; z-index: 1 }
+.rcourt .zsel button.q { opacity: .55 }
+.rpop { position: absolute; left: 3%; right: 3%; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.45); padding: 10px }
+.rpop.r0 { top: 34% } .rpop.r1 { top: 67% } .rpop.r2 { bottom: 34% }
+.rpop h4 { font-size: 17px } .rpop .hint { display: none } .rpop .nums { grid-template-columns: repeat(4, 1fr) } .rpop .num { min-height: 46px } .rpop .foot { margin-top: 6px }
 .rcourt .netlbl { position: absolute; bottom: -22px; left: 0; right: 0; text-align: center; font-size: 11px; letter-spacing: .1em; color: var(--muted); font-weight: 600 }
 
 /* step bar */
@@ -551,7 +556,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v26';
+const APP_VER = 'v27';
 </script>
 <script>
 // ===================== i18n =====================
@@ -918,7 +923,7 @@ function renderLive() {
         <div class="who">${t('set')}<br><b class="disp" style="font-size:18px;color:var(--ink)">${lv.set}</b></div>
         <button class="srvtog" data-act="toggleSrv">${lv.serving === 'us' ? t('srvUs') : t('srvThem')} ⇄</button>
       </div>
-      ${(UI.step || UI.sub) ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
+      ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
     </div>
     <div class="right">
       <div class="topbar">
@@ -952,6 +957,11 @@ function rcourtHTML() {
     const ln = laneOf(n);
     z += `<div class="zone lane-${ln}"><span class="zn">${n}</span>${['#', '+', '!', '-', '/', '='].map(q => `<button class="q" data-q="${q}" data-z="${n}" aria-label="${n} ${q}">${q === '-' ? '−' : q}</button>`).join('')}</div>`;
   }));
+  const r = UI.rally, pick = UI.step === 'rcv' && r;
+  if (pick) { // popup on the court: the tapped zone stays visible, the popup takes the other half
+    const row = [[1, 6, 5], [9, 8, 7], [2, 3, 4]].findIndex(x => x.includes(r.rz));
+    return `<div class="rcourt off picking">${z.replace(`<div class="zone lane-${laneOf(r.rz)}"><span class="zn">${r.rz}</span>`, `<div class="zone lane-${laneOf(r.rz)} zsel"><span class="zn">${r.rz}</span>`)}<div class="rpop card step r${row}">${stepHTML()}</div></div>`;
+  }
   return `<div class="rcourt ${on ? '' : 'off'}">${z}</div>`;
 }
 function sigRowHTML() {
@@ -1047,13 +1057,14 @@ function crumbs() {
   const r = UI.rally; if (!r) return '';
   const c = [];
   c.push(`<span><i class="sw" style="background:${laneVar(r.lane)}"></i>${r.q === 'F' ? t('free') : 'Z' + r.rz + ' ' + (r.q === '-' ? '−' : r.q)}</span>`);
-  if (r.rcv >= 0) c.push(`<span>#${r.rcv}</span>`);
+  if (r.rcv >= 0) c.push(`<span>#${r.rcv}${pName(r.rcv) ? ' <small>' + esc(pName(r.rcv)) + '</small>' : ''}</span>`);
   if (r.call) c.push(`<span>${r.call === 'FS' ? t('fs') : r.call}</span>`);
   if (r.a1) c.push(`<span>↘ ${landZone(r.a1) || ''}</span>`);
-  if (r.att >= 0) c.push(`<span>A #${r.att}</span>`);
+  if (r.att >= 0) c.push(`<span>A #${r.att}${pName(r.att) ? ' <small>' + esc(pName(r.att)) + '</small>' : ''}</span>`);
   return `<div class="crumbs">${c.join('')}</div>`;
 }
 const foot = () => `<div class="foot"><button class="btn ghost" data-act="back">← ${t('back')}</button><button class="btn ghost" data-act="cancel">✕ ${t('cancel')}</button></div>`;
+const pName = n => { const p = ((L() || {}).roster || {})[n] || {}; return (p.last || '').toLowerCase().replace(/(^|[\s'-])\S/g, m => m.toUpperCase()); };
 function numBtn(num, extra = '', label = '') {
   const lv = L(), p = (lv.roster || {})[num] || {};
   return `<button class="num ${extra}" data-num="${num}"><b>${num}</b><small>${esc(label || p.last || '')}</small></button>`;
@@ -1076,7 +1087,7 @@ function stepHTML() {
     const fq = {}; DB.recs.forEach(x => { if (x.team === lv.team && x.rot === lv.rot && x.rz === r.rz && x.rcv >= 0) fq[x.rcv] = (fq[x.rcv] || 0) + 1; });
     const cands = [...new Set([...lv.lineup.filter(n => n !== lv.sNum), ...(lv.liberos || [])])].sort((a, b) => (fq[b] || 0) - (fq[a] || 0));
     const best = cands.find(n => fq[n]);
-    return `<h4>${t('rcv')}</h4><p class="hint">${t('rcvH')}</p>${crumbs()}<div class="nums">${cands.map(n => numBtn(n, n === best ? 'hot' : '', (lv.liberos || []).includes(n) ? t('libero') : '')).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
+    return `<h4>${t('rcv')}</h4><p class="hint">${t('rcvH')}</p>${crumbs()}<div class="nums">${cands.map(n => numBtn(n, n === best ? 'hot' : '', (lv.liberos || []).includes(n) ? (pName(n) ? pName(n) + ' · L' : t('libero')) : '')).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
   }
   if (st === 'board') return `<h4>${t('board')}</h4><p class="hint">${t('boardH')}</p>${crumbs()}<button class="btn" style="width:100%" data-act="moreCall">${t('more')}</button>${foot()}`;
   if (st === 'pickcall') {
@@ -1086,7 +1097,7 @@ function stepHTML() {
   if (st === 'traj') return `<h4>${t('traj')}</h4><p class="hint">${t('trajH')}</p>${crumbs()}<button class="btn" style="width:100%" data-act="skipTraj">${t('skip')}</button>${foot()}`;
   if (st === 'att') {
     const order = [3, 2, 1, 4, 5, 0];
-    return `<h4>${t('att')}</h4><p class="hint">${t('attH')}</p>${crumbs()}<div class="nums">${order.map(i => numBtn(lv.lineup[i], '', 'Z' + (i + 1))).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
+    return `<h4>${t('att')}</h4><p class="hint">${t('attH')}</p>${crumbs()}<div class="nums">${order.map(i => numBtn(lv.lineup[i], '', (pName(lv.lineup[i]) ? pName(lv.lineup[i]) + ' · ' : '') + 'Z' + (i + 1))).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
   }
   if (st === 'out') return `<h4>${t('out')}</h4>${crumbs()}<div class="outs">${OUTS.map(([o, k]) => `<button data-out="${o}">${markerIcon(o)}<span><b>A${o === '-' ? '−' : o}</b><small>${t(k)}</small></span></button>`).join('')}</div>${foot()}`;
   if (st === 'who') return `<h4>${t('who')}</h4>${crumbs()}<div class="grid2"><button class="btn big pri" data-act="whoUs">${t('ptUs')}</button><button class="btn big" data-act="whoThem">${t('ptThem')}</button></div>`;
