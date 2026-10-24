@@ -64,7 +64,9 @@ header.top .wrap { display: flex; align-items: center; gap: 12px; padding-block:
 main { padding-block: 8px 20px }
 .idlebar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
 .idlebar .btn { min-height: 46px; padding: 4px 6px; font-size: 14px; line-height: 1.1 }
-.rwrap { min-height: 0; display: grid; place-items: center }
+.rwrap { min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px }
+.rotbox { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; height: 58px; flex: 0 0 58px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.rotbox b { font-family: var(--f-display); font-weight: 700; font-size: 44px; line-height: 1 } .rotbox small { font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; font-weight: 600 } .rotbox .exbtn { margin-top: 0; font-size: 14px; padding: 6px 10px }
 .stepfull { overflow: auto }
 
 .view[hidden] { display: none }
@@ -149,12 +151,12 @@ main { padding-block: 8px 20px }
 
 /* right top */
 .topbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
-.topbar .tbr { flex: 1 1 auto; justify-content: flex-end } .topbar .tbr .undobig { margin-right: auto }
+.topbar .tbr { flex: 1 1 auto; justify-content: flex-end } .topbar .tbr .btn { font-size: 17px; font-weight: 700; min-height: 48px; padding: 6px 14px } .topbar .tbr .undobig { margin-right: auto }
 .topbar .btn.undobig { font-size: 17px; font-weight: 700; min-height: 48px; padding: 6px 16px; border-width: 2px; border-color: var(--ink) } .topbar .btn.undobig:disabled { border-color: var(--line) }
 .rots { display: flex; gap: 4px }
 .rots button { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--f-display); font-weight: 700; font-size: 19px }
 .rots button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink) }
-.sigrow { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch }
+.sigrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch }
 .exbtn { margin-top: 4px; font-family: var(--f-body); font-size: 11px; font-weight: 700; border: 1px dashed var(--line); background: var(--sunk); color: var(--muted); border-radius: 7px; padding: 3px 6px; white-space: nowrap }
 .exbtn.on { border-style: solid; border-color: var(--accent); color: var(--ink); background: var(--surface) }
 .sigrow .rlab { display: grid; place-items: center; align-content: center; padding: 0 8px; font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
@@ -294,7 +296,7 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .left { grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; height: 100% }
   .left:has(.stepfull) { grid-template-rows: auto minmax(0, 1fr) }
   .rwrap { container-type: size; height: 100% }
-  .rcourt { width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); aspect-ratio: auto }
+  .rcourt { width: min(100cqw, calc(100cqh - 66px)); height: min(100cqw, calc(100cqh - 66px)); aspect-ratio: auto; flex: 0 0 auto }
   .right { grid-template-rows: auto auto minmax(0, 1fr) auto; min-height: 0; height: 100% }
   .boards { grid-auto-rows: minmax(0, 1fr); min-height: 0 }
   .board { grid-template-rows: auto minmax(0, 1fr) auto auto; min-height: 0 }
@@ -333,7 +335,9 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
   .score { padding: 2px 8px; gap: 6px } .score .n { font-size: 26px } .score .who { font-size: 9px; max-width: 80px } .srvtog { font-size: 11px; padding: 3px 6px; min-height: 34px }
   .rots { gap: 3px } .rots button { width: 36px; height: 36px; font-size: 15px; border-radius: 8px }
   .topbar { gap: 4px } .topbar .row { gap: 4px } .topbar .btn { padding: 4px 7px; font-size: 12px; min-height: 36px }
-  .sigrow { gap: 5px } .sigrow .rlab { font-size: 22px; padding: 0 5px }
+  .sigrow { gap: 5px }
+  .topbar .tbr .btn, .topbar .btn.undobig { font-size: 14px; padding: 4px 8px; min-height: 42px }
+  .rotbox { height: 50px; flex-basis: 50px; gap: 10px } .rotbox b { font-size: 36px } .rotbox .exbtn { font-size: 13px; padding: 4px 8px }
   .sigc { grid-template-columns: 38px 1fr; gap: 6px; padding: 4px 6px; border-left-width: 5px }
   .glyph { width: 38px; height: 38px; font-size: 25px; border-radius: 9px }
   .sigc h5 { font-size: 13px } .sigc h5.warnh { font-size: 11.5px } .sigc .sub { font-size: 10px }
@@ -576,7 +580,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v35';
+const APP_VER = 'v36';
 </script>
 <script>
 // ===================== i18n =====================
@@ -621,7 +625,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -663,7 +667,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -948,7 +952,7 @@ function renderLive() {
         <div class="who">${t('set')}<br><b class="disp" style="font-size:18px;color:var(--ink)">${lv.set}</b>${(lv.won || [0, 0]).some(x => x) ? `<br><small>${(lv.won || [0, 0]).join('–')}</small>` : ''}</div>
         <button class="srvtog" data-act="toggleSrv">${lv.serving === 'us' ? t('srvUs') : t('srvThem')} ⇄</button>
       </div>
-      ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
+      ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${rotBoxHTML()}${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
     </div>
     <div class="right">
       <div class="topbar">
@@ -1037,7 +1041,11 @@ function sigRowHTML() {
       <div class="sub">${covInline(s.cov)}</div></div></div>`;
   }).join('');
   const ex = S().sigExcl !== false;
-  return `<div class="sigrow"><div class="rlab">P${rot}<button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button></div>${cards}</div>`;
+  return `<div class="sigrow">${cards}</div>`;
+}
+function rotBoxHTML() {
+  const ex = S().sigExcl !== false;
+  return `<div class="rotbox"><small>${t('rotW')}</small><b>P${L().rot}</b><button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button></div>`;
 }
 function boardHTML(call) {
   const lv = L(), rot = lv.rot, li = S().lang === 'it' ? 0 : 1;
