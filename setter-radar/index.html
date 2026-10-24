@@ -149,6 +149,7 @@ main { padding-block: 8px 20px }
 
 /* right top */
 .topbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.topbar .tbr { flex: 1 1 auto; justify-content: flex-end } .topbar .tbr .undobig { margin-right: auto }
 .topbar .btn.undobig { font-size: 17px; font-weight: 700; min-height: 48px; padding: 6px 16px; border-width: 2px; border-color: var(--ink) } .topbar .btn.undobig:disabled { border-color: var(--line) }
 .rots { display: flex; gap: 4px }
 .rots button { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--f-display); font-weight: 700; font-size: 19px }
@@ -575,7 +576,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v34';
+const APP_VER = 'v35';
 </script>
 <script>
 // ===================== i18n =====================
@@ -951,9 +952,9 @@ function renderLive() {
     </div>
     <div class="right">
       <div class="topbar">
-        <button class="btn undobig" data-act="undo" ${UNDO.length ? '' : 'disabled'}>↶ ${t('undo')}</button>
         <div class="rots" role="group" aria-label="rotation">${[1, 6, 5, 4, 3, 2].map(k => `<button data-rot="${k}" aria-pressed="${k === rot}">P${k}</button>`).join('')}</div>
-        <div class="row" style="margin-left:auto">
+        <div class="row tbr">
+          <button class="btn undobig" data-act="undo" ${UNDO.length ? '' : 'disabled'}>↶ ${t('undo')}</button>
           <button class="btn" data-act="sub">${t('sub')}</button>
           <button class="btn" data-act="timeout">⏱ ${t('timeout')}</button>
           <button class="btn" data-act="endset">${t('matchMenu')}</button>
