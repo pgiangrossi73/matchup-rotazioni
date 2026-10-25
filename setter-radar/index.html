@@ -538,7 +538,13 @@ const SR = (() => {
       }
     }
     fin();
+    // the scoutman's own call table: code, description, run of the middle (start .. end at the net, DataVolley grid row*100+col)
+    const calls = section(lines, 'SETTERCALL').map(l => l.split(';')).filter(f => /^K[A-Z0-9]$/.test((f[0] || '').trim())).map(f => {
+      const end = (f[7] || '').trim(), run = /^\d{4}$/.test(end) && end !== '0000';
+      return { code: f[0].trim(), name: (f[2] || '').trim(), col: run ? +end % 100 : null, run };
+    });
     return {
+      calls,
       match: { id, file: fileName, date, teams: teams.map(t => t.name), keys: teams.map(t => t.key), n: recs.length },
       rosters: teams.map((t, i) => ({ team: t.key, name: t.name, date, players: players[i], orders: orders[i].map(seq => ({ m: id, seq })) })),
       recs
@@ -601,7 +607,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v44';
+const APP_VER = 'v45';
 </script>
 <script>
 // ===================== i18n =====================
@@ -646,7 +652,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', setByW: 'Alza', setByNo: 'non la palleggiatrice: fuori dalle sue tendenze', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', callsNew: 'chiamate nuove imparate', callsDiff: 'sigle con significato diverso (vedi Dati)', callsLT: 'Chiamate imparate dai DVW', callsLH: 'Lette dalla tabella chiamate di ogni file. Una sigla usata con un altro significato diventa una chiamata separata (es. KO-2), così i dati non si mescolano.', towards2: 'verso 2', towards4: 'verso 4', centreW: 'al centro', noRunW: 'senza rincorsa', diffFrom: 'diversa da', setByW: 'Alza', setByNo: 'non la palleggiatrice: fuori dalle sue tendenze', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -688,7 +694,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', setByW: 'Set by', setByNo: 'not the setter: left out of her tendencies', repT: 'Match report', repH: 'Tap one or more sets to add them up; Match = all.', repPerSet: 'Set by set', repPerRot: 'Distribution by rotation', libSwap: 'Libero change', libSwapH: 'Tap the libero coming in: she replaces the one on court (highlighted).', libNow: 'Libero on court:', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', callsNew: 'new calls learned', callsDiff: 'codes with a different meaning (see Data)', callsLT: 'Calls learned from the DVW files', callsLH: 'Read from each file\'s call table. A code used with another meaning becomes a separate call (e.g. KO-2), so data is not mixed.', towards2: 'towards 2', towards4: 'towards 4', centreW: 'centre', noRunW: 'no run', diffFrom: 'different from', setByW: 'Set by', setByNo: 'not the setter: left out of her tendencies', repT: 'Match report', repH: 'Tap one or more sets to add them up; Match = all.', repPerSet: 'Set by set', repPerRot: 'Distribution by rotation', libSwap: 'Libero change', libSwapH: 'Tap the libero coming in: she replaces the one on court (highlighted).', libNow: 'Libero on court:', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -703,7 +709,47 @@ const CALL_NAMES = {
 };
 // where the middle goes along the net (screen x: 0 = their zone 2 on the left, 1 = their zone 4 on the right)
 const BASE_X = { KF: .08, KB: .14, KL: .2, KT: .26, KM: .27, KE: .28, KG: .28, K2: .33, KC: .45, K1: .47, KN: .5, KA: .5, K7: .62, KD: .7, KJ: .74, KS: .8, KP: .82, KW: .88, K3: .5, KK: .48 };
-const ALL_CALLS = Object.keys(BASE_X);
+let ALL_CALLS = Object.keys(BASE_X);
+// ---- calls learned from the DVW files: every scoutman's table is read; a code used with another meaning becomes its own call (e.g. KO-2)
+const NO_RUN = ['KA', 'KE', 'KS', 'KL', 'KJ', 'KO'];
+const STOP = new Set(['zona', 'zone', 'in', 'da', 'from', 'to', 'the', 'di', 'a', 'e', 'and', 'r', 'sets', 'set']);
+const toks = n => String(n || '').toLowerCase().split(/[^a-z0-9àèéìòù]+/).filter(w => w && !STOP.has(w));
+const colX = c => Math.min(1, Math.max(0, +(0.99 - 0.00987 * c).toFixed(3))); // DataVolley column -> board x (0 = zone 2 side)
+function regEntries(code) {
+  const out = [];
+  if (CALL_NAMES[code] && !(DB.callLearn || []).some(e => e.key === code)) out.push({ key: code, code, names: CALL_NAMES[code], x: NO_RUN.includes(code) ? null : (BASE_X[code] ?? null), run: !NO_RUN.includes(code) && BASE_X[code] != null, builtin: true });
+  (DB.callLearn || []).filter(e => e.code === code).forEach(e => out.push({ ...e, names: [e.name, e.name] }));
+  return out;
+}
+function compatible(def, e) {
+  const dx = def.run ? colX(def.col) : null, tn = toks(def.name), te = new Set(e.names.flatMap(toks));
+  const share = num => tn.some(w => te.has(w) && (num || !/^\d+$/.test(w)));
+  if (!def.name || !tn.length) return def.run ? (!e.run || Math.abs(dx - e.x) <= .15) : true;
+  if (share(false)) return true; // same words in the description (e.g. "Slide from 4" / "Slide da 4")
+  if (def.run && e.run) return Math.abs(dx - e.x) <= .15; // different language: same run of the middle
+  if (!def.run && !e.run) return share(true);
+  return false;
+}
+function learnCalls(defs, fileName) {
+  const map = {}, news = [], diff = [];
+  DB.callLearn = DB.callLearn || [];
+  defs.forEach(def => {
+    const ents = regEntries(def.code), hit = ents.find(e => compatible(def, e));
+    if (hit) { map[def.code] = hit.key; const l = DB.callLearn.find(e => e.key === hit.key); if (l) l.n = (l.n || 1) + 1; return; }
+    let key = def.code, k = 2; if (ents.length) { while (ents.some(e => e.key === key) || DB.callLearn.some(e => e.key === key)) key = def.code + '-' + k++; }
+    DB.callLearn.push({ key, code: def.code, name: def.name || def.code, x: def.run ? colX(def.col) : null, run: def.run, n: 1, file: fileName, other: ents.map(e => e.key + ' ' + e.names[0]).join(' / ') });
+    map[def.code] = key; (ents.length ? diff : news).push(key);
+  });
+  applyLearned();
+  return { map, news, diff };
+}
+function applyLearned() {
+  (DB.callLearn || []).forEach(e => {
+    CALL_NAMES[e.key] = [e.name, e.name];
+    if (e.run && e.x != null) { BASE_X[e.key] = e.x; if (!RUN[e.key]) { if (e.x <= .33) RUN[e.key] = 'R'; else if (e.x >= .56) RUN[e.key] = 'L'; } }
+  });
+  ALL_CALLS = Object.keys(BASE_X);
+}
 
 // ===================== state =====================
 const STORE = 'setter-radar-v2'; // kept: data migrates in place
@@ -735,6 +781,7 @@ function load() {
 let saveT = 0;
 function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(DB)); } catch (e) {} }, 250); }
 DB = load();
+setTimeout(() => { try { applyLearned(); } catch (e) {} }, 0);
 try { if (DB.settings.theme) document.documentElement.dataset.theme = DB.settings.theme; } catch (e) {}
 
 // ===================== helpers =====================
@@ -835,7 +882,7 @@ function effMap(setter, qf) {
   return out;
 }
 // side the middle runs toward with each call: following her also covers attacks on that side
-const RUN = { K7: 'L', KP: 'L', KD: 'L', KS: 'L', KW: 'L', KJ: 'L', KF: 'R', KB: 'R', KM: 'R', KG: 'R', KT: 'R', KE: 'R', KL: 'R', K2: 'R' };
+var RUN = { K7: 'L', KP: 'L', KD: 'L', KS: 'L', KW: 'L', KJ: 'L', KF: 'R', KB: 'R', KM: 'R', KG: 'R', KT: 'R', KE: 'R', KL: 'R', K2: 'R' };
 const OPTS = ['fist', '4', '2'];
 function coverOf(recs, E) {
   const c = { fist: 0, '4': 0, '2': 0 }; let w = 0, n = 0;
@@ -1608,6 +1655,8 @@ function renderData() {
         <td><button class="btn ghost" style="min-height:38px;padding:4px 10px" data-del="${esc(m.id)}">${UI.delConfirm === m.id ? t('sure') : t('del')}</button></td></tr>`).join('')}
       </tbody></table></div></div>
     <div style="display:grid;gap:12px">
+      ${(DB.callLearn || []).length ? `<div class="card"><h2 class="h">${t('callsLT')}</h2><p class="muted" style="margin:4px 0 8px;font-size:13px">${t('callsLH')}</p>
+        <div style="display:grid;gap:4px;font-size:13px">${DB.callLearn.map(e => `<div><b>${esc(e.key)}</b> ${esc(e.name)} · ${e.run ? (e.x <= .33 ? t('towards2') : e.x >= .56 ? t('towards4') : t('centreW')) : t('noRunW')}${e.other ? ` <span style="color:var(--accent)">⚠ ${t('diffFrom')} ${esc(e.other)}</span>` : ''} <small class="muted">· ${e.n || 1} file</small></div>`).join('')}</div></div>` : ''}
       ${customSetters().length ? `<div class="card"><h2 class="h">${t('teamsT')}</h2><p class="muted" style="margin:4px 0 8px;font-size:13px">${t('teamsH')}</p>
         ${customSetters().map(c => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span><b>${esc(c.teamName)}</b> <small class="muted">· ${esc(c.sName)} #${c.sNum}</small></span><button class="btn ghost" style="min-height:38px;padding:4px 10px;color:var(--bad)" data-delteam="${esc(c.team)}">${UI.delConfirm === 'team:' + c.team ? t('sure') : t('delTeam')}</button></div>`).join('')}</div>` : ''}
       <div class="card"><h2 class="h">${t('settingsT')}</h2>
@@ -1627,13 +1676,15 @@ function renderData() {
       </div></div></div>`;
 }
 function importDVWFiles(files) {
-  let add = 0, skip = 0, nr = 0, bad = 0;
+  let add = 0, skip = 0, nr = 0, bad = 0, lNew = 0, lDiff = 0;
   Promise.all([...files].map(f => new Promise(res => {
     const fr = new FileReader();
     fr.onload = () => {
       try {
         if (!/\[3SCOUT\]/i.test(fr.result)) { bad++; return res(); } // not a DataVolley file: skip quietly
         const p = SR.parseDVW(fr.result, f.name);
+        const lc = learnCalls(p.calls || [], f.name); lNew += lc.news.length; lDiff += lc.diff.length;
+        p.recs.forEach(r => { if (r.call && lc.map[r.call]) r.call = lc.map[r.call]; });
         p.rosters.forEach(mergeRoster); // also on re-import: picks up the starting lineups
         if (DB.matches.some(m => m.id === p.match.id)) { DB.recs = DB.recs.filter(r => r.m !== p.match.id).concat(p.recs); skip++; return res(); } // re-import refreshes its actions
         DB.matches.push({ ...p.match, src: 'dvw' }); DB.recs.push(...p.recs); nr += p.recs.length; add++;
@@ -1641,7 +1692,7 @@ function importDVWFiles(files) {
       res();
     };
     fr.onerror = () => res(); fr.readAsText(f, 'ISO-8859-1');
-  }))).then(() => { UNDO = []; save(); render(); toast(`${t('imported')}: ${add} · ${nr} ${t('recsW')}${skip ? ' · ' + skip + ' ' + t('skipped') : ''}${bad ? ' · ' + bad + ' ' + t('notDvw') : ''}`); });
+  }))).then(() => { UNDO = []; save(); render(); toast(`${t('imported')}: ${add} · ${nr} ${t('recsW')}${skip ? ' · ' + skip + ' ' + t('skipped') : ''}${bad ? ' · ' + bad + ' ' + t('notDvw') : ''}${lNew ? ' · ' + lNew + ' ' + t('callsNew') : ''}${lDiff ? ' · ⚠ ' + lDiff + ' ' + t('callsDiff') : ''}`); });
 }
 function restore(txt) { try { const d = JSON.parse(txt); if (!d.recs || !d.matches) throw 0; d.settings = { ...DEF_SET, ...(d.settings || {}) }; DB = d; UNDO = []; save(); render(); toast(t('done')); } catch (e) { toast(t('err')); } }
 
