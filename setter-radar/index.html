@@ -176,6 +176,7 @@ main { padding-block: 8px 20px }
 .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunk); margin-top: 4px }
 .bar span { display: block; height: 100% }
 .photo .bar { height: 12px }
+.vrot { display: grid; grid-template-columns: 54px 28px 1fr; align-items: center; gap: 6px; font-size: 13px } .vrot .bar { margin: 0 }
 .barlbl { display: flex; margin-top: 4px; font-size: 13px; line-height: 1.2 } .barlbl span { display: block; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: clip; min-width: 0; padding: 0 1px } .barlbl b { display: block; font-weight: 700 }
 .barlbl .t-L, .barlbl .t-L5 { color: var(--sig-4) } .barlbl .t-C { color: var(--sig-fist) } .barlbl .t-R, .barlbl .t-R1 { color: var(--sig-2) } .barlbl .t-P { color: var(--k-p) } .barlbl .t-D { color: var(--muted) }
 .k-L { background: var(--sig-4) } .k-L5 { background: color-mix(in srgb, var(--sig-4) 45%, var(--surface)) } .k-R1 { background: color-mix(in srgb, var(--sig-2) 45%, var(--surface)) } .k-C { background: var(--sig-fist) } .k-R { background: var(--sig-2) } .k-P { background: var(--k-p) } .k-D { background: var(--muted) }
@@ -600,7 +601,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v41';
+const APP_VER = 'v42';
 </script>
 <script>
 // ===================== i18n =====================
@@ -645,7 +646,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre inserite a mano', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -687,7 +688,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', repT: 'Match report', repH: 'Tap one or more sets to add them up; Match = all.', repPerSet: 'Set by set', repPerRot: 'Distribution by rotation', libSwap: 'Libero change', libSwapH: 'Tap the libero coming in: she replaces the one on court (highlighted).', libNow: 'Libero on court:', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams entered by hand', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -1054,7 +1055,7 @@ function render() {
 // ===================== live =====================
 function renderLive() {
   const el = $('#v-live');
-  if (!L() || !L().started) { el.innerHTML = setupHTML(); return; }
+  if (!L() || !L().started) { el.innerHTML = (UI.photo && L() ? photoHTML(UI.photo.mode) : '') + setupHTML(); return; }
   const lv = L(), rot = lv.rot;
   if (!UI.step && !UI.sub && !UI.photo && !UI.scEdit && setOver(lv) && lv.endAck !== lv.set + ':' + lv.score.join('-')) {
     const w = (lv.won || [0, 0]).slice(); w[lv.score[0] > lv.score[1] ? 0 : 1]++;
@@ -1096,8 +1097,10 @@ function scEditHTML() {
     ${row(0, S().myTeam || t('us'))}${row(1, lv.teamName)}
     <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn big pri" data-act="scDone">${t('closeW')}</button></div></div></div>`;
 }
+function matchSets() { const lv = L(); return [...new Set([...DB.recs.filter(r => r.m === lv.id).map(r => r.set), ...(lv.started ? [lv.set] : [])])].filter(x => x).sort((a, b) => a - b); }
 function photoHTML(mode) {
   const lv = L(), mine = DB.recs.filter(r => r.m === lv.id && r.g), inS = r => INSYS(r.q) || r.q === 'F';
+  if (mode === 'view') return viewHTML(mine, inS);
   const setR = mine.filter(r => r.set === lv.set);
   const dist = (title, arr) => {
     const c = counts(arr.filter(inS)), d = {}; KEYS.forEach(k => d[k] = c.n ? c.c[k] / c.n : 0);
@@ -1125,6 +1128,29 @@ function photoHTML(mode) {
       <div class="lbl" style="margin:10px 0 4px">${t('attT')}</div><div style="font-size:13px;display:grid;gap:2px">${atts}</div></div>
     <div><div class="lbl" style="margin:8px 0 4px">${t('planT')}</div><div class="plan6">${plan}</div></div></div>
     <div class="row" style="margin-top:12px;justify-content:flex-end">${btns}</div></div></div>`;
+}
+// match report on demand: single sets, several sets added up, whole match
+function viewHTML(mine, inS) {
+  const lv = L(), all = matchSets(), sel = UI.photo.sets && UI.photo.sets.length ? UI.photo.sets : all;
+  const recs = mine.filter(r => sel.includes(r.set));
+  const distOf = arr => { const c = counts(arr.filter(inS)), d = {}; KEYS.forEach(k => d[k] = c.n ? c.c[k] / c.n : 0); return { c, d }; };
+  const big = distOf(recs);
+  const cl = {}; recs.filter(r => r.call && inS(r)).forEach(r => { const o = cl[r.call] = cl[r.call] || { n: 0, c: {} }; o.n++; const k = SIDE(r.g); if (k) o.c[k] = (o.c[k] || 0) + 1; });
+  const calls = Object.entries(cl).sort((a, b) => b[1].n - a[1].n).slice(0, 6).map(([k, o]) => { const top = Object.entries(o.c).sort((a, b) => b[1] - a[1])[0]; return `<div><b>${k}</b> ${o.n} → ${top ? t('s' + top[0]).toLowerCase() + ' ' + pct(top[1] / o.n) : '—'}</div>`; }).join('') || `<div class="muted">${t('noData')}</div>`;
+  const at = {}; recs.filter(r => r.att >= 0).forEach(r => { const o = at[r.att] = at[r.att] || { n: 0, k: 0, e: 0 }; o.n++; if (r.out === '#') o.k++; if (r.out === '=' || r.out === '/') o.e++; });
+  const atts = Object.entries(at).sort((a, b) => b[1].n - a[1].n).slice(0, 6).map(([n, o]) => `<div><b>#${n}</b> ${esc(pName(+n))} · ${o.n} att · ${o.k} # · ${o.e} =/</div>`).join('') || `<div class="muted">${t('noData')}</div>`;
+  const rots = [1, 6, 5, 4, 3, 2].map(rt => { const x = distOf(recs.filter(r => r.rot === rt)); return x.c.n ? `<div class="vrot"><b>P${rt}</b><span class="muted">${x.c.n}</span>${barHTML(x.d)}</div>` : ''; }).join('');
+  const per = sel.length > 1 ? sel.map(st => { const x = distOf(mine.filter(r => r.set === st)); return `<div class="vrot"><b>${t('set')} ${st}</b><span class="muted">${x.c.n}</span>${x.c.n ? barHTML(x.d) : ''}</div>`; }).join('') : '';
+  const log = (lv.setsLog || []).filter(x => sel.includes(x.set)).map(x => `${t('set')} ${x.set} ${x.score[0]}–${x.score[1]}`).join(' · ');
+  const chips = all.map(st => `<button class="chip" data-pset="${st}" aria-pressed="${!UI.photo.sets || !UI.photo.sets.length ? 'false' : UI.photo.sets.includes(st)}">${t('set')} ${st}${st === lv.set && lv.started ? ' ●' : ''}</button>`).join('') + `<button class="chip" data-pset="all" aria-pressed="${!UI.photo.sets || !UI.photo.sets.length || UI.photo.sets.length === all.length}">${t('wholeM')}</button>`;
+  return `<div class="photo-ov"><div class="card photo"><h3 class="h" style="margin:0 0 6px">📊 ${t('repT')}${log ? ` <small class="muted" style="font-size:13px">${log}</small>` : ''}</h3>
+    <div class="chips" style="margin-bottom:6px">${chips}</div><div class="muted" style="font-size:12px">${t('repH')}</div>
+    <div class="pgrid"><div><div class="lbl" style="margin:8px 0 4px">${sel.length === all.length ? t('wholeM') : sel.map(x => t('set') + ' ' + x).join(' + ')} <span style="text-transform:none;letter-spacing:0">(${big.c.n})</span></div>${big.c.n ? barHTML(big.d) + barLblHTML(big.d) : `<div class="muted" style="font-size:13px">${t('noData')}</div>`}
+      ${per ? `<div class="lbl" style="margin:12px 0 4px">${t('repPerSet')}</div><div style="display:grid;gap:6px">${per}</div>` : ''}
+      <div class="lbl" style="margin:12px 0 4px">${t('callsT')}</div><div style="font-size:13px;display:grid;gap:2px">${calls}</div>
+      <div class="lbl" style="margin:10px 0 4px">${t('attT')}</div><div style="font-size:13px;display:grid;gap:2px">${atts}</div></div>
+    <div><div class="lbl" style="margin:8px 0 4px">${t('repPerRot')}</div><div style="display:grid;gap:6px">${rots || `<div class="muted">${t('noData')}</div>`}</div></div></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn big pri" data-act="photoClose">${t('closeW')}</button></div></div></div>`;
 }
 function idleBarHTML() {
   const lv = L();
@@ -1294,6 +1320,7 @@ function stepHTML() {
   if (st === 'endset') return `<h4>${t('matchMenu').replace(' ▾', '')} · ${t('set')} ${lv.set} (${lv.score[0]}–${lv.score[1]})</h4>
     <div style="display:grid;gap:8px;margin-top:8px">
       <button class="btn big pri" data-act="endsetYes">${t('closeSet')} ${lv.set}</button>
+      <button class="btn" data-act="repOpen">📊 ${t('repT')}</button>
       <button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button>
       <button class="btn" data-act="closeMAsk">✓ ${t('closeM')}</button>
       <button class="btn" style="color:var(--bad);border-color:var(--bad)" data-act="discardAsk">🗑 ${t('discard')}</button>
@@ -1337,6 +1364,20 @@ function stepHTML() {
   if (st === 'who') return `<h4>${t('who')}</h4>${crumbs()}<div class="grid2"><button class="btn big pri" data-act="whoUs">${t('ptUs')}</button><button class="btn big" data-act="whoThem">${t('ptThem')}</button></div>`;
   return '';
 }
+function liberoSwapHTML() {
+  const lv = L(), libs = lv.liberos || [], ro = lv.roster || {};
+  const pool = Object.keys(ro).map(Number).filter(n => !lv.lineup.includes(n) && n !== lv.sNum).sort((a, b) => ((ro[b] || {}).role === 1) - ((ro[a] || {}).role === 1) || a - b);
+  return `<div class="muted" style="font-size:12px;margin-bottom:6px">${t('libSwapH')}</div>
+    <div class="chips">${pool.map(n => `<button class="chip" data-libswap="${n}" aria-pressed="${libs.includes(n)}">${n}${pName(n) ? ' ' + esc(pName(n)) : ''}${(ro[n] || {}).role === 1 ? ' · L' : ''}</button>`).join('')}</div>
+    <div class="row" style="margin-top:6px"><input id="libNum" type="number" inputmode="numeric" placeholder="${t('addNum')}" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100px;min-height:44px"><button class="btn" data-act="libTyped">${t('confirm')}</button></div>`;
+}
+function libSwap(n) {
+  const lv = L(); if (isNaN(n) || lv.lineup.includes(n)) return;
+  snapshot(); const old = (lv.liberos || []).slice();
+  lv.liberos = [n]; lv.roster = lv.roster || {}; lv.roster[n] = lv.roster[n] || { last: '', first: '' };
+  (lv.subs = lv.subs || []).push({ set: lv.set, score: lv.score.slice(), libOut: old, libIn: n });
+  UI.sub = null; save(); render(); toast(t('libNow') + ' #' + n + (pName(n) ? ' ' + pName(n) : ''));
+}
 function subHTML() {
   const lv = L(), sb = UI.sub;
   if (sb.ask) {
@@ -1344,9 +1385,10 @@ function subHTML() {
     return `<h4>${t('setterQ')}</h4><p class="hint">${t('setterQH')}</p><div class="nums" style="grid-template-columns:repeat(3,1fr)">${[3, 2, 1, 4, 5, 0].map(i => numBtn(lv.lineup[i], lv.lineup[i] === sb.ask ? 'hot' : '', 'Z' + (i + 1) + (lv.lineup[i] === lv.sNum ? ' · P' : ''))).join('')}</div>
       ${keep ? `<div class="foot"><button class="btn" data-act="keepSetter">${t('keepSetter')}</button></div>` : ''}`;
   }
+  if (sb.lib) return `<h4>${t('libSwap')}</h4>${liberoSwapHTML()}<div class="foot"><button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
   const n2 = (sb.done || []).length;
   if (sb.out == null) return `<h4>${n2 ? t('subOut2') : t('subOut')}</h4>${n2 ? `<div class="crumbs">${sb.done.map(p => `<span>↓ #${p.out} ↑ #${p.in}</span>`).join('')}</div>` : ''}<div class="nums" style="grid-template-columns:repeat(3,1fr)">${[3, 2, 1, 4, 5, 0].map(i => numBtn(lv.lineup[i], '', 'Z' + (i + 1))).join('')}</div>
-    <div class="foot">${n2 ? '' : `<button class="btn ${sb.double ? 'pri' : ''}" data-act="subDouble" aria-pressed="${!!sb.double}">⇄⇄ ${t('subDouble')}</button>`}<button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
+    <div class="foot">${n2 ? '' : `<button class="btn" data-act="libOpen">L ⇄ ${t('libSwap')}</button><button class="btn ${sb.double ? 'pri' : ''}" data-act="subDouble" aria-pressed="${!!sb.double}">⇄⇄ ${t('subDouble')}</button>`}<button class="btn ghost" data-act="subCancel">✕ ${t('no')}</button></div>`;
   const bench = Object.keys(lv.roster || {}).map(Number).filter(n => !lv.lineup.includes(n) && !(lv.liberos || []).includes(n));
   return `<h4>${t('subIn')}</h4><div class="crumbs">${(sb.done || []).map(p => `<span>↓ #${p.out} ↑ #${p.in}</span>`).join('')}<span>↓ #${sb.out}</span></div><div class="nums">${bench.map(n => numBtn(n, (lv.roster[n] || {}).role === 5 ? 'hot' : '')).join('')}</div>
     <div class="row" style="margin-top:8px"><input id="subNum" type="number" inputmode="numeric" placeholder="${t('addNum')}" style="font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100px;min-height:44px"><button class="btn" data-act="subTyped">${t('confirm')}</button></div>
@@ -1407,7 +1449,7 @@ function setupHTML() {
       <div class="lbl" style="margin:12px 0 6px">${t('firstServe')}</div>
       <div class="chips"><button class="chip" data-first="us" aria-pressed="${lv.serving === 'us'}">${t('us')}</button><button class="chip" data-first="them" aria-pressed="${lv.serving === 'them'}">${esc(lv.teamName)}</button></div>
       <button class="btn big pri" style="width:100%;margin-top:14px" data-act="startSet">${t('start')}</button>
-      ${DB.recs.some(r => r.m === lv.id) ? `<div class="grid2" style="margin-top:10px"><button class="btn" data-act="closeMAsk2">${UI.delConfirm === '__close' ? t('sure') + ' ✓' : '✓ ' + t('closeM')}</button><button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button></div><button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
+      ${DB.recs.some(r => r.m === lv.id) ? `<button class="btn" style="width:100%;margin-top:10px" data-act="repOpen">📊 ${t('repT')}</button><div class="grid2" style="margin-top:10px"><button class="btn" data-act="closeMAsk2">${UI.delConfirm === '__close' ? t('sure') + ' ✓' : '✓ ' + t('closeM')}</button><button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button></div><button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
     </div></div>`;
 }
 function initLiveFor(key, custom) {
@@ -1628,6 +1670,12 @@ document.addEventListener('click', e => {
     if (UI.step === 'att') { UI.rally.att = n; UI.attAll = false; UI.step = 'out'; render(); return; }
     return;
   }
+  if (d.pset && UI.photo) {
+    const all = matchSets(); let cur = UI.photo.sets && UI.photo.sets.length ? UI.photo.sets.slice() : [];
+    if (d.pset === 'all') cur = []; else { const n = +d.pset; cur = cur.includes(n) ? cur.filter(x => x !== n) : [...cur, n].sort((a, b) => a - b); if (cur.length === all.length) cur = []; }
+    UI.photo.sets = cur; render(); return;
+  }
+  if (d.libswap != null && UI.sub) { libSwap(+d.libswap); return; }
   if (d.patt != null && UI.rally) { UI.rally.att = +d.patt; UI.attAll = false; render(); return; }
   if (d.rcvpick) { UI.rally.rcv = +d.rcvpick; UI.rally.rcvAuto = false; render(); return; }
   if (d.c1call) { UI.rally.call = d.c1call; UI.rally.callAuto = false; render(); return; }
@@ -1696,6 +1744,8 @@ document.addEventListener('click', e => {
     subCancel() { UI.sub = null; render(); },
     subDouble() { UI.sub.double = !UI.sub.double; render(); },
     keepSetter() { UI.sub = null; save(); render(); },
+    libOpen() { UI.sub.lib = true; render(); },
+    libTyped() { libSwap(parseInt($('#libNum').value, 10)); },
     subTyped() { const n = parseInt($('#subNum').value, 10); if (!isNaN(n)) doSub(n); },
     endset() { UI.step = 'endset'; render(); },
     endsetNo() { UI.step = null; render(); },
@@ -1705,6 +1755,7 @@ document.addEventListener('click', e => {
     closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); } closeMatch(); },
     timeout() { UI.photo = { mode: 'timeout' }; render(); },
     photoClose() { UI.photo = null; render(); },
+    repOpen() { UI.step = null; UI.photo = { mode: 'view', sets: null }; render(); },
     photoNext() { UI.photo = null; acts.endsetYes(); },
     photoUndo() { UI.photo = null; doUndo(); },
     photoCont() { lv.endAck = lv.set + ':' + lv.score.join('-'); UI.photo = null; save(); render(); },
