@@ -627,7 +627,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v50';
+const APP_VER = 'v51';
 </script>
 <script>
 // ===================== i18n =====================
@@ -1425,7 +1425,7 @@ function bindPen() {
       const near = F.filter(p => !p.setter).sort((a, b) => Math.hypot(a.pos[0] - m[0], a.pos[1] - m[1]) - Math.hypot(b.pos[0] - m[0], b.pos[1] - m[1]))[0];
       UI.pen = { pt: m, rz: zoneOfPt(m), rcv: near ? near.n : -1, strokes: [] }; render(); return;
     }
-    UI.pen.strokes.push(st.map(p => p.map(v => +v.toFixed(1))));
+    UI.pen.strokes.push(st.map(p => p.map(v => +v.toFixed(1)))); const pl = svg.querySelector('#penLive'); if (pl) pl.removeAttribute('id'); // keep the stroke on screen
     UI.penT = setTimeout(() => { const P = UI.pen; if (!P) return; const q = classifyQ(P.strokes);
       if (q) startRally(q, P.rz, P.rcv); else { P.strokes = []; P.guess = '?'; render(); toast(t('penUnk')); } }, 650);
   });
