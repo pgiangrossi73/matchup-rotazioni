@@ -199,6 +199,15 @@ main { padding-block: 8px 20px }
 .ctrow input, .ctrow select { font: inherit; font-size: 13px; padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-height: 38px; min-width: 0 }
 .ctrow.merged { opacity: .6 } .lnk { border: 0; background: none; color: var(--accent); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; padding: 0 }
 @media (max-width: 640px) { .cthead { display: none } .ctrow { grid-template-columns: 52px 1fr 1fr } }
+.rcourt.pen { display: block; background: var(--court) } .rcourt.pen.off .pensvg { opacity: .55 } .pensvg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none }
+.pensvg .pz { stroke: rgba(255,255,255,.3); stroke-width: .5; stroke-dasharray: 2 2 } .pc circle { fill: rgba(255,255,255,.18); stroke: #fff; stroke-width: .8 } .pc.rec circle { fill: #fff } .pc text { font: 700 6.5px var(--f-display, sans-serif); fill: #fff } .pc.rec text { fill: var(--court) } .pc .tag { font-size: 4.2px; fill: #fff !important } .pc.set circle { stroke: var(--accent); stroke-width: 1.2 } .pc.sel circle { fill: var(--accent); stroke: #fff; stroke-width: 1.4 } .pc.sel text { fill: #fff }
+.ppt { fill: none; stroke: #ffd38a; stroke-width: 1.2 } .pst { fill: none; stroke: #ffd38a; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round }
+.penq { position: absolute; z-index: 4; width: 36%; min-width: 128px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 5px; background: var(--surface); border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.45) } .penq .pqh { grid-column: 1 / -1; font-size: 11px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.penq button { min-height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font: 700 17px var(--f-display); cursor: pointer } .penq .x { grid-column: 1 / -1; min-height: 26px; font-size: 12px }
+.fedit { position: absolute; left: 0; bottom: 0; z-index: 3; width: 30px; height: 26px; border: 0; border-radius: 0 8px 0 0; background: rgba(0,0,0,.35); color: #fff; font-size: 14px; cursor: pointer }
+.formed { width: min(560px, 100%) } .fsvg { width: 100%; max-height: calc(100dvh - 280px); aspect-ratio: 1 / 1; display: block; margin: 0 auto; touch-action: none; background: var(--court); border-radius: 8px }
+.fsvg .fbg { fill: var(--court) } .fsvg .pz { stroke: rgba(255,255,255,.3); stroke-width: .5; stroke-dasharray: 2 2 } .fsvg .p3m { stroke: rgba(255,255,255,.7); stroke-width: .6 } .fsvg .pnet { stroke: #fff; stroke-width: 2 }
+.frun { stroke: #ffd38a; stroke-width: 1; fill: none; stroke-dasharray: 2.5 1.6 } .fh { fill: #ffd38a; stroke: #fff; stroke-width: .5; cursor: grab } .fsvg .pc circle { cursor: grab } .fsvg text, .pensvg text { pointer-events: none }
 .apop { position: absolute; z-index: 6; visibility: hidden; width: min(330px, 96%); padding: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.45); border: 2px solid var(--ink) }
 .pnums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 4px } .pnums button { border: 1px solid var(--line); background: var(--surface); border-radius: 9px; min-height: 46px; padding: 3px 2px; display: grid; justify-items: center; line-height: 1.05; color: var(--ink); cursor: pointer; min-width: 0 } .pnums b { font-family: var(--f-display); font-size: 20px } .pnums small { font-size: 9.5px; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap } .pnums button.on { border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)) }
 .pouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 4px } .pouts button { border: 1px solid var(--line); background: var(--surface); border-radius: 9px; min-height: 52px; padding: 3px 2px; display: grid; justify-items: center; align-content: center; line-height: 1.05; color: var(--ink); cursor: pointer } .pouts svg { width: 16px; height: 16px } .pouts b { font-size: 14px } .pouts small { font-size: 9.5px; color: var(--muted) }
@@ -618,7 +627,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v49';
+const APP_VER = 'v50';
 </script>
 <script>
 // ===================== i18n =====================
@@ -663,7 +672,7 @@ const T = {
     settingsT: 'Impostazioni', covMin: 'Copertura minima %', lead: 'Distacco minimo (punti)', minN: 'Casi minimi storico', minLive: 'Casi minimi live', histK: 'Peso storico iniziale (casi)',
     resetSeed: 'Ricarica dati di esempio', wipe: 'Cancella tutto', done: 'Fatto', err: 'File non leggibile',
     seedNote: 'Precaricate le 13 partite DVW che hai condiviso.', driveHint: 'Anche da Google Drive: nel selettore dei file apri il menu ☰ e scegli Drive. Tieni premuto un file per selezionarne più di uno. I file che non sono DVW vengono ignorati.', notDvw: 'non DVW ignorati', localNote: 'I file restano solo su questo dispositivo: nulla viene inviato o pubblicato.',
-    verW: 'versione', rt_dist: 'Distribuzione', rt_rcvT: 'Ricezione', rt_attkT: 'Attacco', totW: 'Tot', posW: 'Pos %', perfW: 'Perf %', killW: 'Punto %', effW: 'Eff %', byPlayer: 'Per giocatrice', byRot: 'Per rotazione', byDest: 'Per destinazione', byRcv: 'Per ricezione', playerW: 'Giocatrice', rotShortW: 'Rot.', destW: 'Destinazione', rcvW: 'Ricezione', unknownP: 'non indicata', distW: 'Distribuzione', newTeamShort: 'Nuova squadra', importSQ: 'Carica roster (.sq)', teamsDH: 'Squadre inserite a mano o da file roster DataVolley (.sq). Ruoli e formazione automatica vengono dal file; si possono correggere con Modifica.', playersW: 'giocatrici', editW: 'Modifica', teamSavedD: 'Squadra salvata', sqDone: 'Squadre caricate', sqBad: 'file non letti', sqNoSetter: 'senza palleggiatrice (aprila con Modifica)', ctT: 'Tabella chiamate', ctH: 'Nome, posizione della rincorsa del centrale rispetto alla palleggiatrice e "uguale a" (unisce una sigla a un\'altra: le azioni passano a quella, e anche i prossimi DVW). Le modifiche valgono su questo dispositivo.', ctCode: 'Sigla', ctName: 'Nome', ctPos: 'Rincorsa', ctSame: 'Uguale a', ctN: 'Azioni', ctOwn: '—', ctReset: 'ripristina', pos_far2: 'lontano verso 2', pos_to2: 'verso 2', pos_mid: 'al centro', pos_to4: 'verso 4', pos_far4: 'lontano verso 4', pos_none: 'nessuna', callsNew: 'chiamate nuove imparate', callsDiff: 'sigle con significato diverso (vedi Dati)', callsLT: 'Chiamate imparate dai DVW', callsLH: 'Lette dalla tabella chiamate di ogni file. Una sigla usata con un altro significato diventa una chiamata separata (es. KO-2), così i dati non si mescolano.', towards2: 'verso 2', towards4: 'verso 4', centreW: 'al centro', noRunW: 'senza rincorsa', diffFrom: 'diversa da', setByW: 'Alza', setByNo: 'non la palleggiatrice: fuori dalle sue tendenze', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre e roster', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
+    verW: 'versione', formT: 'Formazioni di ricezione', formH: 'Per ogni rotazione: trascina i cerchi (posizione in ricezione) e il pallino giallo (dove arriva la rincorsa d\'attacco). ▲ = prima linea. Partenza dallo storico; le modifiche valgono per questa squadra.', formReset: 'Torna allo storico', penMode: 'Campo ricezione', penA: 'Griglia zone (dito)', penB: 'Giocatrici (penna)', penUnk: 'Segno non riconosciuto: tocca la qualità', rt_dist: 'Distribuzione', rt_rcvT: 'Ricezione', rt_attkT: 'Attacco', totW: 'Tot', posW: 'Pos %', perfW: 'Perf %', killW: 'Punto %', effW: 'Eff %', byPlayer: 'Per giocatrice', byRot: 'Per rotazione', byDest: 'Per destinazione', byRcv: 'Per ricezione', playerW: 'Giocatrice', rotShortW: 'Rot.', destW: 'Destinazione', rcvW: 'Ricezione', unknownP: 'non indicata', distW: 'Distribuzione', newTeamShort: 'Nuova squadra', importSQ: 'Carica roster (.sq)', teamsDH: 'Squadre inserite a mano o da file roster DataVolley (.sq). Ruoli e formazione automatica vengono dal file; si possono correggere con Modifica.', playersW: 'giocatrici', editW: 'Modifica', teamSavedD: 'Squadra salvata', sqDone: 'Squadre caricate', sqBad: 'file non letti', sqNoSetter: 'senza palleggiatrice (aprila con Modifica)', ctT: 'Tabella chiamate', ctH: 'Nome, posizione della rincorsa del centrale rispetto alla palleggiatrice e "uguale a" (unisce una sigla a un\'altra: le azioni passano a quella, e anche i prossimi DVW). Le modifiche valgono su questo dispositivo.', ctCode: 'Sigla', ctName: 'Nome', ctPos: 'Rincorsa', ctSame: 'Uguale a', ctN: 'Azioni', ctOwn: '—', ctReset: 'ripristina', pos_far2: 'lontano verso 2', pos_to2: 'verso 2', pos_mid: 'al centro', pos_to4: 'verso 4', pos_far4: 'lontano verso 4', pos_none: 'nessuna', callsNew: 'chiamate nuove imparate', callsDiff: 'sigle con significato diverso (vedi Dati)', callsLT: 'Chiamate imparate dai DVW', callsLH: 'Lette dalla tabella chiamate di ogni file. Una sigla usata con un altro significato diventa una chiamata separata (es. KO-2), così i dati non si mescolano.', towards2: 'verso 2', towards4: 'verso 4', centreW: 'al centro', noRunW: 'senza rincorsa', diffFrom: 'diversa da', setByW: 'Alza', setByNo: 'non la palleggiatrice: fuori dalle sue tendenze', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre e roster', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
@@ -705,7 +714,7 @@ const T = {
     settingsT: 'Settings', covMin: 'Minimum coverage %', lead: 'Minimum lead (points)', minN: 'Min. history cases', minLive: 'Min. live cases', histK: 'Initial history weight (cases)',
     resetSeed: 'Reload sample data', wipe: 'Delete everything', done: 'Done', err: 'File could not be read',
     seedNote: 'Preloaded with the 13 DVW matches you shared.', driveHint: 'Google Drive works too: in the file picker open the ☰ menu and choose Drive. Long-press a file to select several. Files that are not DVW are ignored.', notDvw: 'non-DVW skipped', localNote: 'Files stay on this device only: nothing is sent or published.',
-    verW: 'version', rt_dist: 'Distribution', rt_rcvT: 'Reception', rt_attkT: 'Attack', totW: 'Tot', posW: 'Pos %', perfW: 'Perf %', killW: 'Kill %', effW: 'Eff %', byPlayer: 'By player', byRot: 'By rotation', byDest: 'By destination', byRcv: 'By reception', playerW: 'Player', rotShortW: 'Rot.', destW: 'Destination', rcvW: 'Reception', unknownP: 'not given', distW: 'Distribution', newTeamShort: 'New team', importSQ: 'Load roster (.sq)', teamsDH: 'Teams entered by hand or from DataVolley roster files (.sq). Roles and automatic lineup come from the file; fix them with Edit.', playersW: 'players', editW: 'Edit', teamSavedD: 'Team saved', sqDone: 'Teams loaded', sqBad: 'files not read', sqNoSetter: 'no setter (open it with Edit)', ctT: 'Call table', ctH: 'Name, where the middle runs relative to the setter, and "same as" (merges a code into another: its actions move there, and so do future DVW files). Changes apply on this device.', ctCode: 'Code', ctName: 'Name', ctPos: 'Run', ctSame: 'Same as', ctN: 'Actions', ctOwn: '—', ctReset: 'reset', pos_far2: 'far towards 2', pos_to2: 'towards 2', pos_mid: 'centre', pos_to4: 'towards 4', pos_far4: 'far towards 4', pos_none: 'none', callsNew: 'new calls learned', callsDiff: 'codes with a different meaning (see Data)', callsLT: 'Calls learned from the DVW files', callsLH: 'Read from each file\'s call table. A code used with another meaning becomes a separate call (e.g. KO-2), so data is not mixed.', towards2: 'towards 2', towards4: 'towards 4', centreW: 'centre', noRunW: 'no run', diffFrom: 'different from', setByW: 'Set by', setByNo: 'not the setter: left out of her tendencies', repT: 'Match report', repH: 'Tap one or more sets to add them up; Match = all.', repPerSet: 'Set by set', repPerRot: 'Distribution by rotation', libSwap: 'Libero change', libSwapH: 'Tap the libero coming in: she replaces the one on court (highlighted).', libNow: 'Libero on court:', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams and rosters', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
+    verW: 'version', formT: 'Reception formations', formH: 'For each rotation: drag the circles (reception position) and the yellow dot (where the attack run ends). ▲ = front row. Starts from the history; changes apply to this team.', formReset: 'Back to history', penMode: 'Reception court', penA: 'Zone grid (finger)', penB: 'Players (pen)', penUnk: 'Sign not recognised: tap the quality', rt_dist: 'Distribution', rt_rcvT: 'Reception', rt_attkT: 'Attack', totW: 'Tot', posW: 'Pos %', perfW: 'Perf %', killW: 'Kill %', effW: 'Eff %', byPlayer: 'By player', byRot: 'By rotation', byDest: 'By destination', byRcv: 'By reception', playerW: 'Player', rotShortW: 'Rot.', destW: 'Destination', rcvW: 'Reception', unknownP: 'not given', distW: 'Distribution', newTeamShort: 'New team', importSQ: 'Load roster (.sq)', teamsDH: 'Teams entered by hand or from DataVolley roster files (.sq). Roles and automatic lineup come from the file; fix them with Edit.', playersW: 'players', editW: 'Edit', teamSavedD: 'Team saved', sqDone: 'Teams loaded', sqBad: 'files not read', sqNoSetter: 'no setter (open it with Edit)', ctT: 'Call table', ctH: 'Name, where the middle runs relative to the setter, and "same as" (merges a code into another: its actions move there, and so do future DVW files). Changes apply on this device.', ctCode: 'Code', ctName: 'Name', ctPos: 'Run', ctSame: 'Same as', ctN: 'Actions', ctOwn: '—', ctReset: 'reset', pos_far2: 'far towards 2', pos_to2: 'towards 2', pos_mid: 'centre', pos_to4: 'towards 4', pos_far4: 'far towards 4', pos_none: 'none', callsNew: 'new calls learned', callsDiff: 'codes with a different meaning (see Data)', callsLT: 'Calls learned from the DVW files', callsLH: 'Read from each file\'s call table. A code used with another meaning becomes a separate call (e.g. KO-2), so data is not mixed.', towards2: 'towards 2', towards4: 'towards 4', centreW: 'centre', noRunW: 'no run', diffFrom: 'different from', setByW: 'Set by', setByNo: 'not the setter: left out of her tendencies', repT: 'Match report', repH: 'Tap one or more sets to add them up; Match = all.', repPerSet: 'Set by set', repPerRot: 'Distribution by rotation', libSwap: 'Libero change', libSwapH: 'Tap the libero coming in: she replaces the one on court (highlighted).', libNow: 'Libero on court:', rotShort: 'Rotate', c1Pop: 'Who attacked and how it ended', c1PopT: 'Attacker and result', c1Set: 'Tap where she sets', c1RunOrAtt: 'Middle run or attack', c1Att: 'Draw the attack', c1H: 'Tap = set. Arrow in their court = run. Line across the net = attack.', c1PickH: 'Choose the right call.', c1Call: 'Call', c1Auto: 'recognised', c1Other: 'more', c1Sys: 'Set', c1In: 'in system', c1Excl: 'off the net (!)', c1NoRun: 'no run', c1Reset: 'Start over', c1NoAtt: 'No trajectory', oneMode: 'Set and attack scouting', oneModeA: 'Single court (set, run, attack)', oneModeB: 'One board per call (as v36)', rotW: 'Rotation', rotCourt: 'Rotate the reception court', scEdit: 'Fix score', scEditH: 'Changes only the numbers: rotation and serve stay as they are (fix them with the P and ⇄ buttons).', rOri: 'Reception court', rOri0: 'Net at the bottom', rOri1: 'Net on the right', rOri2: 'Net at the top', rOri3: 'Net on the left', myTeam: 'Your team', myTeamPh: 'e.g. Volley Reds', matchMenu: 'Match ▾', timeout: 'Timeout', closeSet: 'Close set', pauseM: 'Pause match', closeM: 'Close match', closeMQ: 'Close the match? It stays saved among the matches and goes into the history.', paused: 'Matches in progress', resume: 'Resume', pausedT: 'Match paused: resume it from Matches in progress', closedT: 'Match closed and saved', setOverT: 'End of set', matchOverT: 'End of match', toNext: 'Close set and prepare set', notOver: 'Keep playing the set', undoPt: 'Undo last point', closeW: 'Close', thisSet: 'This set', wholeM: 'Match', callsT: 'Calls', attT: 'Attackers', planT: 'What she can do: signal by rotation', nextW: 'now', noData: 'no attacks yet', otherAtt: 'Other players', setsW: 'sets', teamsT: 'Teams and rosters', delTeam: 'Delete team', teamDeleted: 'Team deleted', teamInUse: 'First close or discard the match in progress with this team', teamsH: 'Scouting already recorded stays in the matches above (delete it there).', screenW: 'screen', newTeam: 'New team (no history)', teamName: 'Team name', rP: 'Setter', rO: 'Opposite', rS1: 'Outside 1', rS2: 'Outside 2', rC1: 'Middle 1', rC2: 'Middle 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Bench', roleW: 'Role', lastW: 'Last name', createTeam: 'Save team', needSetterRow: 'Enter at least team name and setter number', teamSaved: 'Team saved: now choose where the setter starts', autoLine: 'Automatic lineup: setter starts in', autoDvw: 'order from DVW, {n} of {t} matches', autoReimport: 'Automatic lineup not available: import this team\'s DVW files once more (Data tab \u2192 Import DVW files, matches are not duplicated).', autoMissing: 'Fill setter, opposite, 2 outsides and 2 middles in the team form', editTeam: 'Edit team', rlS: 'Outside', rlO: 'Opposite', rlC: 'Middle', rlP: 'Setter', rlL: 'Libero', noSetters: 'No setters yet. Import DVW files in the Data tab, or add one below.'
   }
 };
 const CALL_NAMES = {
@@ -1126,9 +1135,15 @@ function fixBarHTML() {
   const rc = rcvCands(r.rz), list = rc.on.slice().sort((a, b) => (b === r.rcv) - (a === r.rcv) || (rc.sc[b] || 0) - (rc.sc[a] || 0));
   return `<div class="fixbar"><span class="fl">Z${r.rz}<b>${r.q}</b></span>${list.map(n => `<button class="${n === r.rcv ? 'on' : ''}" data-fixrcv="${n}" title="${esc(pName(n))}">${n}</button>`).join('')}</div>`;
 }
-function startRally(q, rz) {
-  UI.fixRec = null;
+function startRally(q, rz, preRcv) {
+  UI.fixRec = null; UI.pen = null;
   UI.rally = { q, rz, lane: laneOf(rz), rcv: -1, call: '', sz: '', setX: null, a0: null, a1: null, att: -1, out: '' };
+  if (preRcv != null && preRcv >= 0) {
+    UI.rally.rcv = preRcv;
+    if (q === '=') { snapshot(); commit(); pointUs(); endRally(); return; }
+    if (q === '/') { snapshot(); commit(); UI.step = 'who'; render(); return; }
+    UI.step = ONE() ? 'court' : 'board'; render(); return;
+  }
   if (q !== 'F' && q !== '=' && q !== '/') { const b = rcvCands(rz).best; if (b != null) { UI.rally.rcv = b; UI.rally.rcvAuto = true; UI.step = ONE() ? 'court' : 'board'; render(); return; } }
   if ((q === '=' || q === '/') && rcvCands(rz).best != null) UI.rally.rcv = rcvCands(rz).best;
   if (q === '=') { snapshot(); commit(); UI.fixRec = DB.recs.length - 1; pointUs(); endRally(); return; }
@@ -1175,13 +1190,13 @@ function render() {
 // ===================== live =====================
 function renderLive() {
   const el = $('#v-live');
-  if (!L() || !L().started) { el.innerHTML = (UI.photo && L() ? photoHTML(UI.photo.mode) : '') + setupHTML(); return; }
+  if (!L() || !L().started) { el.innerHTML = (UI.photo && L() ? photoHTML(UI.photo.mode) : '') + (UI.formEd && L() && !L().lineup.includes(null) ? formEdHTML() : '') + setupHTML(); bindFormEd(); return; }
   const lv = L(), rot = lv.rot;
   if (!UI.step && !UI.sub && !UI.photo && !UI.scEdit && setOver(lv) && lv.endAck !== lv.set + ':' + lv.score.join('-')) {
     const w = (lv.won || [0, 0]).slice(); w[lv.score[0] > lv.score[1] ? 0 : 1]++;
     UI.photo = { mode: (w[0] >= 3 || w[1] >= 3) ? 'match' : 'set' };
   }
-  el.innerHTML = `${UI.photo ? photoHTML(UI.photo.mode) : ''}${UI.scEdit ? scEditHTML() : ''}<div class="live">
+  el.innerHTML = `${UI.photo ? photoHTML(UI.photo.mode) : ''}${UI.scEdit ? scEditHTML() : ''}${UI.formEd ? formEdHTML() : ''}<div class="live">
     <div class="left">
       <div class="score">
         <div><div class="who">${t('us')}${lv.serving === 'us' ? '<span class="serve"></span>' : ''}</div><button class="n ed" data-act="scEdit" title="${t('scEdit')}">${lv.score[0]}</button></div>
@@ -1190,7 +1205,7 @@ function renderLive() {
         <div class="who">${t('set')}<br><b class="disp" style="font-size:18px;color:var(--ink)">${lv.set}</b>${(lv.won || [0, 0]).some(x => x) ? `<br><small>${(lv.won || [0, 0]).join('–')}</small>` : ''}</div>
         <button class="srvtog" data-act="toggleSrv">${lv.serving === 'us' ? t('srvUs') : t('srvThem')} ⇄</button>
       </div>
-      ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${fixBarHTML() || rotBoxHTML()}${rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
+      ${(UI.step && UI.step !== 'rcv') || UI.sub ? `<div class="card step stepfull">${stepHTML()}</div>` : `<div class="rwrap">${fixBarHTML() || rotBoxHTML()}${PEN() ? penCourtHTML() : rcourtHTML()}</div><div class="idlebar">${idleBarHTML()}</div>`}
     </div>
     <div class="right">
       <div class="topbar">
@@ -1209,7 +1224,7 @@ function renderLive() {
         <span style="margin-left:auto">${lv.n || 0} ${t('actions')} · ${esc(lv.sName)} #${lv.sNum}</span></div>
     </div>
   </div>`;
-  bindBoards(); bindCourt1(); placePop();
+  bindBoards(); bindCourt1(); placePop(); bindPen(); bindFormEd();
 }
 function scEditHTML() {
   const lv = L(), row = (i, nm) => `<div class="scrow"><b style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</b><button class="btn" data-sc="${i}:-1" ${lv.score[i] ? '' : 'disabled'}>−</button><span class="n">${lv.score[i]}</span><button class="btn" data-sc="${i}:1">+</button></div>`;
@@ -1314,6 +1329,129 @@ function idleBarHTML() {
   if (lv.serving === 'us') return `<button class="btn" data-act="srvErr">${t('srvErr')}</button><button class="btn" data-act="free">${t('free')}</button><button class="btn" data-act="ptUs">${t('ptUs')}</button><button class="btn" data-act="ptThem">${t('ptThem')}</button>`;
   return `<button class="btn pri" data-act="ptUs">${t('ptUs')}</button><button class="btn" data-act="ptThem">${t('ptThem')}</button><button class="btn" data-act="free">${t('free')}</button><span class="lbl" style="align-self:center;text-align:center">${t('idleThem')}</span>`;
 }
+// ===================== formations (pen mode) =====================
+// model coords of THEIR court seen from our bench: x 0..1 (left = their zone 1/2 side), y 0..1 (0 = their end line, 1 = net)
+const PEN = () => S().penCourt === true;
+const ZC = { 1: [0, 0], 6: [1, 0], 5: [2, 0], 9: [0, 1], 8: [1, 1], 7: [2, 1], 2: [0, 2], 3: [1, 2], 4: [2, 2] };
+const zPt = z => ZC[z] ? [(ZC[z][0] + .5) / 3, (ZC[z][1] + .5) / 3] : null;
+const atkPt = z => ZC[z] ? [(ZC[z][0] + .5) / 3, [2, 3, 4].includes(z) ? .93 : .6] : null;
+function lineupFor(k) {
+  const lv = L(); let l = lv.lineup.slice(); if (!l.includes(lv.sNum)) return l;
+  let g = 0; while (l.indexOf(lv.sNum) + 1 !== k && g++ < 6) l = [l[1], l[2], l[3], l[4], l[5], l[0]];
+  return l;
+}
+function formFor(k) {
+  const lv = L(), team = lv.team, l = lineupFor(k), ro = lv.roster || {}, mids = lv.middles || [];
+  const isMid = n => mids.includes(n) || (ro[n] || {}).role === 4, lib = (lv.liberos || [])[0];
+  const players = l.map((n, i) => ({ n, z: i + 1 }));
+  if (lib != null) { const b = players.find(p => [1, 6, 5].includes(p.z) && isMid(p.n)); if (b) b.n = lib; }
+  const hist = DB.recs.filter(r => r.team === team && r.rot === k);
+  const st = (DB.forms && DB.forms[team] && DB.forms[team][k]) || { pos: {}, run: {} };
+  const rc = {}; hist.forEach(r => { if (r.rcv >= 0 && zPt(r.rz)) { const o = rc[r.rcv] = rc[r.rcv] || { n: 0, x: 0, y: 0 }; const p = zPt(r.rz); o.n++; o.x += p[0]; o.y += p[1]; } });
+  const recv = Object.entries(rc).filter(([n]) => players.some(p => p.n === +n)).sort((a, b) => b[1].n - a[1].n).slice(0, 3).map(([n]) => +n);
+  const at = {}; hist.forEach(r => { if (!(r.att >= 0)) return; let pt = null;
+    if (r.a0) { const d = (NETY - r.a0[1]) * 13.5; pt = [r.a0[0], Math.max(0, Math.min(1, 1 - d / 9))]; } else if (r.az) pt = atkPt(r.az);
+    if (!pt) return; const o = at[r.att] = at[r.att] || { n: 0, pts: {} }; const key = pt.map(v => v.toFixed(2)).join(','); o.n++; o.pts[key] = (o.pts[key] || 0) + 1; });
+  const out = players.map(p => {
+    const front = [2, 3, 4].includes(p.z), def = zPt(p.z), h = rc[p.n];
+    let pos = st.pos[p.n] || (h && h.n >= 2 ? [h.x / h.n, h.y / h.n] : [def[0], front ? .84 : .3]);
+    let run = st.run[p.n];
+    if (!run && p.n !== lv.sNum && p.n !== lib) {
+      const a = at[p.n]; if (a && a.n >= 2) run = Object.entries(a.pts).sort((x, y) => y[1] - x[1])[0][0].split(',').map(Number);
+      else if (front) run = [def[0], .93]; else if (!isMid(p.n)) run = [def[0], .6];
+    }
+    return { n: p.n, z: p.z, pos: pos.slice(), run: run || null, rec: recv.includes(p.n) || p.n === lib, setter: p.n === lv.sNum, lib: p.n === lib, fixed: !!st.pos[p.n] };
+  });
+  // averages from the history can stack two players on the same spot: push apart the ones not placed by hand
+  for (let it = 0; it < 30; it++) for (let i = 0; i < out.length; i++) for (let j = i + 1; j < out.length; j++) {
+    const a = out[i], b = out[j], dx = b.pos[0] - a.pos[0], dy = b.pos[1] - a.pos[1], d = Math.hypot(dx, dy) || .001, min = .17;
+    if (d >= min) continue; const k = (min - d) / 2, ux = dx / d || 1, uy = dy / d;
+    if (!a.fixed) { a.pos[0] -= ux * k; a.pos[1] -= uy * k; } if (!b.fixed) { b.pos[0] += ux * k; b.pos[1] += uy * k; }
+    [a, b].forEach(q => q.pos = q.pos.map(v => Math.min(.95, Math.max(.05, v))));
+  }
+  return out;
+}
+function setForm(k, n, kind, pt) {
+  const team = L().team; DB.forms = DB.forms || {}; const f = DB.forms[team] = DB.forms[team] || {}; const r = f[k] = f[k] || { pos: {}, run: {} };
+  r[kind][n] = pt.map(v => +Math.min(1, Math.max(0, v)).toFixed(3));
+}
+// display <-> model for the 4 orientations of the reception court
+const toD = (o, p) => o === 1 ? [p[1], 1 - p[0]] : o === 2 ? [1 - p[0], 1 - p[1]] : o === 3 ? [1 - p[1], p[0]] : p;
+const toM = (o, p) => o === 1 ? [1 - p[1], p[0]] : o === 2 ? [1 - p[0], 1 - p[1]] : o === 3 ? [p[1], 1 - p[0]] : p;
+function zoneOfPt(p) { const c = Math.min(2, Math.floor(p[0] * 3)), r = Math.min(2, Math.floor(p[1] * 3)); return [[1, 6, 5], [9, 8, 7], [2, 3, 4]][r][c]; }
+function penCourtHTML() {
+  const lv = L(), o = (S().rOri || 0) % 4, on = !UI.step && !UI.sub && lv.serving === 'us', F = formFor(lv.rot), P = UI.pen;
+  const D = p => toD(o, p).map(v => v * 100);
+  let s = '';
+  [1 / 3, 2 / 3].forEach(v => { const a = D([v, 0]), b = D([v, 1]), c = D([0, v]), d = D([1, v]); s += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="pz"/><line x1="${c[0]}" y1="${c[1]}" x2="${d[0]}" y2="${d[1]}" class="pz"/>`; });
+  F.forEach(p => { const [x, y] = D(p.pos), sel = P && P.rcv === p.n;
+    s += `<g class="pc ${p.rec ? 'rec' : ''} ${p.setter ? 'set' : ''} ${sel ? 'sel' : ''}"><circle cx="${x}" cy="${y}" r="${p.rec ? 8 : 6.5}"/><text x="${x}" y="${y + 2.4}" text-anchor="middle">${p.n}</text>${p.lib || p.setter ? `<text x="${x}" y="${y + (p.rec ? 13 : 11.5)}" text-anchor="middle" class="tag">${p.lib ? 'L' : 'P'}</text>` : ''}</g>`; });
+  if (P) { const [x, y] = D(P.pt); s += `<circle cx="${x}" cy="${y}" r="2.2" class="ppt"/>`; (P.strokes || []).forEach(st => s += `<polyline points="${st.map(q => q.join(',')).join(' ')}" class="pst"/>`); }
+  const pop = P ? (() => { const [x, y] = D(P.pt); return `<div class="penq" style="${x < 50 ? 'right:2%' : 'left:2%'};${y < 50 ? 'bottom:2%' : 'top:2%'}"><div class="pqh">#${P.rcv}${pName(P.rcv) ? ' ' + esc(pName(P.rcv)) : ''} · Z${P.rz}${P.guess === '?' ? ' · ?' : ''}</div>${['#', '+', '!', '-', '/', '='].map(q => `<button data-penq="${q}">${q === '-' ? '−' : q}</button>`).join('')}<button class="x" data-act="penCancel">✕</button></div>`; })() : '';
+  return `<div class="rcourt pen ${on ? '' : 'off'} o${o}"><svg class="pensvg" viewBox="0 0 100 100" preserveAspectRatio="none">${s}</svg>${pop}<button class="fedit" data-act="formOpen" title="${t('formT')}">✎</button></div>`;
+}
+function classifyQ(strokes) {
+  const lines = [], dots = [];
+  strokes.forEach(st => { const xs = st.map(p => p[0]), ys = st.map(p => p[1]), w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+    const o = { w, h, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), dx: st[st.length - 1][0] - st[0][0], dy: st[st.length - 1][1] - st[0][1] };
+    if (Math.max(w, h) < 2.2) dots.push(o); else { o.k = w > 1.8 * h ? 'h' : h > 1.8 * w ? 'v' : 'd'; lines.push(o); } });
+  const n = lines.length, ks = lines.map(l => l.k).sort().join('');
+  if (n === 1) return ks === 'h' ? '-' : ks === 'v' ? '!' : '/';
+  if (n === 2 && ks === 'hh') return '=';
+  if (n === 2 && (ks === 'hv' || ks === 'dh')) { const [a, b] = lines; const cross = a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 + 1 && b.y0 < a.y1 + 1; return cross ? '+' : null; }
+  if (n === 2 && ks === 'vv' && dots.length === 0) return null;
+  if (n >= 3) return '#';
+  return null;
+}
+function bindPen() {
+  const svg = document.querySelector('svg.pensvg'); if (!svg) return;
+  const o = (S().rOri || 0) % 4;
+  const pt = e => { const b = svg.getBoundingClientRect(); return [Math.min(100, Math.max(0, (e.clientX - b.left) / b.width * 100)), Math.min(100, Math.max(0, (e.clientY - b.top) / b.height * 100))]; };
+  let cur = null, t0 = 0;
+  svg.addEventListener('pointerdown', e => {
+    const lv = L(); if (UI.step || UI.sub || lv.serving !== 'us') return; e.preventDefault(); svg.setPointerCapture(e.pointerId);
+    clearTimeout(UI.penT); cur = [pt(e)]; t0 = Date.now();
+  });
+  svg.addEventListener('pointermove', e => {
+    if (!cur) return; cur.push(pt(e));
+    if (UI.pen) { let pl = svg.querySelector('#penLive'); if (!pl) { pl = document.createElementNS('http://www.w3.org/2000/svg', 'polyline'); pl.id = 'penLive'; pl.setAttribute('class', 'pst'); svg.appendChild(pl); } pl.setAttribute('points', cur.map(q => q.join(',')).join(' ')); }
+  });
+  svg.addEventListener('pointerup', () => {
+    if (!cur) return; const st = cur; cur = null;
+    const xs = st.map(p => p[0]), ys = st.map(p => p[1]), small = Math.max(...xs) - Math.min(...xs) < 2.2 && Math.max(...ys) - Math.min(...ys) < 2.2;
+    if (!UI.pen || (small && !(UI.pen.strokes || []).length)) {
+      if (!small) return; // writing without choosing the passer first
+      const m = toM(o, [st[0][0] / 100, st[0][1] / 100]), F = formFor(L().rot);
+      const near = F.filter(p => !p.setter).sort((a, b) => Math.hypot(a.pos[0] - m[0], a.pos[1] - m[1]) - Math.hypot(b.pos[0] - m[0], b.pos[1] - m[1]))[0];
+      UI.pen = { pt: m, rz: zoneOfPt(m), rcv: near ? near.n : -1, strokes: [] }; render(); return;
+    }
+    UI.pen.strokes.push(st.map(p => p.map(v => +v.toFixed(1))));
+    UI.penT = setTimeout(() => { const P = UI.pen; if (!P) return; const q = classifyQ(P.strokes);
+      if (q) startRally(q, P.rz, P.rcv); else { P.strokes = []; P.guess = '?'; render(); toast(t('penUnk')); } }, 650);
+  });
+}
+// pre-match editor: drag the circles (reception position) and the arrow ends (typical attack run)
+function formEdHTML() {
+  const lv = L(), k = UI.formRot || lv.rot, F = formFor(k);
+  let s = `<rect x="0" y="0" width="100" height="100" class="fbg"/>`;
+  [1 / 3, 2 / 3].forEach(v => s += `<line x1="${v * 100}" y1="0" x2="${v * 100}" y2="100" class="pz"/><line x1="0" y1="${v * 100}" x2="100" y2="${v * 100}" class="pz"/>`);
+  s += `<line x1="0" y1="66.7" x2="100" y2="66.7" class="p3m"/><line x1="0" y1="99" x2="100" y2="99" class="pnet"/>`;
+  F.forEach(p => { if (!p.run) return; const [x1, y1] = p.pos.map(v => v * 100), [x2, y2] = p.run.map(v => v * 100), a = Math.atan2(y2 - y1, x2 - x1);
+    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="frun"/><path d="M${x2} ${y2} L${x2 - 4 * Math.cos(a - .45)} ${y2 - 4 * Math.sin(a - .45)} M${x2} ${y2} L${x2 - 4 * Math.cos(a + .45)} ${y2 - 4 * Math.sin(a + .45)}" class="frun"/><circle cx="${x2}" cy="${y2}" r="3.2" class="fh" data-fd="run:${p.n}"/>`; });
+  F.forEach(p => { const [x, y] = p.pos.map(v => v * 100); s += `<g class="pc ${p.rec ? 'rec' : ''} ${p.setter ? 'set' : ''}"><circle cx="${x}" cy="${y}" r="7.5" data-fd="pos:${p.n}"/><text x="${x}" y="${y + 2.4}" text-anchor="middle">${p.n}</text><text x="${x}" y="${y + 12.5}" text-anchor="middle" class="tag">${esc(p.lib ? 'L' : p.setter ? 'P' : (pName(p.n) || '').slice(0, 9))}${[2, 3, 4].includes(p.z) && !p.lib ? ' ▲' : ''}</text></g>`; });
+  return `<div class="photo-ov"><div class="card photo formed"><h3 class="h" style="margin:0 0 6px">${t('formT')} · ${esc(lv.teamName)}</h3>
+    <div class="chips" style="margin-bottom:6px">${[1, 6, 5, 4, 3, 2].map(r => `<button class="chip" data-frot="${r}" aria-pressed="${r === k}">P${r}</button>`).join('')}</div>
+    <div class="muted" style="font-size:12px;margin-bottom:6px">${t('formH')}</div>
+    <svg class="fsvg" viewBox="-4 -4 108 108">${s}</svg>
+    <div class="row" style="margin-top:10px;justify-content:space-between"><button class="btn" data-act="formReset">↺ ${t('formReset')}</button><button class="btn big pri" data-act="formClose">${t('closeW')}</button></div></div></div>`;
+}
+function bindFormEd() {
+  const svg = document.querySelector('svg.fsvg'); if (!svg) return; let drag = null;
+  const pt = e => { const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return [q.x / 100, q.y / 100]; };
+  svg.addEventListener('pointerdown', e => { const f = e.target.dataset && e.target.dataset.fd; if (!f) return; e.preventDefault(); svg.setPointerCapture(e.pointerId); drag = { f, el: e.target }; });
+  svg.addEventListener('pointermove', e => { if (!drag) return; const p = pt(e); drag.p = p; const el = drag.el; el.setAttribute('cx', p[0] * 100); el.setAttribute('cy', p[1] * 100); });
+  svg.addEventListener('pointerup', () => { if (!drag) return; const d = drag; drag = null; if (!d.p) return; const [kind, n] = d.f.split(':'); setForm(UI.formRot || L().rot, +n, kind, d.p); save(); render(); });
+}
 // reception court orientations: 0 net at the bottom, 1 rotated 90° anticlockwise (net on the right), 2 net at the top, 3 net on the left
 const RGRID = [[[1, 6, 5], [9, 8, 7], [2, 3, 4]], [[5, 7, 4], [6, 8, 3], [1, 9, 2]], [[4, 3, 2], [7, 8, 9], [5, 6, 1]], [[2, 9, 1], [3, 8, 6], [4, 7, 5]]];
 function rcourtHTML() {
@@ -1345,7 +1483,7 @@ function sigRowHTML() {
 }
 function rotBoxHTML() {
   const ex = S().sigExcl !== false;
-  return `<div class="rotbox"><small>${t('rotW')}</small><b>P${L().rot}</b><button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button><button class="exbtn rotb" data-act="rotCourt" title="${t('rotCourt')}" aria-label="${t('rotCourt')}">⟲ ${t('rotShort')}</button></div>`;
+  return `<div class="rotbox"><small>${t('rotW')}</small><b>P${L().rot}</b><button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button><button class="exbtn rotb" data-act="rotCourt" title="${t('rotCourt')}" aria-label="${t('rotCourt')}">⟲ ${t('rotShort')}</button><button class="exbtn rotb" data-act="penToggle" title="${t('penMode')}">${PEN() ? '▦' : '✎'}</button></div>`;
 }
 function boardHTML(call) {
   const lv = L(), rot = lv.rot, li = S().lang === 'it' ? 0 : 1;
@@ -1446,8 +1584,19 @@ function attCands(r) {
   const front = [3, 2, 1].map(i => lv.lineup[i]), back = [4, 5, 0].map(i => lv.lineup[i]).filter(n => n !== lv.sNum && !isMid(n));
   let cands = g === '' || UI.attAll ? order.map(i => lv.lineup[i]) : ['2', '3', '4'].includes(g) ? front : back;
   const want = { '3': isMid, '4': n => role(n) === 2 && !isMid(n), '2': n => role(n) === 3 || n === lv.sNum, '1': n => role(n) === 3, 'P': n => role(n) === 2, '5': n => role(n) === 2 }[g];
-  const best = want ? cands.find(want) : null;
+  let best = want ? cands.find(want) : null;
   if (best != null) cands = [best, ...cands.filter(n => n !== best)];
+  if (r.a0 && (PEN() || (DB.forms && DB.forms[lv.team] && DB.forms[lv.team][lv.rot]))) {
+    // nearest typical run end to where the attack starts (metres)
+    const d = (NETY - r.a0[1]) * 13.5, m = [r.a0[0], 1 - d / 9];
+    const runs = formFor(lv.rot).filter(p => p.run && !p.lib);
+    if (runs.length) {
+      const dist = n => { const p = runs.find(q => q.n === n); return p ? Math.hypot((p.run[0] - m[0]) * 9, (p.run[1] - m[1]) * 9) : 99; };
+      const pool = UI.attAll ? order.map(i => lv.lineup[i]) : [...new Set([...runs.map(p => p.n), ...cands])];
+      cands = pool.filter(n => n != null).sort((a, b) => dist(a) - dist(b)); best = dist(cands[0]) < 3 ? cands[0] : best;
+      if (best != null) cands = [best, ...cands.filter(n => n !== best)];
+    }
+  }
   return { cands, best, g };
 }
 // popup at the end of the attack line: attacker (expected one preselected) + result, then who won if the rally goes on
@@ -1606,6 +1755,7 @@ function setupHTML() {
       <div class="lbl" style="margin:12px 0 6px">${t('firstServe')}</div>
       <div class="chips"><button class="chip" data-first="us" aria-pressed="${lv.serving === 'us'}">${t('us')}</button><button class="chip" data-first="them" aria-pressed="${lv.serving === 'them'}">${esc(lv.teamName)}</button></div>
       <button class="btn big pri" style="width:100%;margin-top:14px" data-act="startSet">${t('start')}</button>
+      ${lv && !lv.lineup.includes(null) ? `<button class="btn" style="width:100%;margin-top:10px" data-act="formOpen">✎ ${t('formT')}</button>` : ''}
       ${DB.recs.some(r => r.m === lv.id) ? `<button class="btn" style="width:100%;margin-top:10px" data-act="repOpen">📊 ${t('repT')}</button><div class="grid2" style="margin-top:10px"><button class="btn" data-act="closeMAsk2">${UI.delConfirm === '__close' ? t('sure') + ' ✓' : '✓ ' + t('closeM')}</button><button class="btn" data-act="pauseM">⏸ ${t('pauseM')}</button></div><button class="btn" style="width:100%;margin-top:10px;color:var(--bad);border-color:var(--bad)" data-act="discardSetup">${UI.delConfirm === '__live' ? t('discardYes') + ' (' + DB.recs.filter(r => r.m === lv.id).length + ')' : '🗑 ' + t('discard')}</button>` : ''}` : `<p class="muted">← ${t('pickSetter')}</p>`}
     </div></div>`;
 }
@@ -1768,6 +1918,7 @@ function renderData() {
         ${customSetters().length ? `<p class="muted" style="margin:6px 0 0;font-size:12px">${t('teamsH')}</p>` : ''}</div>
       <div class="card"><h2 class="h">${t('settingsT')}</h2>
         <div class="field"><label class="lbl" for="set-one">${t('oneMode')}</label><select id="set-one"><option value="1" ${S().oneCourt !== false ? 'selected' : ''}>${t('oneModeA')}</option><option value="0" ${S().oneCourt === false ? 'selected' : ''}>${t('oneModeB')}</option></select></div>
+        <div class="field"><label class="lbl" for="set-pen">${t('penMode')}</label><select id="set-pen"><option value="0" ${!PEN() ? 'selected' : ''}>${t('penA')}</option><option value="1" ${PEN() ? 'selected' : ''}>${t('penB')}</option></select></div>
         <div class="field"><label class="lbl" for="set-rori">${t('rOri')}</label><select id="set-rori">${[0, 1, 2, 3].map(k => `<option value="${k}" ${(s.rOri || 0) === k ? 'selected' : ''}>${t('rOri' + k)}</option>`).join('')}</select></div>
         <div class="field"><label class="lbl" for="set-sigq">${t('sigRule')}</label><select id="set-sigq"><option value="1" ${s.sigExcl !== false ? 'selected' : ''}>${t('sigRuleA')}</option><option value="0" ${s.sigExcl === false ? 'selected' : ''}>${t('sigRuleB')}</option></select></div>
         <div class="settings">${['covMin', 'lead', 'minN', 'minLive', 'histK'].map(k => `<div class="field"><label class="lbl" for="set-${k}">${t(k)}</label><input id="set-${k}" data-set="${k}" type="number" inputmode="decimal" value="${s[k]}"></div>`).join('')}
@@ -1870,6 +2021,8 @@ document.addEventListener('click', e => {
   }
   if (d.dtedit) { UI.dataTeam = d.dtedit; render(); return; }
   if (d.ctreset) { const k = d.ctreset; if (DB.callEdit && DB.callEdit[k]) { if (DB.callEdit[k].merge) callEdit(k, 'merge', ''); delete DB.callEdit[k]; } resetCallTables(); save(); render(); return; }
+  if (d.penq && UI.pen) { clearTimeout(UI.penT); const P = UI.pen; startRally(d.penq, P.rz, P.rcv); return; }
+  if (d.frot) { UI.formRot = +d.frot; render(); return; }
   if (d.fixrcv != null && UI.fixRec != null) { const r = DB.recs[UI.fixRec]; if (r) { r.rcv = +d.fixrcv; if (UI.rally) UI.rally.rcv = r.rcv; } save(); render(); return; }
   if (d.ptab && UI.photo) { UI.photo.tab = d.ptab; render(); return; }
   if (d.pteam && UI.photo) { UI.photo.team = d.pteam; render(); return; }
@@ -1962,6 +2115,11 @@ document.addEventListener('click', e => {
     timeout() { UI.photo = { mode: 'timeout' }; render(); },
     dtNew() { UI.dataTeam = '__new'; render(); },
     dtClose() { UI.dataTeam = null; render(); },
+    penCancel() { clearTimeout(UI.penT); UI.pen = null; render(); },
+    formOpen() { UI.formEd = true; UI.formRot = L().rot; render(); },
+    formClose() { UI.formEd = false; render(); },
+    formReset() { const f = DB.forms && DB.forms[L().team]; if (f) delete f[UI.formRot || L().rot]; save(); render(); },
+    penToggle() { S().penCourt = !PEN(); UI.pen = null; save(); render(); },
     fixClose() { UI.fixRec = null; render(); },
     photoClose() { UI.photo = null; render(); },
     repOpen() { UI.step = null; UI.photo = { mode: 'view', sets: null, mid: L().id }; render(); },
@@ -2037,6 +2195,7 @@ document.addEventListener('change', e => {
   if (el.id === 'myTeam') { S().myTeam = el.value.trim(); save(); }
   if (el.dataset.set) { const v = parseFloat(el.value); if (!isNaN(v)) { S()[el.dataset.set] = v; save(); } }
   if (el.id === 'set-one') { S().oneCourt = el.value === '1'; save(); }
+  if (el.id === 'set-pen') { S().penCourt = el.value === '1'; save(); }
   if (el.id === 'set-rori') { S().rOri = +el.value; save(); }
   if (el.id === 'set-sigq') { S().sigExcl = el.value === '1'; save(); }
   if (el.id === 'set-theme') { S().theme = el.value || undefined; if (el.value) document.documentElement.dataset.theme = el.value; else delete document.documentElement.dataset.theme; save(); }
