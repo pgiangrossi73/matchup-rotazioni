@@ -527,7 +527,7 @@ const SR = (() => {
         const call = c.slice(6, 8);
         pend.call = /^K[A-Z0-9]$/.test(call) ? call : '';
         pend.sz = num !== pend.sNum ? 'FS' : (callZone(pend.call) || '');
-        pend.est = 1;
+        pend.est = 1; pend.setBy = num; // who actually set: only the setter's own sets count in her tendencies
       } else if (skill === 'A' && pend.att < 0) {
         const az = parseInt(c[9], 10), ez = parseInt(c[10], 10);
         pend.att = num; pend.az = az >= 1 && az <= 9 ? az : 0; pend.ez = ez >= 1 && ez <= 9 ? ez : 0;
@@ -601,7 +601,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v43';
+const APP_VER = 'v44';
 </script>
 <script>
 // ===================== i18n =====================
@@ -1635,7 +1635,7 @@ function importDVWFiles(files) {
         if (!/\[3SCOUT\]/i.test(fr.result)) { bad++; return res(); } // not a DataVolley file: skip quietly
         const p = SR.parseDVW(fr.result, f.name);
         p.rosters.forEach(mergeRoster); // also on re-import: picks up the starting lineups
-        if (DB.matches.some(m => m.id === p.match.id)) { skip++; return res(); }
+        if (DB.matches.some(m => m.id === p.match.id)) { DB.recs = DB.recs.filter(r => r.m !== p.match.id).concat(p.recs); skip++; return res(); } // re-import refreshes its actions
         DB.matches.push({ ...p.match, src: 'dvw' }); DB.recs.push(...p.recs); nr += p.recs.length; add++;
       } catch (e) { toast(t('err') + ': ' + f.name); }
       res();
