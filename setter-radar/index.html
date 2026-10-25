@@ -129,6 +129,9 @@ main { padding-block: 8px 20px }
 .step h4 { margin: 0 0 2px; font-family: var(--f-display); font-size: 20px; text-transform: uppercase; letter-spacing: .02em; line-height: 1.1 }
 .step .hint { font-size: 13px; color: var(--muted); margin: 0 0 8px }
 .crumbs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px }
+.crumbs .crb { background: var(--surface); border: 1.5px solid var(--accent); border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 700; color: var(--ink); cursor: pointer; min-height: 30px }
+.rcvrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 0 8px } .rcvrow .lbl { grid-column: 1 / -1 }
+.rcvrow button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 4px 2px; min-height: 46px; font-size: 11px; display: grid; justify-items: center; line-height: 1.1; min-width: 0; overflow: hidden; color: var(--ink); cursor: pointer } .rcvrow button b { font-family: var(--f-display); font-size: 18px } .rcvrow button.on { border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)) }
 .crumbs span { background: var(--sunk); border-radius: 6px; padding: 2px 7px; font-size: 13px; font-weight: 600 }
 .crumbs .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: -1px; margin-right: 4px }
 .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
@@ -184,8 +187,9 @@ main { padding-block: 8px 20px }
 svg.c1 { flex: 1 1 auto; min-height: 0; width: 100%; max-height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; display: block }
 @media (max-width: 699px) { svg.c1 { height: 70vh } }
 .c1call .c1big { display: flex; align-items: baseline; gap: 8px; margin: 2px 0 6px } .c1call .c1big b { font-family: var(--f-display); font-size: 34px; line-height: 1 } .c1call .c1big small { color: var(--muted) }
-.c1alts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px } .c1alts button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 4px; min-height: 48px; display: grid; justify-items: center; cursor: pointer; color: var(--ink) } .c1alts b { font-family: var(--f-display); font-size: 20px; line-height: 1 } .c1alts small { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100% }
+.c1alts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px } .c1alts button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 4px; min-height: 48px; display: grid; justify-items: center; cursor: pointer; color: var(--ink) } .c1alts b { font-family: var(--f-display); font-size: 20px; line-height: 1 } .c1alts small { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100% }
 .c1sq { margin-top: 8px; font-size: 14px }
+@media (max-height: 760px) { .c1hintp { display: none } .c1call .c1big { margin: 0 0 4px } .c1call .c1big b { font-size: 28px } .c1sq { margin-top: 4px } }
 .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 8px 8px; display: grid; gap: 4px; min-width: 0 }
 .board.pick { border: 2px solid var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent) }
 .board.sel { border: 2px solid var(--ink) }
@@ -588,7 +592,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v37';
+const APP_VER = 'v38';
 </script>
 <script>
 // ===================== i18n =====================
@@ -604,7 +608,7 @@ const T = {
     idleUs: 'Ricezione', idleUsH: 'Tocca zona e qualità sulla loro metà campo.',
     idleThem: 'Battono loro', idleThemH: 'Registra chi vince lo scambio. Free ball se mandiamo una palla facile.',
     srvErr: 'Errore battuta', free: 'Free ball', ptUs: 'Punto noi', ptThem: 'Punto loro',
-    rcv: 'Chi ha ricevuto?', rcvH: 'Evidenziata la ricevitrice più frequente da quella zona.',
+    rcv: 'Chi ha ricevuto?', rcvH: 'Evidenziata la ricevitrice prevista in questa rotazione e zona.', rcvChange: 'Cambia ricevitrice', rcvBy: 'Ricevuto da',
     board: 'Chiamata e palleggio', boardH: 'Tocca la rete del riquadro della chiamata, nel punto da cui palleggia.',
     more: '+ altra chiamata', pickCall: 'Quale chiamata?', pickCallH: 'Aggiunge un riquadro in questa rotazione.',
     traj: 'Traiettoria', trajH: 'Nel riquadro, trascina dal punto d\'attacco al punto d\'arrivo.',
@@ -646,7 +650,7 @@ const T = {
     idleUs: 'Reception', idleUsH: 'Tap zone and quality on their half.',
     idleThem: 'They serve', idleThemH: 'Record who wins the rally. Free ball when we send an easy ball.',
     srvErr: 'Serve error', free: 'Free ball', ptUs: 'Our point', ptThem: 'Their point',
-    rcv: 'Who passed?', rcvH: 'Highlighted: the most frequent passer from that zone.',
+    rcv: 'Who passed?', rcvH: 'Highlighted: the expected passer in this rotation and zone.', rcvChange: 'Change passer', rcvBy: 'Passed by',
     board: 'Call and set', boardH: 'Tap the net of the call\'s board, where the setter sets.',
     more: '+ other call', pickCall: 'Which call?', pickCallH: 'Adds a board for this rotation.',
     traj: 'Trajectory', trajH: 'On the board, drag from the attack point to the landing point.',
@@ -975,8 +979,24 @@ function bindCourt1() {
     r.run = [A, B]; r.call = rankCalls(r)[0] || ''; r.callAuto = true; render();
   });
 }
+// expected passer for this rotation and zone: same zone weighs 3, same lane 1; today's match counts triple
+function rcvRowHTML() {
+  const r = UI.rally; if (!r || r.q === 'F') return '';
+  const rc = rcvCands(r.rz), top = rc.on.slice().sort((a, b) => (n => n === r.rcv ? -1 : 0)(a) - (n => n === r.rcv ? -1 : 0)(b) || (rc.sc[b] || 0) - (rc.sc[a] || 0)).slice(0, 3);
+  return `<div class="rcvrow"><span class="lbl">${t('rcvBy')}</span>${top.map(n => `<button class="${n === r.rcv ? 'on' : ''}" data-rcvpick="${n}"><b>#${n}</b><small style="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(pName(n))}</small></button>`).join('')}<button data-act="rcvChange">${t('c1Other')}…</button></div>`;
+}
+function rcvCands(rz) {
+  const lv = L(), on = [...new Set([...lv.lineup.filter(n => n !== lv.sNum), ...(lv.liberos || [])])], sc = {};
+  DB.recs.forEach(x => {
+    if (x.team !== lv.team || x.rot !== lv.rot || !(x.rcv >= 0) || !on.includes(x.rcv)) return;
+    const w = (x.rz === rz ? 3 : laneOf(x.rz) === laneOf(rz) ? 1 : 0) * (x.m === lv.id ? 3 : 1);
+    if (w) sc[x.rcv] = (sc[x.rcv] || 0) + w;
+  });
+  return { on, sc, best: on.filter(n => sc[n]).sort((a, b) => sc[b] - sc[a])[0] };
+}
 function startRally(q, rz) {
   UI.rally = { q, rz, lane: laneOf(rz), rcv: -1, call: '', sz: '', setX: null, a0: null, a1: null, att: -1, out: '' };
+  if (q !== 'F' && q !== '=' && q !== '/') { const b = rcvCands(rz).best; if (b != null) { UI.rally.rcv = b; UI.rally.rcvAuto = true; UI.step = ONE() ? 'court' : 'board'; render(); return; } }
   if (q === '=') { snapshot(); commit(); pointUs(); endRally(); return; }
   if (q === '/') { snapshot(); commit(); UI.step = 'who'; render(); return; }
   UI.step = q === 'F' ? (ONE() ? 'court' : 'board') : 'rcv'; render();
@@ -1007,7 +1027,7 @@ function commit() {
   });
   lv.n = (lv.n || 0) + 1;
 }
-function endRally() { UI.step = null; UI.rally = null; save(); render(); }
+function endRally() { UI.step = null; UI.rally = null; UI.rcvBack = null; save(); render(); }
 
 // ===================== render shell =====================
 function render() {
@@ -1212,7 +1232,7 @@ function crumbs() {
   const r = UI.rally; if (!r) return '';
   const c = [];
   c.push(`<span><i class="sw" style="background:${laneVar(r.lane)}"></i>${r.q === 'F' ? t('free') : 'Z' + r.rz + ' ' + (r.q === '-' ? '−' : r.q)}</span>`);
-  if (r.rcv >= 0) c.push(`<span>#${r.rcv}${pName(r.rcv) ? ' <small>' + esc(pName(r.rcv)) + '</small>' : ''}</span>`);
+  if (r.rcv >= 0 && UI.step !== 'court') c.push(`<button class="crb" data-act="rcvChange" title="${t('rcvChange')}">#${r.rcv}${pName(r.rcv) ? ' <small>' + esc(pName(r.rcv)) + '</small>' : ''} ✎</button>`);
   if (r.call) c.push(`<span>${r.call === 'FS' ? t('fs') : r.call}${r.setQ === '!' ? ' !' : ''}</span>`);
   if (r.a1) c.push(`<span>↘ ${landZone(r.a1) || ''}</span>`);
   if (r.att >= 0) c.push(`<span>A #${r.att}${pName(r.att) ? ' <small>' + esc(pName(r.att)) + '</small>' : ''}</span>`);
@@ -1245,15 +1265,13 @@ function stepHTML() {
       <button class="btn" style="width:100%;margin-top:6px" data-act="free">${t('free')}</button>`;
   }
   if (st === 'rcv') {
-    const fq = {}; DB.recs.forEach(x => { if (x.team === lv.team && x.rot === lv.rot && x.rz === r.rz && x.rcv >= 0) fq[x.rcv] = (fq[x.rcv] || 0) + 1; });
-    const cands = [...new Set([...lv.lineup.filter(n => n !== lv.sNum), ...(lv.liberos || [])])].sort((a, b) => (fq[b] || 0) - (fq[a] || 0));
-    const best = cands.find(n => fq[n]);
+    const rc = rcvCands(r.rz), fq = rc.sc, cands = rc.on.sort((a, b) => (fq[b] || 0) - (fq[a] || 0)), best = r.rcv >= 0 ? r.rcv : rc.best;
     return `<h4>${t('rcv')}</h4><p class="hint">${t('rcvH')}</p>${crumbs()}<div class="nums">${cands.map(n => numBtn(n, n === best ? 'hot' : '', (lv.liberos || []).includes(n) ? (pName(n) ? pName(n) + ' · L' : t('libero')) : '')).join('')}<button class="num" data-num="-1"><b>?</b><small>${t('skip')}</small></button></div>${foot()}`;
   }
   if (st === 'court') {
-    const alts = r.run ? rankCalls(r).filter(c => c !== r.call).slice(0, 5) : [];
+    const alts = r.run ? rankCalls(r).filter(c => c !== r.call).slice(0, 3) : [];
     const sq = setQOf(r);
-    return `<h4>${!r.sp ? t('c1Set') : !r.run ? t('c1RunOrAtt') : t('c1Att')}</h4><p class="hint">${t('c1H')}</p>${crumbs()}
+    return `<h4>${!r.sp ? t('c1Set') : !r.run ? t('c1RunOrAtt') : t('c1Att')}</h4><p class="hint c1hintp">${t('c1H')}</p>${crumbs()}${rcvRowHTML()}
       ${r.run ? `<div class="c1call"><div class="lbl">${t('c1Call')}${r.callAuto ? ' · ' + t('c1Auto') : ''}</div><div class="c1big"><b>${r.call}</b><small>${esc((CALL_NAMES[r.call] || ['', ''])[li])}</small></div>
         <div class="c1alts">${alts.map(c => `<button data-c1call="${c}"><b>${c}</b><small>${esc((CALL_NAMES[c] || ['', ''])[li])}</small></button>`).join('')}<button data-act="moreCall"><b>…</b><small>${t('c1Other')}</small></button></div></div>` : ''}
       ${r.sp ? `<div class="c1sq">${t('c1Sys')}: <b>${sq === 'FS' ? t('fs') : sq === '!' ? t('c1Excl') : t('c1In')}</b>${r.run ? '' : ' · ' + t('c1NoRun')}</div>` : ''}
@@ -1568,10 +1586,11 @@ document.addEventListener('click', e => {
   if (d.num != null) {
     const n = +d.num;
     if (UI.sub) { if (UI.sub.ask != null) { setActiveSetter(n); UI.sub = null; save(); render(); toast(t('setterNow') + ': ' + L().sName + ' #' + n + ' · P' + L().rot); return; } if (UI.sub.out == null) { UI.sub.out = n; render(); } else doSub(n); return; }
-    if (UI.step === 'rcv') { UI.rally.rcv = n; UI.step = ONE() ? 'court' : 'board'; render(); return; }
+    if (UI.step === 'rcv') { UI.rally.rcv = n; UI.rally.rcvAuto = false; UI.step = UI.rcvBack || (ONE() ? 'court' : 'board'); UI.rcvBack = null; render(); return; }
     if (UI.step === 'att') { UI.rally.att = n; UI.attAll = false; UI.step = 'out'; render(); return; }
     return;
   }
+  if (d.rcvpick) { UI.rally.rcv = +d.rcvpick; UI.rally.rcvAuto = false; render(); return; }
   if (d.c1call) { UI.rally.call = d.c1call; UI.rally.callAuto = false; render(); return; }
   if (d.newcall) {
     if (ONE()) { UI.rally.call = d.newcall; UI.rally.callAuto = false; UI.step = 'court'; render(); return; }
@@ -1665,12 +1684,14 @@ document.addEventListener('click', e => {
     whoThem() { pointThem(); endRally(); },
     moreCall() { UI.step = 'pickcall'; render(); },
     skipTraj() { UI.step = 'att'; render(); },
+    rcvChange() { UI.rcvBack = UI.step; UI.step = 'rcv'; render(); },
     c1Reset() { const r = UI.rally; r.sp = null; r.run = null; r.call = ''; render(); },
     c1NoAtt() { const r = UI.rally; r.setQ = setQOf(r); if (!r.run) r.call = 'FS'; r.setX = +(r.sp[0] / C1W).toFixed(3); r.a0 = r.a1 = null; UI.step = 'att'; render(); },
     attAll() { UI.attAll = true; render(); },
     cancel() { UI.step = null; UI.rally = null; render(); },
     back() {
       const r = UI.rally, st = UI.step;
+      if (st === 'rcv' && UI.rcvBack) { UI.step = UI.rcvBack; UI.rcvBack = null; render(); return; }
       const prev = ONE() ? { rcv: null, court: r.q === 'F' ? null : 'rcv', pickcall: 'court', att: 'court', out: 'att' }[st] : { rcv: null, board: r.q === 'F' ? null : 'rcv', pickcall: 'board', traj: 'board', att: 'traj', out: 'att' }[st];
       if (ONE() && prev === 'court') { r.a0 = r.a1 = null; if (st === 'att' && r.call === 'FS' && !r.run) r.call = ''; UI.step = 'court'; render(); return; }
       if (!prev) { UI.step = null; UI.rally = null; } else { UI.step = prev; if (prev === 'traj' || prev === 'board') r.a0 = r.a1 = null; if (prev === 'board') { r.call = ''; r.setX = null; } }
