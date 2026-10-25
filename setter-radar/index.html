@@ -173,6 +173,9 @@ main { padding-block: 8px 20px }
 .sigc .sub { font-size: 11px; color: var(--muted); line-height: 1.2 }
 .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--sunk); margin-top: 4px }
 .bar span { display: block; height: 100% }
+.photo .bar { height: 12px }
+.barlbl { display: flex; margin-top: 4px; font-size: 13px; line-height: 1.2 } .barlbl span { display: block; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: clip; min-width: 0; padding: 0 1px } .barlbl b { display: block; font-weight: 700 }
+.barlbl .t-L, .barlbl .t-L5 { color: var(--sig-4) } .barlbl .t-C { color: var(--sig-fist) } .barlbl .t-R, .barlbl .t-R1 { color: var(--sig-2) } .barlbl .t-P { color: var(--k-p) } .barlbl .t-D { color: var(--muted) }
 .k-L { background: var(--sig-4) } .k-L5 { background: color-mix(in srgb, var(--sig-4) 45%, var(--surface)) } .k-R1 { background: color-mix(in srgb, var(--sig-2) 45%, var(--surface)) } .k-C { background: var(--sig-fist) } .k-R { background: var(--sig-2) } .k-P { background: var(--k-p) } .k-D { background: var(--muted) }
 .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted) }
 .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px }
@@ -592,7 +595,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v38';
+const APP_VER = 'v39';
 </script>
 <script>
 // ===================== i18n =====================
@@ -882,6 +885,8 @@ function callTend(setter, liveId, rot, call) {
   const m = call === 'FS' ? (r => r.sz === 'FS' || r.call === 'KO') : (r => r.call === call);
   return blend(setter, liveId, [r => INSYS(r.q), r => m(r), r => m(r) && r.rot === rot], r => m(r) && r.rot === rot);
 }
+// labels under each coloured segment, same order and width as the bar
+function barLblHTML(d) { return `<div class="barlbl">${VIEW.map(k => { const w = d[k] * 100; return `<span style="width:${w.toFixed(1)}%">${w >= 13 ? `<b class="t-${k}">${t('s' + k)}</b> ${pct(d[k])}` : w >= 5 ? pct(d[k]) : ''}</span>`; }).join('')}</div>`; }
 function barHTML(d) { return `<div class="bar">${VIEW.map(k => `<span class="k-${k}" style="width:${(d[k] * 100).toFixed(1)}%"></span>`).join('')}</div>`; }
 
 // ===================== live logic =====================
@@ -1089,7 +1094,7 @@ function photoHTML(mode) {
   const dist = (title, arr) => {
     const c = counts(arr.filter(inS)), d = {}; KEYS.forEach(k => d[k] = c.n ? c.c[k] / c.n : 0);
     const top = KEYS.filter(k => c.c[k]).sort((a, b) => c.c[b] - c.c[a]).slice(0, 3).map(k => `<b>${t('s' + k)}</b> ${pct(d[k])}`).join(' · ');
-    return `<div class="lbl" style="margin:8px 0 4px">${title} <span style="text-transform:none;letter-spacing:0">(${c.n})</span></div>${c.n ? barHTML(d) + `<div style="font-size:13px;margin-top:4px">${top}</div>` : `<div class="muted" style="font-size:13px">${t('noData')}</div>`}`;
+    return `<div class="lbl" style="margin:8px 0 4px">${title} <span style="text-transform:none;letter-spacing:0">(${c.n})</span></div>${c.n ? barHTML(d) + barLblHTML(d) : `<div class="muted" style="font-size:13px">${t('noData')}</div>`}`;
   };
   const src = setR.length >= 3 ? setR : mine;
   const cl = {}; src.filter(r => r.call && inS(r)).forEach(r => { const o = cl[r.call] = cl[r.call] || { n: 0, c: {} }; o.n++; const k = SIDE(r.g); if (k) o.c[k] = (o.c[k] || 0) + 1; });
