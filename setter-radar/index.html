@@ -329,6 +329,12 @@ td.hl { font-weight: 700 }
 textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Consolas, monospace; border-radius: 10px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); padding: 8px }
 .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px }
 .badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 6px; background: var(--sunk); color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em }
+.memerr { position: relative; z-index: 6; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); background: var(--bad); color: #fff; font-weight: 700; font-size: 15px; display: flex; gap: 12px; align-items: center; justify-content: space-between }
+.memerr.high { background: var(--accent); color: var(--accent-ink) }
+.memerr button { font: inherit; background: transparent; color: inherit; border: 1px solid currentColor; border-radius: 8px; padding: 4px 10px; min-height: 36px }
+.membar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunk); margin: 6px 0 }
+.membar span { display: block; height: 100% }
+.mrhint { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 10px 12px; margin: 0 0 10px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 14%, var(--surface)); border: 1px solid var(--accent) }
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px) }
 @media (max-width: 640px) { .sigrow { grid-template-columns: minmax(0, 1fr) } .score { flex-wrap: wrap } .topbar .row { margin-left: 0 } .rots button { width: 42px } }
 @media (min-width: 700px) {
@@ -436,6 +442,7 @@ textarea { width: 100%; min-height: 100px; font: 12px ui-monospace, Menlo, Conso
 
 </head>
 <body>
+<div class="memerr" id="memErr" role="alert" hidden></div>
 <header class="top"><div class="wrap">
   <div class="brand">
     <svg viewBox="0 0 64 64" aria-hidden="true">
@@ -628,12 +635,13 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v54';
+const APP_VER = 'v55';
 </script>
 <script>
 // ===================== i18n =====================
 const T = {
   it: {
+    memT: 'Memoria del dispositivo', memUsed: 'Spazio usato', memOf: 'su circa', memEx: 'Scambio tra le app', memOther: 'Altro', memNote: 'Setter Radar e Matchup Rotazioni sono sullo stesso sito e dividono lo stesso spazio (circa 5,2 milioni di caratteri in Chrome). Se si riempie, i nuovi dati non vengono salvati.', memFail: 'Memoria del dispositivo piena: le ultime modifiche NON sono salvate. Fai un Backup (scheda Dati) e rimuovi partite vecchie.', memHigh: 'Memoria quasi piena ({p}). Fai un Backup e rimuovi partite vecchie (scheda Dati).', mrFrom: 'Da Matchup Rotazioni', mrApply: 'Applica', mrServeUs: 'battiamo noi', mrServeThem: 'battono loro', mrDone: 'Formazione e battuta da Matchup', mrNoSeq: 'Battuta da Matchup: la formazione va completata a mano',
     tLive: 'Partita', tStudy: 'Report', tData: 'Dati',
     us: 'Noi', them: 'Loro', set: 'Set', srvUs: 'Battiamo noi', srvThem: 'Battono loro',
     sub: 'Cambio', undo: 'Annulla', endSet: 'Fine set / Scarta',
@@ -676,6 +684,7 @@ const T = {
     verW: 'versione', sameSetter: 'Partita in corso con questa palleggiatrice: continua da qui', otherSetterQ: 'Partita in corso: tocca di nuovo per sospenderla e iniziarne un\'altra', reopen: 'Riapri la partita', reopenedT: 'Partita riaperta', sqDl: 'Scarica roster (.sq)', sqSaved: 'Roster salvato', formT: 'Formazioni di ricezione', formH: 'Per ogni rotazione: trascina i cerchi (posizione in ricezione) e il pallino giallo (dove arriva la rincorsa d\'attacco). ▲ = prima linea. Partenza dallo storico; le modifiche valgono per questa squadra.', formReset: 'Torna allo storico', penMode: 'Campo ricezione: tipo', penA: 'Griglia zone (dito)', penB: 'Giocatrici (penna)', penUnk: 'Segno non riconosciuto: tocca la qualità', rt_dist: 'Distribuzione', rt_rcvT: 'Ricezione', rt_attkT: 'Attacco', totW: 'Tot', posW: 'Pos %', perfW: 'Perf %', killW: 'Punto %', effW: 'Eff %', byPlayer: 'Per giocatrice', byRot: 'Per rotazione', byDest: 'Per destinazione', byRcv: 'Per ricezione', playerW: 'Giocatrice', rotShortW: 'Rot.', destW: 'Destinazione', rcvW: 'Ricezione', unknownP: 'non indicata', distW: 'Distribuzione', newTeamShort: 'Nuova squadra', importSQ: 'Carica roster (.sq)', teamsDH: 'Squadre inserite a mano o da file roster DataVolley (.sq). Ruoli e formazione automatica vengono dal file; si possono correggere con Modifica.', playersW: 'giocatrici', editW: 'Modifica', teamSavedD: 'Squadra salvata', sqDone: 'Squadre caricate', sqBad: 'file non letti', sqNoSetter: 'senza palleggiatrice (aprila con Modifica)', ctT: 'Tabella chiamate', ctH: 'Nome, posizione della rincorsa del centrale rispetto alla palleggiatrice e "uguale a" (unisce una sigla a un\'altra: le azioni passano a quella, e anche i prossimi DVW). Le modifiche valgono su questo dispositivo.', ctCode: 'Sigla', ctName: 'Nome', ctPos: 'Rincorsa', ctSame: 'Uguale a', ctN: 'Azioni', ctOwn: '—', ctReset: 'ripristina', pos_far2: 'lontano verso 2', pos_to2: 'verso 2', pos_mid: 'al centro', pos_to4: 'verso 4', pos_far4: 'lontano verso 4', pos_none: 'nessuna', callsNew: 'chiamate nuove imparate', callsDiff: 'sigle con significato diverso (vedi Dati)', callsLT: 'Chiamate imparate dai DVW', callsLH: 'Lette dalla tabella chiamate di ogni file. Una sigla usata con un altro significato diventa una chiamata separata (es. KO-2), così i dati non si mescolano.', towards2: 'verso 2', towards4: 'verso 4', centreW: 'al centro', noRunW: 'senza rincorsa', diffFrom: 'diversa da', setByW: 'Alza', setByNo: 'non la palleggiatrice: fuori dalle sue tendenze', repT: 'Report partita', repH: 'Tocca uno o pi\u00f9 set per sommarli; Partita = tutti.', repPerSet: 'Set per set', repPerRot: 'Distribuzione per rotazione', libSwap: 'Cambio libero', libSwapH: 'Tocca il libero che entra: sostituisce quello in campo (evidenziato).', libNow: 'Libero in campo:', rotShort: 'Ruota', c1Pop: 'Chi attacca e com\'è finita', c1PopT: 'Attaccante ed esito', c1Set: 'Tocca dove palleggia', c1RunOrAtt: 'Rincorsa del centrale o attacco', c1Att: 'Traccia l\'attacco', c1H: 'Tocco = palleggio. Freccia nel loro campo = rincorsa. Linea oltre la rete = attacco.', c1PickH: 'Scegli la chiamata giusta.', c1Call: 'Chiamata', c1Auto: 'riconosciuta', c1Other: 'altre', c1Sys: 'Palleggio', c1In: 'in sistema', c1Excl: 'staccato (!)', c1NoRun: 'nessuna rincorsa', c1Reset: 'Ricomincia', c1NoAtt: 'Senza traiettoria', oneMode: 'Rilevazione palleggio e attacco', oneModeA: 'Campo unico (palleggio, rincorsa, attacco)', oneModeB: 'Riquadri per chiamata (come v36)', rotW: 'Rotazione', rotCourt: 'Ruota il campo di ricezione', scEdit: 'Correggi punteggio', scEditH: 'Cambia solo i numeri: rotazione e battuta restano come sono (si sistemano con i pulsanti P e ⇄).', rOri: 'Orientamento campo ricezione', rOri0: 'Rete in basso', rOri1: 'Rete a destra', rOri2: 'Rete in alto', rOri3: 'Rete a sinistra', myTeam: 'La tua squadra', myTeamPh: 'es. Volley Rossi', matchMenu: 'Partita ▾', timeout: 'Timeout', closeSet: 'Chiudi set', pauseM: 'Sospendi partita', closeM: 'Chiudi partita', closeMQ: 'Chiudere la partita? Resta salvata tra le partite e va nello storico.', paused: 'Partite in corso', resume: 'Riprendi', pausedT: 'Partita sospesa: la riprendi da Partite in corso', closedT: 'Partita chiusa e salvata', setOverT: 'Fine set', matchOverT: 'Fine partita', toNext: 'Chiudi set e prepara il set', notOver: 'Continua il set', undoPt: 'Annulla ultimo punto', closeW: 'Chiudi', thisSet: 'Questo set', wholeM: 'Partita', callsT: 'Chiamate', attT: 'Attaccanti', planT: 'Cosa può fare: segnale per rotazione', nextW: 'adesso', noData: 'ancora nessun attacco', otherAtt: 'Altre giocatrici', setsW: 'set', teamsT: 'Squadre e roster', delTeam: 'Elimina squadra', teamDeleted: 'Squadra eliminata', teamInUse: 'Prima chiudi o scarta la partita in corso con questa squadra', teamsH: 'Le rilevazioni gi\u00e0 fatte restano nelle partite qui sopra (si eliminano da l\u00ec).', screenW: 'schermo', newTeam: 'Nuova squadra (senza storico)', teamName: 'Nome squadra', rP: 'Palleggiatrice', rO: 'Opposto', rS1: 'Schiacciatrice 1', rS2: 'Schiacciatrice 2', rC1: 'Centrale 1', rC2: 'Centrale 2', rL1: 'Libero 1', rL2: 'Libero 2', bench: 'Panchina', roleW: 'Ruolo', lastW: 'Cognome', createTeam: 'Salva squadra', needSetterRow: 'Servono almeno nome squadra e numero della palleggiatrice', teamSaved: 'Squadra salvata: ora scegli dove parte la palleggiatrice', autoLine: 'Formazione automatica: palleggiatrice in', autoDvw: 'ordine dai DVW, {n} partite su {t}', autoReimport: 'Formazione automatica non disponibile: ricarica una volta i DVW di questa squadra (scheda Dati \u2192 Importa file DVW, le partite non si duplicano).', autoMissing: 'Compila palleggiatrice, opposto, 2 schiacciatrici e 2 centrali nel form squadra', editTeam: 'Modifica squadra', rlS: 'Schiacciatrice', rlO: 'Opposto', rlC: 'Centrale', rlP: 'Palleggiatrice', rlL: 'Libero', noSetters: 'Nessuna palleggiatrice ancora. Importa i file DVW nella scheda Dati, oppure aggiungine una qui sotto.'
   },
   en: {
+    memT: 'Device storage', memUsed: 'Space used', memOf: 'of about', memEx: 'Exchange between the apps', memOther: 'Other', memNote: 'Setter Radar and Rotation Matchup live on the same site and share the same space (about 5.2 million characters in Chrome). When it is full, new data is not saved.', memFail: 'Device storage full: the latest changes are NOT saved. Make a Backup (Data tab) and remove old matches.', memHigh: 'Storage almost full ({p}). Make a Backup and remove old matches (Data tab).', mrFrom: 'From Rotation Matchup', mrApply: 'Apply', mrServeUs: 'we serve', mrServeThem: 'they serve', mrDone: 'Lineup and serve from Matchup', mrNoSeq: 'Serve from Matchup: complete the lineup by hand',
     tLive: 'Match', tStudy: 'Report', tData: 'Data',
     us: 'Us', them: 'Them', set: 'Set', srvUs: 'We serve', srvThem: 'They serve',
     sub: 'Substitution', undo: 'Undo', endSet: 'End set / Discard',
@@ -845,8 +854,39 @@ function load() {
       return migrate(d); } } } catch (e) {}
   return seedDB();
 }
+// ===== memoria del dispositivo: le due app (Setter Radar e Matchup Rotazioni) sono sullo stesso sito e dividono lo stesso spazio =====
+const MEM = (() => {
+  const LIMIT = 5242880; // caratteri (chiavi + valori) per sito, misurati in Chromium
+  const GROUP = { 'setter-radar-v2': 'sr', 'rotmatch.v1': 'mr', 'suite.sr.v1': 'ex', 'suite.mr.v1': 'ex' };
+  let failed = false, highShown = false;
+  function usage() {
+    const by = { sr: 0, mr: 0, ex: 0, other: 0 }; let tot = 0;
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i), n = k.length + (localStorage.getItem(k) || '').length; tot += n; by[GROUP[k] || 'other'] += n; } } catch (e) {}
+    return { tot, by, pct: tot / LIMIT, limit: LIMIT };
+  }
+  function banner(cls, txt) {
+    const el = document.getElementById('memErr'); if (!el) return;
+    if (!txt) { el.hidden = true; fit(); return; }
+    el.className = 'memerr ' + cls; el.hidden = false;
+    el.innerHTML = `<span>⚠ ${txt}</span><button type="button" data-memclose="1">✕</button>`; fit();
+  }
+  function fail(e) { failed = true; banner('', t('memFail')); try { console.warn('salvataggio non riuscito', e); } catch (x) {} }
+  function ok() { if (failed) { failed = false; banner('', ''); } }
+  function check() { const u = usage(); if (u.pct >= 0.9 && !highShown && !failed) { highShown = true; banner('high', t('memHigh').replace('{p}', Math.round(u.pct * 100) + '%')); } }
+  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-memclose]')) { document.getElementById('memErr').hidden = true; fit(); } });
+  return { usage, fail, ok, check, LIMIT };
+})();
+function memHTML() {
+  const u = MEM.usage(), mb = n => (n / 1e6).toFixed(2).replace('.', S().lang === 'it' ? ',' : '.');
+  const parts = [['sr', 'Setter Radar', 'var(--accent)'], ['mr', 'Matchup Rotazioni', '#5a3fd4'], ['ex', t('memEx'), 'var(--sig-fist)'], ['other', t('memOther'), 'var(--muted)']];
+  return `<div class="card"><h2 class="h">${t('memT')}</h2>
+    <p style="margin:4px 0 0"><b>${t('memUsed')}: ${Math.round(u.pct * 100)}%</b> <span class="muted">(${mb(u.tot)} ${t('memOf')} ${mb(u.limit)} M)</span></p>
+    <div class="membar" role="img" aria-label="${Math.round(u.pct * 100)}%">${parts.map(([k, , c]) => `<span style="width:${(u.by[k] / u.limit * 100).toFixed(2)}%;background:${c}"></span>`).join('')}</div>
+    <div class="row" style="gap:6px 14px;flex-wrap:wrap;font-size:13px">${parts.filter(([k]) => u.by[k]).map(([k, n, c]) => `<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c}"></i> ${esc(n)} ${mb(u.by[k])} M</span>`).join('')}</div>
+    <p class="muted" style="margin:8px 0 0;font-size:12.5px">${t('memNote')}</p></div>`;
+}
 let saveT = 0;
-function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(DB)); } catch (e) {} }, 250); }
+function save() { clearTimeout(saveT); saveT = setTimeout(() => { plogSync(DB.live); try { localStorage.setItem(STORE, JSON.stringify(DB)); MEM.ok(); } catch (e) { MEM.fail(e); } publishSR(); }, 250); }
 DB = load();
 setTimeout(() => { try { applyLearned(); } catch (e) {} }, 0);
 try { if (DB.settings.theme) document.documentElement.dataset.theme = DB.settings.theme; } catch (e) {}
@@ -1016,8 +1056,22 @@ const L = () => DB.live;
 function snapshot() { UNDO.push({ live: JSON.stringify(DB.live), n: DB.recs.length }); if (UNDO.length > 60) UNDO.shift(); }
 function doUndo() { UI.fixRec = null; const s = UNDO.pop(); if (!s) return; DB.live = JSON.parse(s.live); DB.recs.length = Math.min(DB.recs.length, s.n); UI.step = null; UI.rally = null; UI.sub = null; save(); render(); }
 function rotateLineup(lv) { const l = lv.lineup; lv.lineup = [l[1], l[2], l[3], l[4], l[5], l[0]]; lv.rot = SR.nextRot(lv.rot); }
-function pointUs() { const lv = L(); lv.score[0]++; if (lv.serving === 'them') lv.serving = 'us'; }
-function pointThem() { const lv = L(); lv.score[1]++; if (lv.serving === 'us') { lv.serving = 'them'; rotateLineup(lv); } }
+// ===== registro dei punti, nello stesso formato del conta punti di Matchup Rotazioni =====
+// 'U' punto nostro, 'T' punto loro; { fix: 'op', to } loro rotazione corretta (P, cambio della palleggiatrice),
+// { fix: 'sv' } battuta corretta, { fix: 'sc', to: [noi, loro] } punteggio corretto a mano
+function plogSync(lv) {
+  if (!lv || !lv.started) return;
+  const p = lv.plog = lv.plog || [];
+  if (lv.pRot == null) { lv.pRot = lv.rot; lv.pSv = lv.serving; lv.pSc = lv.score.slice(); return; }
+  if (lv.pRot !== lv.rot) { p.push({ fix: 'op', to: lv.rot }); lv.pRot = lv.rot; }
+  if (lv.pSv !== lv.serving) { p.push({ fix: 'sv' }); lv.pSv = lv.serving; }
+  if (!lv.pSc || lv.pSc[0] !== lv.score[0] || lv.pSc[1] !== lv.score[1]) { p.push({ fix: 'sc', to: lv.score.slice() }); lv.pSc = lv.score.slice(); }
+}
+function plogMark(lv, w) { if (!lv.started) return; (lv.plog = lv.plog || []).push(w); lv.pRot = lv.rot; lv.pSv = lv.serving; lv.pSc = lv.score.slice(); }
+function plogReset(lv) { lv.plog = []; lv.pRot = null; lv.pSv = null; lv.pSc = null; }
+function setLogEntry(lv) { plogSync(lv); return { set: lv.set, score: lv.score.slice(), oppStart: lv.startRot || null, weServe: lv.firstSrv ? lv.firstSrv === 'us' : null, plog: (lv.plog || []).slice() }; }
+function pointUs() { const lv = L(); plogSync(lv); lv.score[0]++; if (lv.serving === 'them') lv.serving = 'us'; plogMark(lv, 'U'); }
+function pointThem() { const lv = L(); plogSync(lv); lv.score[1]++; if (lv.serving === 'us') { lv.serving = 'them'; rotateLineup(lv); } plogMark(lv, 'T'); }
 function setRot(k) {
   const lv = L(); snapshot();
   if (lv.lineup.includes(lv.sNum)) { let g = 0; while (lv.lineup.indexOf(lv.sNum) + 1 !== k && g++ < 6) { const l = lv.lineup; lv.lineup = [l[1], l[2], l[3], l[4], l[5], l[0]]; } }
@@ -1740,7 +1794,7 @@ function reopenMatch(id) {
   const played = Math.max(0, ...recs.map(r => r.set || 0), (lv.setsLog || []).length);
   const last = (lv.setsLog || []).slice(-1)[0];
   if (m.state && lv.started && last && last.set === lv.set) {
-    if (setOver(lv)) { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); }
+    if (setOver(lv)) { lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); plogReset(lv); }
     else { lv.setsLog.pop(); const w = lv.won || [0, 0]; const k = last.score[0] > last.score[1] ? 0 : 1; if (w[k] > 0) w[k]--; } // closed in the middle of a set: carry on with it
   } else if (!m.state) {
     // sets already played: winner from the score saved with the last action of each set
@@ -1768,7 +1822,7 @@ function setupHTML() {
       <details id="teamForm" style="margin-top:10px" ${list.length && !UI.teamOpen ? '' : 'open'}><summary class="lbl" style="cursor:pointer;padding:8px 0">+ ${t('newTeam')}</summary>${teamFormHTML()}</details>
     </div>
     <div class="card"><h2 class="h">${t('lineupT')} ${lv ? lv.set : 1}</h2>
-      ${lv ? `<p class="muted" style="margin:0 0 8px;font-size:13px">${esc(lv.sName)} #${lv.sNum} · ${esc(lv.teamName)} — ${t('rosterH')}</p>
+      ${lv ? mrHintHTML(lv) : ''}${lv ? `<p class="muted" style="margin:0 0 8px;font-size:13px">${esc(lv.sName)} #${lv.sNum} · ${esc(lv.teamName)} — ${t('rosterH')}</p>
       <div class="lineup">${pos.map(([z, i, c], k) => `<button class="slot ${lineup[i] === lv.sNum && lineup[i] != null ? 'setter' : ''}" style="grid-column:${c};grid-row:${k < 3 ? 1 : 2}" data-slot="${i}" aria-pressed="${UI.slot === i}"><b>${lineup[i] ?? '·'}</b><small>Z${z}</small></button>`).join('')}</div>
       ${(() => { const a = autoSeq(lv); return a ? `<div class="lbl" style="margin:12px 0 6px">${t('autoLine')}${a.src === 'dvw' ? ` <span style="text-transform:none;letter-spacing:0">· ${t('autoDvw').replace('{n}', a.n).replace('{t}', a.tot)}</span>` : ''}</div><div class="chips">${[1, 6, 5, 4, 3, 2].map(z => `<button class="chip" data-autoz="${z}" aria-pressed="${a.seq.every((n, k) => lineup[(z - 1 + k) % 6] === n)}">Z${z}</button>`).join('')}</div>` : (DB.recs.some(r => r.setter === lv.setter && r.src !== 'live') ? `<p class="muted" style="margin:10px 0 0;font-size:12.5px">ⓘ ${t('autoReimport')}</p>` : ''); })()}
       <div class="lbl" style="margin:12px 0 6px">${t('roster')}</div>
@@ -1802,6 +1856,60 @@ function initLiveFor(key, custom) {
   DB.live = { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + team, setter: key, sName, sNum, team, teamName, roster: ro, liberos: libs, middles: mids, lineup: [null, null, null, null, null, null], serving: 'us', rot: 1, set: 1, score: [0, 0], started: false, n: 0, extra: {} };
   UI.slot = 3; UNDO = [];
 }
+
+// ===================== scambio con Matchup Rotazioni (vedi SUITE.md) =====================
+// stesso sito e stesso dispositivo: ogni app scrive solo la sua chiave e legge quella dell'altra
+const SUITE_SR = 'suite.sr.v1', SUITE_MR = 'suite.mr.v1';
+let suiteLast = '', suiteDistT = 0, suiteDist = null;
+const r3 = o => { const x = {}; Object.keys(o).forEach(k => x[k] = Math.round(o[k] * 1000) / 1000); return x; };
+function rotDist(setter, liveId, rot) {
+  const hf = [r => SIGQ(r), r => SIGQ(r) && r.rot === rot], lf = r => SIGQ(r) && r.rot === rot;
+  return blend(setter, liveId, hf, lf);
+}
+function suiteDistCalc() {
+  const lv = DB.live; if (!lv || !lv.setter) return;
+  try {
+    const rots = {};
+    [1, 2, 3, 4, 5, 6].forEach(r => {
+      const b = rotDist(lv.setter, lv.id, r), lanes = {};
+      LANES.forEach(l => { const s = laneSignal(lv.setter, lv.id, r, l); lanes[l] = { sig: s.sig, warn: s.warn || null, cov: r3(s.cov), nh: s.nh, nl: s.nl }; });
+      rots[r] = { d: r3(b.d), nh: b.nh, nl: b.nl, lanes };
+    });
+    suiteDist = { setter: lv.setter, liveId: lv.id, rule: { covMin: S().covMin, lead: S().lead }, rots };
+  } catch (e) { suiteDist = null; }
+  publishSR(true);
+}
+function publishSR(fromDist) {
+  const lv = DB.live;
+  const st = lv && lv.setter ? {
+    v: 1, app: 'setter-radar', id: lv.id, oppKey: lv.team, oppName: lv.teamName, myName: S().myTeam || '',
+    setter: { key: lv.setter, name: lv.sName, num: lv.sNum },
+    set: lv.set, started: !!lv.started, oppStart: lv.started ? lv.startRot || null : null, weServe: lv.started && lv.firstSrv ? lv.firstSrv === 'us' : null,
+    serving: lv.serving, oppRot: lv.rot, score: lv.score.slice(), won: (lv.won || [0, 0]).slice(),
+    plog: lv.started ? (lv.plog || []) : [],
+    sets: (lv.setsLog || []).map(s => ({ set: s.set, score: s.score, oppStart: s.oppStart || null, weServe: s.weServe ?? null, plog: s.plog || null })),
+    dist: suiteDist && suiteDist.setter === lv.setter ? suiteDist : null
+  } : { v: 1, app: 'setter-radar', none: true };
+  const body = JSON.stringify(st);
+  if (body !== suiteLast) { try { localStorage.setItem(SUITE_SR, JSON.stringify({ ts: Date.now(), ...st })); suiteLast = body; } catch (e) { MEM.fail(e); } }
+  if (!fromDist) { clearTimeout(suiteDistT); suiteDistT = setTimeout(suiteDistCalc, 1200); }
+}
+// partenza avversaria e battuta decise in Matchup per questo set (prima dell'inizio del set)
+function mrHint(lv) {
+  if (!lv || lv.started) return null;
+  try {
+    const m = JSON.parse(localStorage.getItem(SUITE_MR) || 'null');
+    if (!m || Date.now() - (m.ts || 0) > 6 * 3600e3 || m.oppKey !== lv.team || m.set !== lv.set || !m.oppStart) return null;
+    return m;
+  } catch (e) { return null; }
+}
+function mrHintHTML(lv) {
+  const m = mrHint(lv); if (!m) return '';
+  const sv = m.weServe == null ? '' : ' · ' + (m.weServe ? t('mrServeUs') : t('mrServeThem'));
+  const done = lv.serving === (m.weServe ? 'us' : 'them') && lv.lineup[m.oppStart - 1] === lv.sNum;
+  return `<div class="mrhint"><span><b>${t('mrFrom')}</b> · ${t('set')} ${m.set}: <b>P${m.oppStart}</b>${sv}</span>${done ? '<span>✓</span>' : `<button class="btn pri" data-act="mrApply">${t('mrApply')}</button>`}</div>`;
+}
+window.addEventListener('storage', e => { if (e.key === SUITE_MR && DB.live && !DB.live.started && UI.tab === 'live' && !UI.step) render(); });
 
 // ===================== report =====================
 function renderReport() {
@@ -1951,6 +2059,7 @@ function renderData() {
         <div class="settings">${['covMin', 'lead', 'minN', 'minLive', 'histK'].map(k => `<div class="field"><label class="lbl" for="set-${k}">${t(k)}</label><input id="set-${k}" data-set="${k}" type="number" inputmode="decimal" value="${s[k]}"></div>`).join('')}
         <div class="field"><label class="lbl" for="set-theme">Tema / Theme</label><select id="set-theme"><option value="">Auto</option><option value="light" ${s.theme === 'light' ? 'selected' : ''}>Light</option><option value="dark" ${s.theme === 'dark' ? 'selected' : ''}>Dark</option></select></div></div>
       </div>
+      ${memHTML()}
       <div class="card"><h2 class="h">${t('backup')}</h2>
         <div class="row"><button class="btn" data-act="copyB">${t('copyB')}</button>${window.self === window.top ? `<button class="btn" data-act="dlB">${t('dlB')}</button>` : ''}
         <label class="btn" style="display:inline-flex;align-items:center">${t('restB')}<input id="jsonIn" type="file" accept=".json,application/json" hidden></label></div>
@@ -2129,12 +2238,18 @@ document.addEventListener('click', e => {
       if (UI.tab === 'data') { UI.dataTeam = null; save(); render(); toast(t('teamSavedD')); return; }
       initLiveFor(key, entry); UI.setupSetter = key; UI.teamOpen = false; UI.slot = null; save(); render(); toast(t('teamSaved'));
     },
+    mrApply() {
+      const m = mrHint(lv); if (!m) return; const a = autoSeq(lv);
+      if (m.weServe != null) lv.serving = m.weServe ? 'us' : 'them';
+      if (a) { a.seq.forEach((n, k) => { lv.lineup[(m.oppStart - 1 + k) % 6] = n; if (!lv.roster[n]) lv.roster[n] = { last: '', role: 0 }; }); UI.slot = null; }
+      save(); render(); toast(a ? t('mrDone') : t('mrNoSeq'));
+    },
     addNum() { const n = parseInt($('#addNum').value, 10); if (isNaN(n) || !lv) return; lv.roster[n] = lv.roster[n] || { last: '', role: 0 }; save(); render(); },
     startSet() {
       if (lv.lineup.some(x => x == null)) { toast(t('needSix')); return; }
       if (!lv.lineup.includes(lv.sNum)) { const c = lv.lineup.find(n => (lv.roster[n] || {}).role === 5); if (c != null) setActiveSetter(c); }
       const si = lv.lineup.indexOf(lv.sNum); if (si < 0) { toast(t('needSetter')); return; }
-      lv.rot = si + 1; lv.started = true; lv.startLineup = lv.lineup.slice(); lv.startSetter = { setter: lv.setter, sName: lv.sName, sNum: lv.sNum };
+      lv.rot = si + 1; lv.started = true; lv.startLineup = lv.lineup.slice(); lv.startRot = lv.rot; lv.firstSrv = lv.serving; plogReset(lv); plogSync(lv); lv.startSetter = { setter: lv.setter, sName: lv.sName, sNum: lv.sNum };
       if (!DB.matches.some(m => m.id === lv.id)) DB.matches.push({ id: lv.id, date: new Date().toISOString().slice(0, 10), teams: [S().myTeam || t('us'), lv.teamName], src: 'live' });
       UI.step = null; UNDO = []; save(); render(); wake();
     },
@@ -2161,7 +2276,7 @@ document.addEventListener('click', e => {
     pauseM() { if (!pauseLive()) { DB.live = null; } UI.step = null; save(); render(); toast(t('pausedT')); },
     closeMAsk() { UI.step = 'closeq'; render(); },
     closeMAsk2() { if (UI.delConfirm !== '__close') { UI.delConfirm = '__close'; render(); return; } UI.delConfirm = null; closeMatch(); },
-    closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); } closeMatch(); },
+    closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push(setLogEntry(lv)); } closeMatch(); },
     timeout() { UI.photo = { mode: 'timeout' }; render(); },
     sqDlSel() { const v = ($('#sqSel') || {}).value; if (v) downloadSQ(v); },
     dtNew() { UI.dataTeam = '__new'; render(); },
@@ -2181,10 +2296,10 @@ document.addEventListener('click', e => {
     discardAsk() { UI.step = 'discard'; render(); },
     discardYes() {
       const id = lv.id; DB.recs = DB.recs.filter(r => r.m !== id); DB.matches = DB.matches.filter(m => m.id !== id);
-      Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, lineup: (lv.startLineup || lv.lineup).slice(), ...(lv.startSetter || {}) });
+      Object.assign(lv, { id: 'live|' + new Date().toISOString().slice(0, 16) + '|' + lv.team, set: 1, score: [0, 0], rot: 1, started: false, n: 0, serr: 0, extra: {}, plog: [], pRot: null, pSv: null, pSc: null, lineup: (lv.startLineup || lv.lineup).slice(), ...(lv.startSetter || {}) });
       UI.step = null; UI.rally = null; UI.sub = null; UI.slot = 3; UNDO = []; save(); render(); toast(t('discarded'));
     },
-    endsetYes() { const w = lv.won = lv.won || [0, 0]; if (lv.score[0] !== lv.score[1]) w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push({ set: lv.set, score: lv.score.slice() }); if (w[0] >= 3 || w[1] >= 3) { closeMatch(); return; } lv.set++; lv.score = [0, 0]; lv.started = false; lv.lineup = (lv.startLineup || lv.lineup).slice(); if (lv.startSetter) Object.assign(lv, lv.startSetter); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
+    endsetYes() { const w = lv.won = lv.won || [0, 0]; if (lv.score[0] !== lv.score[1]) w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push(setLogEntry(lv)); if (w[0] >= 3 || w[1] >= 3) { closeMatch(); return; } lv.set++; lv.score = [0, 0]; lv.started = false; plogReset(lv); lv.lineup = (lv.startLineup || lv.lineup).slice(); if (lv.startSetter) Object.assign(lv, lv.startSetter); UI.step = null; UI.slot = null; UNDO = []; save(); render(); },
     srvErr() { snapshot(); lv.serr = (lv.serr || 0) + 1; pointThem(); save(); render(); },
     free() { startRally('F', 0); },
     ptUs() { snapshot(); pointUs(); save(); render(); },
@@ -2252,14 +2367,14 @@ document.addEventListener('change', e => {
   if (el.id === 'set-theme') { S().theme = el.value || undefined; if (el.value) document.documentElement.dataset.theme = el.value; else delete document.documentElement.dataset.theme; save(); }
 });
 // live screen must fit the tablet without scrolling: size it to the real visible height
-function fit() { const h = $('header.top'); document.documentElement.style.setProperty('--avail', Math.max(480, window.innerHeight - (h ? h.offsetHeight : 48) - 14) + 'px'); }
+function fit() { const h = $('header.top'), m = $('#memErr'); document.documentElement.style.setProperty('--avail', Math.max(480, window.innerHeight - (h ? h.offsetHeight : 48) - (m && !m.hidden ? m.offsetHeight : 0) - 14) + 'px'); }
 window.addEventListener('resize', fit); window.addEventListener('orientationchange', () => setTimeout(fit, 200)); document.addEventListener('fullscreenchange', fit);
 let wl = null;
 function wake() { try { if (navigator.wakeLock && !wl) navigator.wakeLock.request('screen').then(w => { wl = w; w.addEventListener('release', () => wl = null); }).catch(() => {}); } catch (e) {} }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && L() && L().started) wake(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return; if (L() && L().started) wake(); else if (L() && UI.tab === 'live' && !UI.step) render(); });
 
 if (!DB.live) { const s = settersList().find(x => /^MATSUMOTO/.test(x.key)) || settersList()[0]; if (s) { initLiveFor(s.key); UI.setupSetter = s.key; } }
-render(); fit();
+render(); fit(); MEM.check(); publishSR();
 </script>
 <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
