@@ -11,3 +11,7 @@ Versione inglese: `en.html`. Funziona offline dopo la prima apertura.
 ## Setter Radar
 
 Seconda app nella cartella `setter-radar/`: rilevazione da panchina della distribuzione della palleggiatrice avversaria (ricezione per zona, riquadri per chiamata del centrale, traiettorie, segnale per corsia di battuta, report pre-gara dai file .dvw). Installabile e offline come Matchup Rotazioni; i dati restano solo sul dispositivo.
+
+## Scambio tra le due app
+
+Sullo stesso tablet Matchup Rotazioni e Setter Radar si passano partenza avversaria, battuta, punti del set e distribuzione in gara, senza server: vedi `SUITE.md`. Le due app dividono lo stesso spazio di memoria del browser; lo spazio usato è nella scheda Dati.
