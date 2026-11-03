@@ -286,6 +286,10 @@ button.sc:hover { background: var(--bg) }
   h2, h3 { break-after: avoid } .plan { grid-template-columns: repeat(2, minmax(0, 1fr)) } .grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)) }
   .pc, .bk, tr { break-inside: avoid }
 }
+.steps .cancel { margin-left: auto; min-height: 36px; font-size: 14px; border-color: color-mix(in oklab, var(--bad) 45%, var(--line)); color: var(--bad) }
+.confirm { margin-top: 12px; padding: 14px; border-radius: 12px; border: 2px solid var(--bad); background: color-mix(in oklab, var(--bad) 8%, var(--surface)); display: grid; gap: 10px }
+.confirm p { margin: 0; font-weight: 600 }
+.bigbtn.danger { background: var(--bad); color: #fff; font-size: 20px }
 .lang { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 6px 4px }
 @media (max-width: 520px) { .verdict .big { font-size: 52px } .brand { font-size: 21px } nav.tabs { width: 100% } nav.tabs button { flex: 1 } }
 @media (prefers-reduced-motion: no-preference) { .bar .t i { transition: width .25s ease } }
@@ -1108,7 +1112,7 @@ const TT = {
     sumNote: 'Verde o rosso: almeno 10 punti percentuali sopra o sotto quanto atteso dai dati pre-gara.',
     followed: (y, r) => y ? `Avete seguito il consiglio (P${r}).` : `Consiglio non seguito: era P${r}.`,
     strong: 'Dove siete andati meglio', weak: 'Dove siete andati peggio',
-    next: n => `Vai al set ${n}`, newMatch: 'Nuova partita', log: 'Set giocati',
+    next: n => `Vai al set ${n}`, newMatch: 'Nuova partita', log: 'Set giocati', cancelMatch: 'Annulla partita', cancelAsk: 'Cancellare la partita in corso? Set registrati e punti contati andranno persi. Le partite caricate nei Dati restano.', cancelYes: 'Sì, annulla la partita', cancelNo: 'No, continua',
     plan: 'Piano di battuta', setDist: "Distribuzione dell'alzata", nets: 'Incroci giocatrici', players: 'Giocatrici in campo',
     playersNote: 'Formazione sul foglietto (posizioni I–VI). Cambia solo chi è diverso dal solito: incroci e piano di battuta si aggiornano.',
     reset: 'Ripristina', ourTeam: 'Noi', theirTeam: 'Loro', lost: 'Perso', won: 'Vinto',
@@ -1139,7 +1143,7 @@ const TT = {
     sumNote: 'Green or red: at least 10 percentage points above or below what the pre-match data expected.',
     followed: (y, r) => y ? `You followed the recommendation (P${r}).` : `Recommendation not followed: it was P${r}.`,
     strong: 'Where you did best', weak: 'Where you did worst',
-    next: n => `Go to set ${n}`, newMatch: 'New match', log: 'Sets played',
+    next: n => `Go to set ${n}`, newMatch: 'New match', log: 'Sets played', cancelMatch: 'Cancel match', cancelAsk: 'Delete the match in progress? Saved sets and counted points will be lost. Matches loaded in Data stay.', cancelYes: 'Yes, cancel the match', cancelNo: 'No, keep going',
     plan: 'Serve plan', setDist: 'Setter distribution', nets: 'Player matchups', players: 'Players on court',
     playersNote: 'Line-up as on the sheet (positions I–VI). Change only who differs from usual: matchups and serve plan update.',
     reset: 'Reset', ourTeam: 'Us', theirTeam: 'Them', lost: 'Lost', won: 'Won',
@@ -1274,7 +1278,8 @@ function renderBench() {
       <div class="bfield"><span class="lbl">${T('prevStart', b.set - 1)}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bprev', i, b.prevOppStart, 'P' + i, 'sm')).join('')}</div></div>
       <div class="bfield"><span class="lbl">${T('prevWon', b.set - 1)}</span><div class="brow">${bigChip('bpwon', 0, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, T('us'), 'sm')}${bigChip('bpwon', 1, b.prevOppWon === false ? 0 : b.prevOppWon === true ? 1 : -1, T('them'), 'sm')}</div></div>
     </div>` : ''}
-    <div class="steps">${['step1', 'step2', 'step3'].map((s, i) => `<span class="${['sheet', 'live', 'summary'].indexOf(b.phase) === i ? 'on' : ''}">${i + 1}. ${T(s)}</span>`).join('')}</div>
+    <div class="steps">${['step1', 'step2', 'step3'].map((s, i) => `<span class="${['sheet', 'live', 'summary'].indexOf(b.phase) === i ? 'on' : ''}">${i + 1}. ${T(s)}</span>`).join('')}<button class="bchip sm cancel" data-bact="cancelask">${T('cancelMatch')}</button></div>
+    ${S.cancelAsk ? `<div class="confirm"><p>${T('cancelAsk')}</p><div class="brow"><button class="bigbtn danger" data-bact="newmatch">${T('cancelYes')}</button><button class="bigbtn sec" data-bact="cancelno">${T('cancelNo')}</button></div></div>` : ''}
   </section>`;
 
   if (b.phase === 'summary') return head + summaryBlock() + logBlock();
@@ -1453,7 +1458,9 @@ function benchClick(d, t) {
     b.weServe = b.set === 5 ? null : last.oppServe; // chi ha ricevuto per primo nel set prima, batte per primo
     window.scrollTo({ top: 0 });
   }
-  else if (act === 'newmatch') { S.bench = freshBench(); invalidate(); }
+  else if (act === 'newmatch') { S.bench = freshBench(); S.cancelAsk = false; S.slotEdit = null; S.fixOpen = false; invalidate(); window.scrollTo({ top: 0 }); }
+  else if (act === 'cancelask') { S.cancelAsk = !S.cancelAsk; }
+  else if (act === 'cancelno') { S.cancelAsk = false; }
   else return false;
   return true;
 }
