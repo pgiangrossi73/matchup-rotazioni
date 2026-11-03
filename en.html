@@ -289,27 +289,10 @@ button.sc:hover { background: var(--bg) }
 .lang { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 6px 4px }
 @media (max-width: 520px) { .verdict .big { font-size: 52px } .brand { font-size: 21px } nav.tabs { width: 100% } nav.tabs button { flex: 1 } }
 @media (prefers-reduced-motion: no-preference) { .bar .t i { transition: width .25s ease } }
-.memerr { position: relative; z-index: 6; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); background: var(--bad); color: #fff; font-weight: 700; font-size: 15px; display: flex; gap: 12px; align-items: center; justify-content: space-between }
-.memerr.high { background: var(--hot) }
-.memerr button { background: transparent; color: inherit; border: 1px solid currentColor; border-radius: 8px; padding: 4px 10px; min-height: 36px }
-.membar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--sunk); margin: 6px 0 }
-.membar span, .srbar span { display: block; height: 100% }
-.memleg, .srlbl { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px }
-.memleg i, .srlbl i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px }
-.srbar { display: flex; height: 26px; border-radius: 8px; overflow: hidden; background: var(--sunk); margin: 10px 0 6px }
-.srlanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0 8px }
-.srlane { padding: 8px 10px; border-radius: 10px; background: var(--sunk); border-left: 5px solid var(--muted) }
-.srlane b { display: block; font-family: var(--f-display); font-size: 22px; line-height: 1.1; text-transform: uppercase }
-.srlane.fist { border-left-color: #c23a33 } .srlane.fist b { color: #c23a33 }
-.srlane.s4 { border-left-color: #ef6a2a } .srlane.s4 b { color: #ef6a2a }
-.srlane.s2 { border-left-color: #7a4ce0 } .srlane.s2 b { color: #7a4ce0 }
-.srline { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; background: color-mix(in oklab, var(--accent) 12%, var(--surface)); border: 1px solid var(--accent) }
-@media (max-width: 560px) { .srlanes { grid-template-columns: 1fr } }
 </style>
 
 </head>
 <body>
-<div class="memerr" id="memErr" role="alert" hidden></div>
 <header class="top">
   <div class="wrap">
     <div class="brand">Rotation <b>Matchup</b></div>
@@ -375,7 +358,7 @@ const RC = (() => {
 
     const scout = section(lines, 'SCOUT');
     const sets = {};
-    let lastWinner = null, curSet = 0, pendingServer = null, setter = [null, null], srv = null, rec = null, waitAtt = -1, att = null, call = null, score = [0, 0], setBy = -1;
+    let lastWinner = null, curSet = 0, pendingServer = null, setter = [null, null], srv = null, rec = null, waitAtt = -1, att = null, call = null, score = [0, 0];
     const attacks = []; // [lato, num, rot, da, a, sottozona, esito, fase 0=ricezione 1=transizione, punti propri, punti avversari, ricezione, chiamata, set, combinazione]
     const getSet = n => (sets[n] = sets[n] || { n, rallies: [], start: null, firstServe: null, lineup: null, setters: [null, null] });
 
@@ -407,8 +390,6 @@ const RC = (() => {
         attacks.push([side, +code.slice(1, 3), rz[side], fz >= 1 && fz <= 9 ? fz : 0, tz >= 1 && tz <= 9 ? tz : 0, /[A-D]/.test(code[11] || '') ? code[11] : '', code[5] || '', first ? 0 : 1, score[side], score[1 - side], first && rec ? rec.ev : '', first ? (call || '') : '', setN, code.slice(6, 8).replace(/~/g, '')]);
       }
       if (waitAtt >= 0 && /^[*a](\d\d|\$\$)[A-Z]/.test(code) && !/^[*a]\d\dR/.test(code)) {
-        // chi alza davvero: la prima alzata (E) dopo la ricezione; se non è la palleggiatrice in campo, l'azione esce dalla sua distribuzione
-        if (side === waitAtt && code[3] === 'E' && setBy < 0) setBy = /^\d\d$/.test(code.slice(1, 3)) ? +code.slice(1, 3) : -1;
         if (side === waitAtt && code[3] === 'E' && /^K[A-Z0-9]$/.test(code.slice(6, 8))) call = code.slice(6, 8);
         if (side !== waitAtt) waitAtt = -1;
         else if (code[3] === 'A') {
@@ -427,7 +408,7 @@ const RC = (() => {
         pendingServer = side;
         { const num = code.slice(1, 3) === '$$' ? -1 : +code.slice(1, 3), ez = parseInt(code[10], 10);
           const sz = parseInt(code[9], 10);
-          srv = { num, type: code[4] || '', ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0, sz: sz >= 1 && sz <= 9 ? sz : 0 }; rec = null; att = null; waitAtt = -1; call = null; setBy = -1; }
+          srv = { num, type: code[4] || '', ev: code[5] || '', ez: ez >= 1 && ez <= 9 ? ez : 0, sz: sz >= 1 && sz <= 9 ? sz : 0 }; rec = null; att = null; waitAtt = -1; call = null; }
         if (!s.start && rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6) {
           s.start = rz.slice(); s.firstServe = side;
           s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)];
@@ -440,7 +421,7 @@ const RC = (() => {
         let server = pendingServer != null ? pendingServer : lastWinner;
         if (!(rz[0] >= 1 && rz[0] <= 6 && rz[1] >= 1 && rz[1] <= 6)) { lastWinner = winner; pendingServer = null; continue; }
         if (!s.start) { s.start = rz.slice(); s.firstServe = server; s.lineup = [f.slice(14, 20).map(Number), f.slice(20, 26).map(Number)]; }
-        if (server != null) s.rallies.push(srv && pendingServer === server ? [server, winner, rz[0], rz[1], srv.num, srv.type, srv.ev, srv.ez, rec ? rec.num : -1, rec ? rec.ev : '', srv.sz, att ? att.num : -1, att ? att.from : 0, att ? att.ev : '', att ? att.combo : '', att ? (call || '') : '', att && setBy >= 0 && setter[1 - server] != null && setBy !== setter[1 - server] ? 1 : 0] : [server, winner, rz[0], rz[1]]);
+        if (server != null) s.rallies.push(srv && pendingServer === server ? [server, winner, rz[0], rz[1], srv.num, srv.type, srv.ev, srv.ez, rec ? rec.num : -1, rec ? rec.ev : '', srv.sz, att ? att.num : -1, att ? att.from : 0, att ? att.ev : '', att ? att.combo : '', att ? (call || '') : ''] : [server, winner, rz[0], rz[1]]);
         [0, 1].forEach(sd => {
           const z = f.slice(14 + sd * 6, 20 + sd * 6).map(x => parseInt(x, 10));
           if (z.some(isNaN)) return;
@@ -448,7 +429,7 @@ const RC = (() => {
           L[k] = (L[k] || 0) + 1;
         });
         s.final = [+pt[1], +pt[2]];
-        lastWinner = winner; pendingServer = null; srv = null; rec = null; att = null; waitAtt = -1; call = null; setBy = -1; score = [+pt[1], +pt[2]];
+        lastWinner = winner; pendingServer = null; srv = null; rec = null; att = null; waitAtt = -1; call = null; score = [+pt[1], +pt[2]];
       }
     }
 
@@ -463,7 +444,7 @@ const RC = (() => {
     });
     return {
       id: teams.map(t => t.key).join('-') + '|' + (mf[0] || '').trim() + '|' + setList.map(s => s.final.join('-')).join(','), file: fileName, date: (mf[0] || '').trim(), season: (mf[2] || '').trim(),
-      competition: (mf[3] || '').trim(), teams, sets: setList, players, pstats, lineups, attacks, v: 2
+      competition: (mf[3] || '').trim(), teams, sets: setList, players, pstats, lineups, attacks
     };
   }
 
@@ -555,7 +536,7 @@ const RC = (() => {
       const side = m.teams.findIndex(t => t.key === key); if (side < 0) return;
       const roster = (m.players || [])[side] || {};
       m.sets.forEach(s => s.rallies.forEach(ra => {
-        if (ra[0] === side || ra.length < 12 || ra[11] < 0 || ra[16] === 1) return;
+        if (ra[0] === side || ra.length < 12 || ra[11] < 0) return;
         const g = setGroup(ra[12], (roster[ra[11]] || {}).role); if (!g) return;
         const R = rot[ra[2 + side]], z = ra[7] || 0, ln = laneOf(z), qg = qGroup(ra[9]), cg = callGroup(ra[15]);
         const inc = o => { o.n++; o.c[g] = (o.c[g] || 0) + 1; };
@@ -791,8 +772,13 @@ const RC = (() => {
     const adapt = opps.length ? opps.filter(m => m !== pat.top).length / opps.length : 0;
     const liveRows = rows.filter(r => r.match === 'live');
     const liveChange = liveRows.length > 1 ? liveRows.slice(1).filter((r, i) => r.eq !== liveRows[i].eq).length / (liveRows.length - 1) : null;
+    // partenza reale nella stessa situazione (batte / riceve), contata a parte;
+    // lo schieramento comune (eq) aiuta solo come base quando i dati della situazione sono pochi
+    const sit = {}; for (let i = 1; i <= 6; i++) sit[i] = 0;
+    rows.forEach(r => { if (ctx.oppServeFirst == null || r.serveFirst !== ctx.oppServeFirst) return; const ww = wOf(r) * (ctx.set === 1 && r.set === 1 ? 2 : 1); sit[r.start] += ww; });
     const w = {}; let wt = 0;
-    for (let i = 1; i <= 6; i++) { w[i] = cnt[i] + (ctx.set === 1 ? c1[i] : 0) + 1; wt += w[i]; }
+    const pooled = {}; let pt = 0; for (let i = 1; i <= 6; i++) { pooled[i] = cnt[i] + (ctx.set === 1 ? c1[i] : 0); pt += pooled[i]; }
+    for (let i = 1; i <= 6; i++) { const pn = pt ? pooled[i] / pt : 1 / 6; w[i] = (ctx.oppServeFirst == null ? pooled[i] : sit[fromEq(i, ctx.oppServeFirst)] + 2 * pn) + 0.3; wt += w[i]; }
     let dist = {}; for (let i = 1; i <= 6; i++) dist[i] = w[i] / wt;
     let pKeep = null;
     if (ctx.set > 1 && ctx.prevEq) {
@@ -834,101 +820,6 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const pc = v => v == null || isNaN(v) ? '–' : Math.round(v * 100) + '%';
 const STORE = 'rotmatch.v1';
-const APP_VER = 'rot-v9';
-
-// memoria del dispositivo: Matchup Rotazioni e Setter Radar sono sullo stesso sito e dividono lo stesso spazio
-const MEM = (() => {
-  const LIMIT = 5242880; // caratteri (chiavi + valori) per sito, misurati in Chromium
-  const GROUP = { 'rotmatch.v1': 'mr', 'setter-radar-v2': 'sr', 'suite.sr.v1': 'ex', 'suite.mr.v1': 'ex' };
-  let failed = false, highShown = false;
-  function usage() {
-    const by = { mr: 0, sr: 0, ex: 0, other: 0 }; let tot = 0;
-    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i), n = k.length + (localStorage.getItem(k) || '').length; tot += n; by[GROUP[k] || 'other'] += n; } } catch (e) {}
-    return { tot, by, pct: tot / LIMIT, limit: LIMIT };
-  }
-  function banner(cls, txt) {
-    const el = document.getElementById('memErr'); if (!el) return;
-    if (!txt) { el.hidden = true; return; }
-    el.className = 'memerr ' + cls; el.hidden = false;
-    el.innerHTML = `<span>⚠ ${txt}</span><button type="button" data-memclose="1">✕</button>`;
-  }
-  function fail(e) { failed = true; banner('', Y('memFail')); try { console.warn('salvataggio non riuscito', e); } catch (x) {} }
-  function ok() { if (failed) { failed = false; banner('', ''); } }
-  function check() { const u = usage(); if (u.pct >= 0.9 && !highShown && !failed) { highShown = true; banner('high', Y('memHigh', Math.round(u.pct * 100) + '%')); } }
-  document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-memclose]')) document.getElementById('memErr').hidden = true; });
-  return { usage, fail, ok, check };
-})();
-function memPanel() {
-  const u = MEM.usage(), mb = n => (n / 1e6).toFixed(2).replace('.', LANG === 'it' ? ',' : '.');
-  const parts = [['mr', LANG === 'it' ? 'Matchup Rotazioni' : 'Rotation Matchup', 'var(--accent)'], ['sr', 'Setter Radar', 'var(--hot)'], ['ex', Y('memEx'), 'var(--good)'], ['other', Y('memOther'), 'var(--muted)']];
-  return `<section class="panel"><h2>${Y('memT')}</h2>
-    <p><b>${Y('memUsed')}: ${Math.round(u.pct * 100)}%</b> <span class="n">(${mb(u.tot)} ${Y('memOf')} ${mb(u.limit)} M)</span></p>
-    <div class="membar" role="img" aria-label="${Math.round(u.pct * 100)}%">${parts.map(([k, , c]) => `<span style="width:${(u.by[k] / u.limit * 100).toFixed(2)}%;background:${c}"></span>`).join('')}</div>
-    <div class="memleg">${parts.filter(([k]) => u.by[k]).map(([k, n, c]) => `<span><i style="background:${c}"></i>${esc(n)} ${mb(u.by[k])} M</span>`).join('')}</div>
-    <p class="note" style="margin-top:8px">${Y('memNote')}</p>
-    <p class="n" style="margin-top:8px">${LANG === 'it' ? 'Matchup Rotazioni' : 'Rotation Matchup'} · ${Y('ver')} <b>${APP_VER}</b></p></section>`;
-}
-
-// ---------- scambio con Setter Radar (vedi SUITE.md) ----------
-// ognuna delle due app scrive solo la sua chiave e legge quella dell'altra
-const SUITE_SR = 'suite.sr.v1', SUITE_MR = 'suite.mr.v1';
-let mrLast = '';
-function publishMR() {
-  const b = S.bench;
-  const st = { v: 1, app: 'matchup', myKey: S.myKey, oppKey: S.oppKey, oppName: teamName(S.oppKey), set: b.set, phase: b.phase, myStart: b.phase === 'sheet' ? null : b.myPick, oppStart: b.oppReal || null, weServe: b.weServe ?? null };
-  const body = JSON.stringify(st); if (body === mrLast) return;
-  try { localStorage.setItem(SUITE_MR, JSON.stringify({ ts: Date.now(), ...st })); mrLast = body; } catch (e) { MEM.fail(e); }
-}
-function srLinked() {
-  try {
-    const x = JSON.parse(localStorage.getItem(SUITE_SR) || 'null');
-    if (!x || x.none || x.oppKey !== S.oppKey || Date.now() - (x.ts || 0) > 6 * 3600e3) return null;
-    return x;
-  } catch (e) { return null; }
-}
-function srSetData(x, n) {
-  if (!x) return null;
-  if (x.set === n && x.started) return { plog: x.plog || [], oppStart: x.oppStart, weServe: x.weServe, cur: true };
-  const s = (x.sets || []).find(s => s.set === n);
-  return s && s.plog ? { plog: s.plog, oppStart: s.oppStart, weServe: s.weServe, cur: false } : null;
-}
-const hhmm = ts => new Date(ts).toLocaleTimeString(LANG === 'it' ? 'it-IT' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
-// con Setter Radar collegato (stessa squadra avversaria) partenza, battuta e punti del set arrivano da lì
-function srSync() {
-  const b = S.bench; S.sr = srLinked(); S.srReal = null;
-  if (!S.sr || b.srOff || b.phase === 'summary') return;
-  const sd = srSetData(S.sr, b.set); if (!sd) return;
-  if (sd.weServe != null) b.weServe = sd.weServe;
-  if (sd.oppStart) { if (b.oppReal && b.oppReal !== sd.oppStart) S.srDiff = b.oppReal; b.oppReal = sd.oppStart; S.srReal = sd.oppStart; }
-  if (b.phase !== 'live' || !b.myPick || !b.oppReal) return;
-  const pts = sd.plog.slice();
-  if (sd.cur) { // allinea allo stato attuale di Setter Radar (correzioni fatte prima della versione con il registro)
-    const r = replay({ myPick: b.myPick, oppReal: b.oppReal, weServe: b.weServe, points: pts });
-    if (S.sr.oppRot && r.o !== S.sr.oppRot) pts.push({ fix: 'op', to: S.sr.oppRot });
-    if (r.sv !== (S.sr.serving === 'us' ? 0 : 1)) pts.push({ fix: 'sv' });
-    if (S.sr.score && (r.su !== S.sr.score[0] || r.so !== S.sr.score[1])) pts.push({ fix: 'sc', to: S.sr.score.slice() });
-  }
-  b.points = pts; S.srPts = true;
-}
-const SRV = ['R', 'R1', 'D', 'C', 'P', 'L5', 'L']; // come dalla panchina: loro 2 a sinistra, loro 4 a destra
-const SRC = { R: '#7a4ce0', R1: 'color-mix(in srgb, #7a4ce0 45%, var(--surface))', D: 'var(--muted)', C: '#c23a33', P: '#c8a21a', L5: 'color-mix(in srgb, #ef6a2a 45%, var(--surface))', L: '#ef6a2a' };
-function srDistSection(rot) {
-  const x = S.sr, dd = x && x.dist && x.dist.rots && x.dist.rots[rot];
-  if (!dd) return `<p class="note">${Y('srDistNone')}</p>`;
-  const K = Y('srKeys'), SG = Y('srSig'), ZL = { a: 'Z1-9-2', b: 'Z6-8-3', c: 'Z5-7-4' };
-  const lane = l => {
-    const s = dd.lanes[l]; if (!s) return '';
-    const k = s.sig !== 'read' ? s.sig : s.warn, cls = s.sig === 'fist' ? 'fist' : s.sig === '4' ? 's4' : s.sig === '2' ? 's2' : '';
-    return `<div class="srlane ${cls}"><span class="lbl">${Y('srLane')} ${ZL[l]}</span><b>${SG[s.sig]}</b>${s.sig === 'read' && s.warn ? `<span class="n">${Y('srWeak')}: ${SG[s.warn]}</span> ` : ''}${k && s.cov && s.cov[k] != null ? `<span class="n">${Y('srCover')} ${pc(s.cov[k])}</span>` : ''}</div>`;
-  };
-  return `<div class="srbar" role="img" aria-label="${SRV.map(k => K[k] + ' ' + pc(dd.d[k])).join(', ')}">${SRV.map(k => `<span style="width:${((dd.d[k] || 0) * 100).toFixed(1)}%;background:${SRC[k]}"></span>`).join('')}</div>
-    <div class="srlbl">${SRV.filter(k => (dd.d[k] || 0) >= 0.05).map(k => `<span><i style="background:${SRC[k]}"></i>${K[k]} <b class="num">${pc(dd.d[k])}</b></span>`).join('')}</div>
-    <div class="srlanes">${['a', 'b', 'c'].map(lane).join('')}</div>
-    <p class="n">${Y('srDistSrc', esc(x.setter.name), x.setter.num, dd.nh, dd.nl)} · ${hhmm(x.ts)}</p>
-    <p class="note" style="margin-top:6px">${Y('srDistNote')}</p>`;
-}
-window.addEventListener('storage', e => { if (e.key === SUITE_SR && S.tab === 'bench') render(); });
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.tab === 'bench') render(); });
 
 function load() { try { return JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { return null; } }
 function save() {
@@ -936,9 +827,7 @@ function save() {
     localStorage.setItem(STORE, JSON.stringify({
       matches: S.customData ? S.matches : null, myKey: S.myKey, oppKey: S.oppKey, tab: S.tab, bench: S.bench, studyServe: S.studyServe
     }));
-    MEM.ok();
-  } catch (e) { MEM.fail(e); } // memoria piena o non disponibile: si lavora in memoria, con l'avviso in alto
-  publishMR();
+  } catch (e) { /* storage non disponibile: si lavora in memoria */ }
 }
 
 const freshBench = () => ({ set: 1, weServe: true, phase: 'sheet', myPick: null, oppReal: null, recommended: null, points: [], endWin: null, ovr: null, prevOppStart: null, prevOppWon: null, log: [] });
@@ -1261,45 +1150,6 @@ const TT = {
   }
 };
 const T = (k, ...a) => { const v = TT[LANG][k]; return typeof v === 'function' ? v(...a) : v; };
-// ---------- testi della versione rot-v9: memoria e scambio con Setter Radar ----------
-const TS = {
-  it: {
-    memT: 'Memoria del dispositivo', memUsed: 'Spazio usato', memOf: 'su circa', memEx: 'Scambio tra le app', memOther: 'Altro', ver: 'versione',
-    memNote: 'Matchup Rotazioni e Setter Radar sono sullo stesso sito e dividono lo stesso spazio (circa 5,2 milioni di caratteri in Chrome). Se si riempie, i nuovi dati non vengono salvati.',
-    memFail: 'Memoria del dispositivo piena: le ultime modifiche NON sono salvate. Rimuovi partite vecchie nella scheda Dati.',
-    memHigh: p => `Memoria quasi piena (${p}). Rimuovi partite vecchie nella scheda Dati.`,
-    srPts: 'Punti da Setter Radar', srPtsNote: h => `Aggiornato alle ${h}. Punti, correzioni e annulla si fanno in Setter Radar.`,
-    srUnlink: 'Scollega Setter Radar', srLink: 'Ricollega Setter Radar', srOffNote: 'Setter Radar segue questa partita ma è scollegato: qui conti tu.',
-    srRealFrom: 'Partenza da Setter Radar', srRealDiff: x => `in Matchup era P${x}`,
-    srDistT: 'Distribuzione in gara', srDistNone: 'Nessun dato da Setter Radar per questa squadra. In gara la distribuzione si segue in Setter Radar: aprilo con la palleggiatrice avversaria. La distribuzione degli studi pre-gara resta in Studio e nel Report.',
-    srDistSrc: (n, num, h, l) => `Setter Radar · ${n} #${num} · storico ${h} · oggi ${l}`,
-    srLane: 'Battuta in', srWeak: 'debole', srCover: 'copre',
-    srSig: { fist: 'Segui centrale', '4': 'Anticipo 4', '2': 'Anticipo 2', read: 'Leggere' },
-    srKeys: { L: 'Lato 4', L5: 'Z5 2ª l.', C: 'Centrale', R: 'Lato 2', R1: 'Z1 2ª l.', P: 'Pipe', D: '2° tocco' },
-    srDistNote: 'Stessa regola del segnale di Setter Radar: ricezioni # e + (e ! se il centrale si è mosso), solo alzate della palleggiatrice, storico pesato con la partita di oggi.',
-    reimp: n => `${n === 1 ? '1 partita caricata' : n + ' partite caricate'} prima della versione rot-v9: ricarica i .dvw per escludere dalla distribuzione le alzate non fatte dalla palleggiatrice (le partite si aggiornano, non si duplicano).`,
-    updated: 'partite aggiornate'
-  },
-  en: {
-    memT: 'Device storage', memUsed: 'Space used', memOf: 'of about', memEx: 'Exchange between the apps', memOther: 'Other', ver: 'version',
-    memNote: 'Rotation Matchup and Setter Radar live on the same site and share the same space (about 5.2 million characters in Chrome). When it is full, new data is not saved.',
-    memFail: 'Device storage full: the latest changes are NOT saved. Remove old matches in the Data tab.',
-    memHigh: p => `Storage almost full (${p}). Remove old matches in the Data tab.`,
-    srPts: 'Points from Setter Radar', srPtsNote: h => `Updated at ${h}. Points, fixes and undo are done in Setter Radar.`,
-    srUnlink: 'Unlink Setter Radar', srLink: 'Link Setter Radar again', srOffNote: 'Setter Radar is following this match but is unlinked: you count here.',
-    srRealFrom: 'Start from Setter Radar', srRealDiff: x => `Matchup had P${x}`,
-    srDistT: 'Distribution in the match', srDistNone: 'No data from Setter Radar for this team. During the match the distribution is followed in Setter Radar: open it with the opposing setter. The pre-match distribution stays in Study and in the Report.',
-    srDistSrc: (n, num, h, l) => `Setter Radar · ${n} #${num} · history ${h} · today ${l}`,
-    srLane: 'Serve to', srWeak: 'weak', srCover: 'covers',
-    srSig: { fist: 'Follow middle', '4': 'Shift to 4', '2': 'Shift to 2', read: 'Read' },
-    srKeys: { L: 'Side 4', L5: 'Z5 back', C: 'Middle', R: 'Side 2', R1: 'Z1 back', P: 'Pipe', D: '2nd ball' },
-    srDistNote: 'Same rule as the Setter Radar signal: passes # and + (and ! when the middle still ran), only sets by the setter, history weighted with today\'s match.',
-    reimp: n => `${n === 1 ? '1 match' : n + ' matches'} loaded before version rot-v9: load the .dvw files again to leave out of the distribution the sets not made by the setter (matches are updated, not duplicated).`,
-    updated: 'matches updated'
-  }
-};
-const Y = (k, ...a) => { const v = TS[LANG][k]; return typeof v === 'function' ? v(...a) : v; };
-
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
 // formazioni per tutte le rotazioni a partire dalla formazione sul foglietto (zone 1..6)
@@ -1342,7 +1192,7 @@ function replay(b) {
       const w = e === 'U' ? 0 : 1; rallies.push({ a, b: o, sv, w });
       if (w === 0) { su++; if (sv === 1) { a = RC.nextRot(a); sv = 0; } }
       else { so++; if (sv === 0) { o = RC.nextRot(o); sv = 1; } }
-    } else if (e && e.fix) { if (e.fix === 'my') a = e.to; else if (e.fix === 'sv') sv = 1 - sv; else if (e.fix === 'sc') { if (e.to) { su = e.to[0]; so = e.to[1]; } } else o = e.to; }
+    } else if (e && e.fix) { if (e.fix === 'my') a = e.to; else o = e.to; }
   }
   return { a, o, sv, su, so, rallies };
 }
@@ -1383,7 +1233,6 @@ const bigChip = (attr, val, cur, label, cls = '') => `<button class="bchip ${cls
 const bigP = (attr, cur, cls = '') => `<div class="pgrid">${[1, 2, 3, 4, 5, 6].map(i => bigChip(attr, i, cur, 'P' + i, cls)).join('')}</div>`;
 
 function renderBench() {
-  S.srPts = false; srSync();
   const b = S.bench;
   if (S.myKey === S.oppKey) return `<section class="panel"><p class="warn">${T('sameTeams')}</p></section>`;
   const pp = people();
@@ -1452,7 +1301,7 @@ function renderBench() {
   const realCard = `
       <div class="tcard real${sheetPhase || !real ? ' active' : ''}"><span class="tlbl">${T('realTitle')}</span>
         ${bigP('breal', real, 'hot')}
-        ${real ? `<div class="tbig"><b class="hot">P${real}</b><span class="n">${real === topOpp[0] ? '✓' : ''}</span></div>${S.srReal === real ? `<p class="n">↺ ${Y('srRealFrom')}${S.srDiff && S.srDiff !== real ? ' · ' + Y('srRealDiff', S.srDiff) : ''}</p>` : ''}${sheetGrid(pp.opp, real, 'them', 'opp')}` : `<p class="n">${sheetPhase ? T('notKnown') : T('realPrompt')}</p>`}</div>`;
+        ${real ? `<div class="tbig"><b class="hot">P${real}</b><span class="n">${real === topOpp[0] ? '✓' : ''}</span></div>${sheetGrid(pp.opp, real, 'them', 'opp')}` : `<p class="n">${sheetPhase ? T('notKnown') : T('realPrompt')}</p>`}</div>`;
   const teams = `<section class="duo">${recCard}${predCard}${pickCard}${realCard}</section>`;
 
   if (sheetPhase) {
@@ -1486,11 +1335,9 @@ function counterBlock() {
       <div class="side them${r.sv === 1 ? ' srv' : ''}"><span class="tn">${n2}</span><b class="num">${r.so}</b><span class="rot">P${r.o}${r.sv === 1 ? ` · ${T('serving')}` : ''}</span></div>
     </div>
     ${alarms().map(([k, t]) => `<p class="alarm ${k}">${t}</p>`).join('')}
-    ${S.srPts ? `<div class="srline"><span><b>${Y('srPts')}</b><br><span class="n">${Y('srPtsNote', hhmm(S.sr.ts))}</span></span><button class="bchip sm" data-bact="sroff">${Y('srUnlink')}</button></div>` : `
-    ${b.srOff && srSetData(srLinked(), b.set) ? `<div class="srline" style="margin-bottom:10px"><span class="n">${Y('srOffNote')}</span><button class="bchip sm" data-bact="sron">${Y('srLink')}</button></div>` : ''}
     <div class="ptbtns"><button class="ptbtn us" data-bact="pt" data-v="U">${T('pointUs')}</button><button class="ptbtn them" data-bact="pt" data-v="T">${T('pointThem')}</button></div>
-    <div class="brow wrap" style="margin-top:10px"><button class="bchip sm" data-bact="undo"${b.points.length ? '' : ' disabled'}>${T('undo')}</button><button class="bchip sm" data-bact="fixtoggle" aria-pressed="${String(!!S.fixOpen)}">${T('fix')}</button></div>`}
-    ${!S.srPts && S.fixOpen ? `<div class="brow wrap" style="margin-top:10px">
+    <div class="brow wrap" style="margin-top:10px"><button class="bchip sm" data-bact="undo"${b.points.length ? '' : ' disabled'}>${T('undo')}</button><button class="bchip sm" data-bact="fixtoggle" aria-pressed="${String(!!S.fixOpen)}">${T('fix')}</button></div>
+    ${S.fixOpen ? `<div class="brow wrap" style="margin-top:10px">
       <div class="bfield"><span class="lbl">${T('nowUs')}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bfixmy', i, r.a, 'P' + i, 'sm')).join('')}</div></div>
       <div class="bfield"><span class="lbl">${T('nowThem')}</span><div class="brow">${[1, 2, 3, 4, 5, 6].map(i => bigChip('bfixop', i, r.o, 'P' + i, 'sm')).join('')}</div></div></div>` : ''}
     ${over ? `<p class="warn" style="margin-top:10px">${T('endLooks', r.su > r.so ? T('us') : T('them'))}</p>` : ''}
@@ -1559,7 +1406,7 @@ function details(pick, oppRot, M) {
   if (S.bench.points.length && S.bench.phase === 'live') S.srot = cur;
   return `
   <details class="panel" id="benchPlan"${S.planOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('plan')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${servePlan(pick, oppRot, S.bench.weServe ? 0 : 1)}</details>
-  <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}><summary><h2 style="display:inline">${Y('srDistT')}</h2> <span class="n">P${cur}</span></summary>${srDistSection(cur)}</details>
+  <details class="panel" id="benchSet"${S.setOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('setDist')}</h2> <span class="n">P${S.srot}</span></summary>${setSection()}</details>
   <details class="panel" id="benchBlock"${S.blockOpen ? ' open' : ''}><summary><h2 style="display:inline">${X('blockTitle')}</h2> <span class="n">P${cur}</span></summary>${blockSection(cur, true)}</details>
   <details class="panel" id="benchHot"${S.hotOpen ? ' open' : ''}><summary><h2 style="display:inline">${X('hotTitle')}</h2></summary>${hotSection(true)}</details>
   <details class="panel" id="benchNets"${S.netsOpen ? ' open' : ''}><summary><h2 style="display:inline">${T('nets')}</h2> <span class="n">P${pick} – P${oppRot}</span></summary>${phaseNets(pick, oppRot, S.bench.weServe ? 0 : 1, M)}</details>`;
@@ -1567,7 +1414,7 @@ function details(pick, oppRot, M) {
 
 function benchClick(d, t) {
   const b = S.bench;
-  if (d.bset) { const n = +d.bset; if (n !== b.set) { b.set = n; b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; b.srOff = false; S.srPts = false; S.srDiff = null; S.slotEdit = null; if (n === 5) b.weServe = null; } return true; }
+  if (d.bset) { const n = +d.bset; if (n !== b.set) { b.set = n; b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; S.slotEdit = null; if (n === 5) b.weServe = null; } return true; }
   if (d.bserve != null) { b.weServe = d.bserve === '1'; return true; }
   if (d.bprev) { b.prevOppStart = +d.bprev; return true; }
   if (d.bpwon != null) { b.prevOppWon = d.bpwon === '1'; return true; }
@@ -1589,8 +1436,6 @@ function benchClick(d, t) {
   if (act === 'confirm') { b.myPick = +d.v; b.recommended = +d.rec; b.phase = 'live'; window.scrollTo({ top: 0 }); }
   else if (act === 'edit') { b.phase = 'sheet'; }
   else if (act === 'pt') { b.points.push(d.v); }
-  else if (act === 'sroff') { b.srOff = true; S.srPts = false; }
-  else if (act === 'sron') { b.srOff = false; }
   else if (act === 'undo') { b.points.pop(); }
   else if (act === 'fixtoggle') { S.fixOpen = !S.fixOpen; }
   else if (act === 'ovrreset') { if (d.v && b.ovr) { b.ovr = Object.assign({}, b.ovr, { [d.v]: null }); } else b.ovr = null; S.slotEdit = null; }
@@ -1604,11 +1449,11 @@ function benchClick(d, t) {
   }
   else if (act === 'next') {
     const last = b.log[b.log.length - 1];
-    b.set = Math.min(5, last.set + 1); b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; S.fixOpen = false; S.slotEdit = null; b.srOff = false; S.srPts = false; S.srDiff = null;
+    b.set = Math.min(5, last.set + 1); b.phase = 'sheet'; b.myPick = null; b.oppReal = null; b.points = []; b.endWin = null; S.fixOpen = false; S.slotEdit = null;
     b.weServe = b.set === 5 ? null : last.oppServe; // chi ha ricevuto per primo nel set prima, batte per primo
     window.scrollTo({ top: 0 });
   }
-  else if (act === 'newmatch') { S.bench = freshBench(); S.srPts = false; S.srDiff = null; invalidate(); }
+  else if (act === 'newmatch') { S.bench = freshBench(); invalidate(); }
   else return false;
   return true;
 }
@@ -1815,7 +1660,11 @@ function findings(rows) {
   if (!p.n) return `<p class="empty">No sets for this team in the loaded files.</p>`;
   const L = [];
   const t = p.top, tr = t === 6 ? 1 : t + 1;
-  L.push([p.topShare >= 0.6, `Usual alignment: goes to its first serve in <b>P${t}</b> in <b>${p.eq[t]} of ${p.n} sets</b>. In practice it starts in P${t} when serving and in P${tr} when receiving.`]);
+  const mode = o => { const k = [1, 2, 3, 4, 5, 6].sort((x, y) => o[y] - o[x])[0]; const n = [1, 2, 3, 4, 5, 6].reduce((s, i) => s + o[i], 0); return { k, c: o[k], n }; };
+  const ms = mode(p.serve), mr = mode(p.recv);
+  if (ms.n) L.push([ms.c / ms.n >= 0.6, `When serving first they usually start in <b>P${ms.k}</b> (${ms.c} of ${ms.n} sets).`]);
+  if (mr.n) L.push([mr.c / mr.n >= 0.6, `When receiving first they usually start in <b>P${mr.k}</b> (${mr.c} of ${mr.n} sets).`]);
+  L.push([false, ms.n && mr.n && RC.eqRot(mr.k, false) === ms.k ? `Same alignment whether serving or receiving (P${t} at first serve in ${p.eq[t]} of ${p.n} sets).` : `Different alignments when serving and when receiving: read the two situations separately.`]);
   const list = o => [1, 2, 3, 4, 5, 6].filter(i => o[i]).map(i => `P${i} ×${o[i]}`).join(', ') || '–';
   L.push([false, `When serving first: ${list(p.serve)}. When receiving first: ${list(p.recv)}.`]);
   if (p.nW + p.nL) {
@@ -1942,7 +1791,6 @@ function renderData() {
       <input id="fileIn" type="file" accept=".dvw" multiple hidden>
     </label>
     <p class="note" id="loadMsg" style="margin-top:8px"></p>
-    ${(n => n ? `<p class="warn" style="margin-top:8px">${Y('reimp', n)}</p>` : '')(S.matches.filter(m => m.v !== 2).length)}
   </section>
   <section class="panel">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -1950,23 +1798,23 @@ function renderData() {
       ${S.customData && SAMPLE.length ? '<button class="btn sec small" data-act="reset">Restore the original matches</button>' : ''}
     </div>
     <div class="matches">${list || '<p class="empty">No matches.</p>'}</div>
-  </section>${memPanel()}`;
+  </section>`;
 }
 
 async function addFiles(files) {
-  const msg = []; let added = 0, upd = 0;
+  const msg = []; let added = 0;
   for (const f of files) {
     try {
       const txt = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f, 'windows-1252'); });
       const m = RC.parseDVW(txt, f.name);
       if (!m.sets.length) { msg.push(`${f.name}: no sets with rallies found.`); continue; }
-      { const j = S.matches.findIndex(x => x.id === m.id); if (j >= 0) { S.matches[j] = m; upd++; continue; } }
+      if (S.matches.some(x => x.id === m.id)) { msg.push(`${f.name}: already loaded.`); continue; }
       S.matches = S.matches.concat([m]); added++;
     } catch (e) { msg.push(`${f.name}: could not read the file (${e.message}).`); }
   }
-  if (added || upd) { S.customData = true; invalidate(); ensureTeams(); }
+  if (added) { S.customData = true; invalidate(); ensureTeams(); }
   render();
-  const el = $('#loadMsg'); if (el) el.textContent = `${added} matches added.` + (upd ? ' ' + upd + ' ' + Y('updated') + '.' : '') + (msg.length ? ' ' + msg.join(' ') : '');
+  const el = $('#loadMsg'); if (el) el.textContent = `${added} matches added.` + (msg.length ? ' ' + msg.join(' ') : '');
 }
 
 // ---------- eventi ----------
@@ -2012,7 +1860,6 @@ document.addEventListener('change', e => {
 
 ensureTeams();
 render();
-MEM.check();
 
 </script>
 
