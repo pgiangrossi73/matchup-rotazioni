@@ -1,9 +1,10 @@
 // Funzionamento offline: guscio dell'app in cache, font Google in cache al primo uso
-const VERSION = 'rot-v10';
+const VERSION = 'rot-v11';
 const SHELL = ['./', './index.html', './en.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
+// cancella solo le cache di Matchup: la cache di Setter Radar (sradar-*) sta sullo stesso sito
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('rot-') && k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
