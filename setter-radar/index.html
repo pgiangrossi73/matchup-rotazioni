@@ -229,6 +229,24 @@ svg.c1 { flex: 1 1 auto; min-height: 0; width: 100%; max-height: 100%; touch-act
 .board .bh span { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .board .bh em { font-style: normal; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap }
 .board svg.bc { width: 100%; height: 200px; display: block; touch-action: none; user-select: none; -webkit-user-select: none }
+.board.plan { font: inherit; color: inherit; text-align: left; cursor: pointer; align-content: start; grid-template-rows: none; grid-auto-rows: min-content; overflow: hidden; gap: 6px; border: 2px solid var(--ink) }
+.board.plan.mini { align-content: center; justify-items: center; text-align: center; gap: 4px } .board.plan.mini .plh { flex-direction: column; align-items: center; gap: 2px } .board.plan.mini .plh b { font-size: 16px; white-space: nowrap }
+.board.plan .plh { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; min-width: 0 }
+.board.plan .plh b, .planpop .plh b { font-family: var(--f-display); font-size: 17px; white-space: nowrap; text-transform: uppercase; line-height: 1 }
+.plh span { font-size: 12px; color: var(--muted); white-space: nowrap }
+.plmain { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; min-width: 0 }
+.pltgt { font-size: 19px; line-height: 1.15 } .pltgt b { font-family: var(--f-display) }
+.plsig { font-family: var(--f-display); font-size: 17px; text-transform: uppercase; line-height: 1.1 }
+.plsub { font-size: 11.5px; color: var(--muted); line-height: 1.25 }
+.ploth { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; align-items: center }
+.ploth > span { display: inline-flex; align-items: center; gap: 5px; border-left: 4px solid; padding-left: 5px }
+.ploth .lane-a { border-color: var(--lane-a) } .ploth .lane-b { border-color: var(--lane-b) } .ploth .lane-c { border-color: var(--lane-c) }
+.glyph.mini { width: 26px; height: 26px; font-size: 17px; border-radius: 7px } .glyph.mini.warn { border-width: 2px }
+.board.plan.mini .plmain { grid-template-columns: auto; justify-items: center } .board.plan.mini .pltgt { font-family: var(--f-display); font-size: 28px; font-weight: 700 }
+.planpop { max-width: 560px; width: 100% } .planpop .plh { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px }
+.pltab { width: 100%; border-collapse: collapse; font-size: 13px } .pltab td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums } .pltab td:first-child { text-align: left }
+.pltab tr.pth td { font-size: 11px; color: var(--muted); text-transform: uppercase } .pltab tr.top td { font-weight: 700 }
+.planbtn { padding: 2px 10px; min-height: 30px; font-size: 13px; font-weight: 700 }
 .board .alert { font-size: 11px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 6px; padding: 2px 6px; line-height: 1.25 }
 .glyph.warn { background: transparent !important; color: var(--muted); border: 3px dashed var(--line) }
 .sigc h5.warnh { color: var(--muted); font-size: 15px }
@@ -635,7 +653,7 @@ const SR = (() => {
 </script>
 <script>
 const SEED = {"K":[],"matches":[],"recs":[],"rosters":{}};
-const APP_VER = 'v55';
+const APP_VER = 'v56';
 </script>
 <script>
 // ===================== i18n =====================
@@ -646,6 +664,7 @@ const T = {
     us: 'Noi', them: 'Loro', set: 'Set', srvUs: 'Battiamo noi', srvThem: 'Battono loro',
     sub: 'Cambio', undo: 'Annulla', endSet: 'Fine set / Scarta',
     sig4: 'Anticipo 4', sig2: 'Anticipo 2', sigfist: 'Segui centrale', sigread: 'Leggere',
+    wdT: 'Cosa facciamo?', wdServe: 'Battiamo noi', wdSO: 'Se facciamo cambio palla', wdHit: 'Batti su', wdLane: 'Batti in', wdWeak: 'ric. debole', wdRcv: 'ricezioni', wdFew: 'pochi dati', wdNone: 'Nessuna ricezione di questa squadra in questa rotazione: leggere.', wdTap: 'tocca per i dettagli', wdPred: 'prevedibilità', wdScore: 'punteggio', wdPl: 'Giocatrici in ricezione', wdLn: 'Corsie', wdWhy: 'Punteggio = 60% ricezione debole (− / = su tutte le ricezioni; ! neutro) + 40% prevedibilità (copertura del segnale della corsia; metà se è solo un avviso debole; 0 se leggere). Le ricezioni di oggi pesano più dello storico, come per i segnali. Giocatrici con almeno 3 ricezioni in questa rotazione e {n} in totale; un solo libero (quello entrato con Cambio libero, altrimenti il più usato).',
     laneA: 'corsia 1-9-2', laneB: 'corsia 6-8-3', laneC: 'corsia 5-7-4', laneShort: 'Battuta in',
     hist: 'storico', live: 'live', cases: 'casi',
     sL: 'Lato 4', sL5: 'Zona 5 (2ª linea)', sC: 'Centrale', sR: 'Lato 2', sR1: 'Zona 1 (2ª linea)', sP: 'Pipe', sD: '2° tocco',
@@ -689,6 +708,7 @@ const T = {
     us: 'Us', them: 'Them', set: 'Set', srvUs: 'We serve', srvThem: 'They serve',
     sub: 'Substitution', undo: 'Undo', endSet: 'End set / Discard',
     sig4: 'Shift to 4', sig2: 'Shift to 2', sigfist: 'Follow middle', sigread: 'Read',
+    wdT: 'What do we do?', wdServe: 'We serve', wdSO: 'If we side out', wdHit: 'Serve at', wdLane: 'Serve to', wdWeak: 'weak pass', wdRcv: 'passes', wdFew: 'few data', wdNone: 'No passes by this team in this rotation: read.', wdTap: 'tap for details', wdPred: 'predictability', wdScore: 'score', wdPl: 'Passers', wdLn: 'Lanes', wdWhy: 'Score = 60% weak passing (− / = over all passes; ! neutral) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 for read). Today\'s passes count more than history, as for the signals. Passers with at least 3 passes in this rotation and {n} overall; one libero (the one entered with Libero swap, otherwise the most used).',
     laneA: 'lane 1-9-2', laneB: 'lane 6-8-3', laneC: 'lane 5-7-4', laneShort: 'Serve to',
     hist: 'history', live: 'live', cases: 'cases',
     sL: 'Side 4', sL5: 'Zone 5 (back row)', sC: 'Middle', sR: 'Side 2', sR1: 'Zone 1 (back row)', sP: 'Pipe', sD: '2nd ball',
@@ -1030,6 +1050,44 @@ function laneSignal(setter, liveId, rot, lane, qf) {
   const cb = coverBlend(setter, liveId, hf, lf, qf), b = blend(setter, liveId, hf, lf);
   return { ...b, cov: cb.cov, ...decide(cb) };
 }
+// ===== "Cosa facciamo?" (v56): where we serve and what the block does =====
+// score = 60% weak reception (− / = over all passes) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 = read)
+// reception chain: team → lane/player → in this rotation; live on top with weight histK − live cases (min 2), as for the signals
+const ISRQ = q => RQ.includes(q), WEAKQ = q => q === '-' || q === '/' || q === '='; // ! is neutral: many scoutmen use it for a playable pass
+const PLAN_W = .6;
+function weakBlend(team, liveId, histFilters, liveFilter) {
+  const mine = DB.recs.filter(r => r.team === team && ISRQ(r.q));
+  const hist = mine.filter(r => r.m !== liveId), live = mine.filter(r => r.m === liveId);
+  let p = .4, nh = 0;
+  histFilters.forEach((f, i) => { const a = hist.filter(f), w = a.filter(r => WEAKQ(r.q)).length, K = i === 0 ? 2 : 6; p = (w + K * p) / (a.length + K); nh = a.length; });
+  const l = live.filter(liveFilter), lw = l.filter(r => WEAKQ(r.q)).length, K = Math.max(2, S().histK - l.length);
+  return { p: (lw + K * p) / (l.length + K), nh, nl: l.length };
+}
+const predOf = s => s.sig !== 'read' ? s.cov[s.sig] : s.warn ? s.cov[s.warn] / 2 : 0;
+function planFor(rot) {
+  const lv = L(), team = lv.team;
+  const lanes = LANES.map(l => {
+    const s = laneSignal(lv.setter, lv.id, rot, l), lf = r => r.rot === rot && laneOf(r.rz) === l;
+    const wk = weakBlend(team, lv.id, [() => true, r => r.rot === rot, lf], lf), pred = predOf(s);
+    return { l, s, wk, pred, sc: PLAN_W * wk.p + (1 - PLAN_W) * pred, n: wk.nh + wk.nl };
+  });
+  const byL = Object.fromEntries(lanes.map(x => [x.l, x]));
+  // one libero on court: after a 'Cambio libero' it is the one entered, otherwise the one with most passes for this team
+  let libs = lv.liberos || [];
+  if (libs.length > 1) { const c = {}; DB.recs.forEach(r => { if (r.team === team && libs.includes(r.rcv) && ISRQ(r.q)) c[r.rcv] = (c[r.rcv] || 0) + 1; }); libs = [libs.slice().sort((a, b) => (c[b] || 0) - (c[a] || 0))[0]]; }
+  const on = [...new Set([...lv.lineup.filter(n => n != null && n !== lv.sNum), ...libs])];
+  const players = on.map(n => {
+    const inRot = DB.recs.filter(r => r.team === team && r.rot === rot && r.rcv === n && ISRQ(r.q) && laneOf(r.rz));
+    if (inRot.length < 3) return null;
+    const sh = { a: 0, b: 0, c: 0 }; let tw = 0;
+    inRot.forEach(r => { const w = r.m === lv.id ? 3 : 1; sh[laneOf(r.rz)] += w; tw += w; });
+    const wk = weakBlend(team, lv.id, [() => true, r => r.rcv === n, r => r.rcv === n && r.rot === rot], r => r.rcv === n);
+    const pred = LANES.reduce((a, l) => a + sh[l] / tw * byL[l].pred, 0), main = LANES.reduce((a, l) => sh[l] > sh[a] ? l : a, 'a');
+    return { n, wk, pred, main, nRot: inRot.length, sc: PLAN_W * wk.p + (1 - PLAN_W) * pred };
+  }).filter(p => p && p.wk.nh + p.wk.nl >= S().minN).sort((a, b) => b.sc - a.sc);
+  const lanesBy = lanes.slice().sort((a, b) => b.sc - a.sc);
+  return { lanes, lanesBy, players, none: lanes.every(x => !x.n), few: lanes.every(x => x.n < S().minN) };
+}
 const QFILT = { all: q => q === '#' || q === '+' || q === '!', good: q => q === '#' || q === '+', hash: q => q === '#', plus: q => q === '+', excl: q => q === '!', neg: q => q === '-' };
 const covTxt = c => `✊ ${pct(c.fist)} · 4 ${pct(c['4'])} · 2 ${pct(c['2'])}`;
 const ZL = { a: 'Z1-9-2', b: 'Z6-8-3', c: 'Z5-7-4' };
@@ -1251,7 +1309,7 @@ function renderLive() {
     const w = (lv.won || [0, 0]).slice(); w[lv.score[0] > lv.score[1] ? 0 : 1]++;
     UI.photo = { mode: (w[0] >= 3 || w[1] >= 3) ? 'match' : 'set' };
   }
-  el.innerHTML = `${UI.photo ? photoHTML(UI.photo.mode) : ''}${UI.scEdit ? scEditHTML() : ''}${UI.formEd ? formEdHTML() : ''}<div class="live">
+  el.innerHTML = `${UI.photo ? photoHTML(UI.photo.mode) : ''}${UI.plan ? planOvHTML() : ''}${UI.scEdit ? scEditHTML() : ''}${UI.formEd ? formEdHTML() : ''}<div class="live">
     <div class="left">
       <div class="score">
         <div><div class="who">${t('us')}${lv.serving === 'us' ? '<span class="serve"></span>' : ''}</div><button class="n ed" data-act="scEdit" title="${t('scEdit')}">${lv.score[0]}</button></div>
@@ -1273,13 +1331,13 @@ function renderLive() {
         </div>
       </div>
       ${sigRowHTML()}
-      ${UI.rally && (UI.step === 'court' || UI.step === 'pop' || (UI.step === 'who' && UI.rally.popMode)) ? `<div class="boards c1mode">${court1HTML()}</div>` : `<div class="boards">${boardsFor(rot).map(c => boardHTML(c)).join('')}</div>`}
+      ${UI.rally && (UI.step === 'court' || UI.step === 'pop' || (UI.step === 'who' && UI.rally.popMode)) ? `<div class="boards c1mode">${court1HTML()}</div>` : `<div class="boards">${boardsFor(rot).map(c => boardHTML(c)).join('')}<button class="board plan" id="planCell" data-act="planOpen" hidden></button></div>`}
       <div class="legend">${VIEW.map(k => `<span><i class="k-${k}"></i>${t('s' + k)}</span>`).join('')}
         <span>· ${OUTS.map(([o, k]) => `<span style="display:inline-flex;align-items:center;gap:2px"><svg viewBox="0 0 20 20" width="13" height="13">${marker(o, 10, 10, 6.5, 'var(--muted)', 1.5)}</svg>A${o === '-' ? '−' : o}</span>`).join(' ')}</span>
-        <span style="margin-left:auto">${lv.n || 0} ${t('actions')} · ${esc(lv.sName)} #${lv.sNum}</span></div>
+        <button class="btn planbtn" id="planBtn" data-act="planOpen" hidden>${t('wdT')}</button><span style="margin-left:auto">${lv.n || 0} ${t('actions')} · ${esc(lv.sName)} #${lv.sNum}</span></div>
     </div>
   </div>`;
-  bindBoards(); bindCourt1(); placePop(); bindPen(); bindFormEd();
+  bindBoards(); bindCourt1(); placePop(); bindPen(); bindFormEd(); planFit();
 }
 function scEditHTML() {
   const lv = L(), row = (i, nm) => `<div class="scrow"><b style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</b><button class="btn" data-sc="${i}:-1" ${lv.score[i] ? '' : 'disabled'}>−</button><span class="n">${lv.score[i]}</span><button class="btn" data-sc="${i}:1">+</button></div>`;
@@ -1536,6 +1594,34 @@ function sigRowHTML() {
   const ex = S().sigExcl !== false;
   return `<div class="sigrow">${cards}</div>`;
 }
+function planHTML(mode) { // mode: 'cell' (2+ free cells), 'mini' (1 cell), 'big' (popup)
+  const lv = L(), rot = lv.rot, P = planFor(rot);
+  const head = `<div class="plh"><b>${t('wdT')}</b><span>${lv.serving === 'us' ? t('wdServe') : t('wdSO')} · P${rot}</span></div>`;
+  if (P.none) return `${head}<div class="plsub">${t('wdNone')}</div>`;
+  const p = P.players[0], ln = p ? P.lanes.find(x => x.l === p.main) : P.lanesBy[0], s = ln.s, warn = s.sig === 'read' && s.warn, g = warn || s.sig;
+  const glyph = `<div class="glyph ${warn ? 'warn sig-' + warn : 'sig-' + s.sig}">${SIGTXT(g)}</div>`;
+  const sigTxt = warn ? `${SIGNAME('read')} · ${t('weak').toLowerCase()}: ${SIGNAME(warn).toLowerCase()}` : SIGNAME(s.sig);
+  const tgt = p ? `${t('wdHit')} <b>#${p.n}</b> <b>${esc(pName(p.n))}</b>` : `${t('wdLane')} <b>${ZL[ln.l]}</b>`;
+  const wk = p ? p.wk : ln.wk, sub = `${p ? ZL[p.main] + ' · ' : ''}${t('wdWeak')} ${pct(wk.p)} · ${wk.nh}+${wk.nl}${mode === 'big' ? ' ' + t('wdRcv') : ''}${P.few && !p ? ' · ' + t('wdFew') : ''}`;
+  if (mode === 'mini') return `${head}<div class="plmain">${glyph}<div class="pltgt">${p ? '#' + p.n : ZL[ln.l]}</div></div><div class="plsub">${t('wdTap')}</div>`;
+  const others = P.lanes.filter(x => x.l !== ln.l).map(x => { const w = x.s.sig === 'read' && x.s.warn; return `<span class="lane-${x.l}">${ZL[x.l]} <span class="glyph mini ${w ? 'warn sig-' + w : 'sig-' + x.s.sig}">${SIGTXT(w || x.s.sig)}</span></span>`; }).join('');
+  let out = `${head}<div class="plmain">${glyph}<div style="min-width:0"><div class="pltgt">${tgt}</div><div class="plsig">${sigTxt}</div><div class="plsub">${sub}</div></div></div><div class="ploth">${others}</div>`;
+  if (mode !== 'big') return out;
+  const row = (a, b, c, d, e, cls) => `<tr class="${cls || ''}"><td>${a}</td><td>${b}</td><td>${c}</td><td>${d}</td><td>${e}</td></tr>`;
+  const th = row('', t('wdWeak'), t('wdPred'), t('wdScore'), t('cases'), 'pth');
+  out += `<div class="lbl" style="margin:10px 0 4px">${t('wdPl')}</div><table class="pltab">${th}${P.players.map((x, i) => row(`<b>#${x.n}</b> ${esc(pName(x.n))} <small>${ZL[x.main]}</small>`, pct(x.wk.p), pct(x.pred), Math.round(x.sc * 100), `${x.wk.nh}+${x.wk.nl}`, i ? '' : 'top')).join('') || row('—', '', '', '', '')}</table>`;
+  out += `<div class="lbl" style="margin:10px 0 4px">${t('wdLn')}</div><table class="pltab">${th}${P.lanesBy.map((x, i) => row(`<b>${ZL[x.l]}</b> → ${SIGNAME(x.s.sig)}`, pct(x.wk.p), pct(x.pred), Math.round(x.sc * 100), `${x.wk.nh}+${x.wk.nl}`, i ? '' : 'top')).join('')}</table>`;
+  return out + `<p class="muted" style="font-size:12px;margin:8px 0 0">${t('wdWhy').replace('{n}', S().minN)}</p>`;
+}
+// the summary sits in the free cells after the call boards; with no room (tablet: 1 or 0 cells) it becomes a button + popup
+function planFit() {
+  const g = document.querySelector('.boards:not(.c1mode)'), c = $('#planCell'), b = $('#planBtn'); if (!g || !c) { if (b) b.hidden = true; return; }
+  const cols = getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length || 1, n = g.querySelectorAll('.board:not(.plan)').length, free = (cols - n % cols) % cols;
+  const mode = free >= 2 ? 'cell' : free === 1 ? 'mini' : 'none';
+  c.hidden = mode === 'none'; if (b) b.hidden = mode !== 'none';
+  if (mode !== 'none' && c.dataset.mode !== mode) { c.dataset.mode = mode; c.className = 'board plan ' + mode; c.style.gridColumn = 'span ' + Math.max(1, free); c.innerHTML = planHTML(mode); }
+}
+function planOvHTML() { return `<div class="photo-ov"><div class="card photo planpop">${planHTML('big')}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn big pri" data-act="planClose">${t('closeW')}</button></div></div></div>`; }
 function rotBoxHTML() {
   const ex = S().sigExcl !== false;
   return `<div class="rotbox"><small>${t('rotW')}</small><b>P${L().rot}</b><button class="exbtn ${ex ? 'on' : ''}" data-act="togExcl" title="${t('sigRule')}">${ex ? t('withExcl') : t('noExcl')}</button><button class="exbtn rotb" data-act="rotCourt" title="${t('rotCourt')}" aria-label="${t('rotCourt')}">⟲ ${t('rotShort')}</button><button class="exbtn rotb" data-act="penToggle" title="${t('penMode')}">${PEN() ? '▦' : '✎'}</button></div>`;
@@ -2278,6 +2364,8 @@ document.addEventListener('click', e => {
     closeMAsk2() { if (UI.delConfirm !== '__close') { UI.delConfirm = '__close'; render(); return; } UI.delConfirm = null; closeMatch(); },
     closeMYes() { const w = lv.won = lv.won || [0, 0]; if (lv.started && lv.score[0] + lv.score[1] > 0 && lv.score[0] !== lv.score[1]) { w[lv.score[0] > lv.score[1] ? 0 : 1]++; (lv.setsLog = lv.setsLog || []).push(setLogEntry(lv)); } closeMatch(); },
     timeout() { UI.photo = { mode: 'timeout' }; render(); },
+    planOpen() { UI.plan = true; render(); },
+    planClose() { UI.plan = false; render(); },
     sqDlSel() { const v = ($('#sqSel') || {}).value; if (v) downloadSQ(v); },
     dtNew() { UI.dataTeam = '__new'; render(); },
     dtClose() { UI.dataTeam = null; render(); },
@@ -2368,7 +2456,7 @@ document.addEventListener('change', e => {
 });
 // live screen must fit the tablet without scrolling: size it to the real visible height
 function fit() { const h = $('header.top'), m = $('#memErr'); document.documentElement.style.setProperty('--avail', Math.max(480, window.innerHeight - (h ? h.offsetHeight : 48) - (m && !m.hidden ? m.offsetHeight : 0) - 14) + 'px'); }
-window.addEventListener('resize', fit); window.addEventListener('orientationchange', () => setTimeout(fit, 200)); document.addEventListener('fullscreenchange', fit);
+window.addEventListener('resize', () => { fit(); planFit(); }); window.addEventListener('orientationchange', () => setTimeout(fit, 200)); document.addEventListener('fullscreenchange', fit);
 let wl = null;
 function wake() { try { if (navigator.wakeLock && !wl) navigator.wakeLock.request('screen').then(w => { wl = w; w.addEventListener('release', () => wl = null); }).catch(() => {}); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return; if (L() && L().started) wake(); else if (L() && UI.tab === 'live' && !UI.step) render(); });
