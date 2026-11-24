@@ -664,7 +664,7 @@ const T = {
     us: 'Noi', them: 'Loro', set: 'Set', srvUs: 'Battiamo noi', srvThem: 'Battono loro',
     sub: 'Cambio', undo: 'Annulla', endSet: 'Fine set / Scarta',
     sig4: 'Anticipo 4', sig2: 'Anticipo 2', sigfist: 'Segui centrale', sigread: 'Leggere',
-    wdT: 'Cosa facciamo?', wdServe: 'Battiamo noi', wdSO: 'Se facciamo cambio palla', wdHit: 'Batti su', wdLane: 'Batti in', wdWeak: 'ric. debole', wdRcv: 'ricezioni', wdFew: 'pochi dati', wdNone: 'Nessuna ricezione di questa squadra in questa rotazione: leggere.', wdTap: 'tocca per i dettagli', wdPred: 'prevedibilità', wdScore: 'punteggio', wdPl: 'Giocatrici in ricezione', wdLn: 'Corsie', wdWhy: 'Punteggio = 60% ricezione debole (! − / = su tutte le ricezioni) + 40% prevedibilità (copertura del segnale della corsia; metà se è solo un avviso debole; 0 se leggere). Le ricezioni di oggi pesano più dello storico, come per i segnali. Giocatrici con almeno 3 ricezioni in questa rotazione e {n} in totale.',
+    wdT: 'Cosa facciamo?', wdServe: 'Battiamo noi', wdSO: 'Se facciamo cambio palla', wdHit: 'Batti su', wdLane: 'Batti in', wdWeak: 'ric. debole', wdRcv: 'ricezioni', wdFew: 'pochi dati', wdNone: 'Nessuna ricezione di questa squadra in questa rotazione: leggere.', wdTap: 'tocca per i dettagli', wdPred: 'prevedibilità', wdScore: 'punteggio', wdPl: 'Giocatrici in ricezione', wdLn: 'Corsie', wdWhy: 'Punteggio = 60% ricezione debole (− / = su tutte le ricezioni; ! neutro) + 40% prevedibilità (copertura del segnale della corsia; metà se è solo un avviso debole; 0 se leggere). Le ricezioni di oggi pesano più dello storico, come per i segnali. Giocatrici con almeno 3 ricezioni in questa rotazione e {n} in totale; un solo libero (quello entrato con Cambio libero, altrimenti il più usato).',
     laneA: 'corsia 1-9-2', laneB: 'corsia 6-8-3', laneC: 'corsia 5-7-4', laneShort: 'Battuta in',
     hist: 'storico', live: 'live', cases: 'casi',
     sL: 'Lato 4', sL5: 'Zona 5 (2ª linea)', sC: 'Centrale', sR: 'Lato 2', sR1: 'Zona 1 (2ª linea)', sP: 'Pipe', sD: '2° tocco',
@@ -708,7 +708,7 @@ const T = {
     us: 'Us', them: 'Them', set: 'Set', srvUs: 'We serve', srvThem: 'They serve',
     sub: 'Substitution', undo: 'Undo', endSet: 'End set / Discard',
     sig4: 'Shift to 4', sig2: 'Shift to 2', sigfist: 'Follow middle', sigread: 'Read',
-    wdT: 'What do we do?', wdServe: 'We serve', wdSO: 'If we side out', wdHit: 'Serve at', wdLane: 'Serve to', wdWeak: 'weak pass', wdRcv: 'passes', wdFew: 'few data', wdNone: 'No passes by this team in this rotation: read.', wdTap: 'tap for details', wdPred: 'predictability', wdScore: 'score', wdPl: 'Passers', wdLn: 'Lanes', wdWhy: 'Score = 60% weak passing (! − / = over all passes) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 for read). Today\'s passes count more than history, as for the signals. Passers with at least 3 passes in this rotation and {n} overall.',
+    wdT: 'What do we do?', wdServe: 'We serve', wdSO: 'If we side out', wdHit: 'Serve at', wdLane: 'Serve to', wdWeak: 'weak pass', wdRcv: 'passes', wdFew: 'few data', wdNone: 'No passes by this team in this rotation: read.', wdTap: 'tap for details', wdPred: 'predictability', wdScore: 'score', wdPl: 'Passers', wdLn: 'Lanes', wdWhy: 'Score = 60% weak passing (− / = over all passes; ! neutral) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 for read). Today\'s passes count more than history, as for the signals. Passers with at least 3 passes in this rotation and {n} overall; one libero (the one entered with Libero swap, otherwise the most used).',
     laneA: 'lane 1-9-2', laneB: 'lane 6-8-3', laneC: 'lane 5-7-4', laneShort: 'Serve to',
     hist: 'history', live: 'live', cases: 'cases',
     sL: 'Side 4', sL5: 'Zone 5 (back row)', sC: 'Middle', sR: 'Side 2', sR1: 'Zone 1 (back row)', sP: 'Pipe', sD: '2nd ball',
@@ -1051,9 +1051,9 @@ function laneSignal(setter, liveId, rot, lane, qf) {
   return { ...b, cov: cb.cov, ...decide(cb) };
 }
 // ===== "Cosa facciamo?" (v56): where we serve and what the block does =====
-// score = 60% weak reception (! − / = over all passes) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 = read)
+// score = 60% weak reception (− / = over all passes) + 40% predictability (coverage of the lane signal; half for a weak warning; 0 = read)
 // reception chain: team → lane/player → in this rotation; live on top with weight histK − live cases (min 2), as for the signals
-const ISRQ = q => RQ.includes(q), WEAKQ = q => q === '!' || q === '-' || q === '/' || q === '=';
+const ISRQ = q => RQ.includes(q), WEAKQ = q => q === '-' || q === '/' || q === '='; // ! is neutral: many scoutmen use it for a playable pass
 const PLAN_W = .6;
 function weakBlend(team, liveId, histFilters, liveFilter) {
   const mine = DB.recs.filter(r => r.team === team && ISRQ(r.q));
@@ -1072,7 +1072,10 @@ function planFor(rot) {
     return { l, s, wk, pred, sc: PLAN_W * wk.p + (1 - PLAN_W) * pred, n: wk.nh + wk.nl };
   });
   const byL = Object.fromEntries(lanes.map(x => [x.l, x]));
-  const on = [...new Set([...lv.lineup.filter(n => n != null && n !== lv.sNum), ...(lv.liberos || [])])];
+  // one libero on court: after a 'Cambio libero' it is the one entered, otherwise the one with most passes for this team
+  let libs = lv.liberos || [];
+  if (libs.length > 1) { const c = {}; DB.recs.forEach(r => { if (r.team === team && libs.includes(r.rcv) && ISRQ(r.q)) c[r.rcv] = (c[r.rcv] || 0) + 1; }); libs = [libs.slice().sort((a, b) => (c[b] || 0) - (c[a] || 0))[0]]; }
+  const on = [...new Set([...lv.lineup.filter(n => n != null && n !== lv.sNum), ...libs])];
   const players = on.map(n => {
     const inRot = DB.recs.filter(r => r.team === team && r.rot === rot && r.rcv === n && ISRQ(r.q) && laneOf(r.rz));
     if (inRot.length < 3) return null;
